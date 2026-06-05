@@ -1,0 +1,14 @@
+export { default as avatar } from "./avatar.svg";
+export { default as propertyA } from "./propertyA.png";
+export { default as propertyB } from "./propertyB.png";
+export { default as propertyC } from "./propertyC.png";
+export { default as emptyWallet } from "./emptyWallet.svg";
+export { default as emptyAssets } from "./emptyAssets.svg";
+export { default as emptyStock } from "./emptyStock.svg";
+export { default as emptyReferral } from "./emptyReferral.svg";
+export { default as emptyBank } from "./emptyBank.svg";
+export { default as emptyUser } from "./emptyUser.svg";
+export { default as worldMap } from "./worldMap.svg";
+export { default as map } from "./map.svg";
+export { default as cardReaderGold } from "./cardReaderGold.svg";
+export { default as cardReaderSilver } from "./cardReaderSilver.svg";
