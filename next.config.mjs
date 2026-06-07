@@ -1,16 +1,44 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   async rewrites() {
+    const backendUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "");
+
+    if (!backendUrl) {
+      console.warn("NEXT_PUBLIC_API_BASE_URL is not set — API rewrites disabled.");
+      return [];
+    }
+
     return [
       {
-        source: "/api/:path*", // incoming request
-        destination: "https://faadevops.cloud/ekobuja/api/:path*", // testing
+        // Browser calls /api/auth/register/initiate
+        // Proxied to https://ekobuja-be.onrender.com/auth/register/initiate
+        source: "/api/:path*",
+        destination: `${backendUrl}/:path*`,
       },
     ];
   },
+
   images: {
-    qualities: [100, 75],
-    // formats: ["image/avif", "image/webp"],
+    remotePatterns: [
+      {
+        protocol: "http",
+        hostname: "res.cloudinary.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "c8ee67ec3fc21d54244624b8dcb6ec4f.r2.cloudflarestorage.com",
+        port: "",
+        pathname: "/**",
+      },
+    ],
   },
 };
 

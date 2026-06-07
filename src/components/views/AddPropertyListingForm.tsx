@@ -1,0 +1,632 @@
+"use client";
+
+import React, { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { useMutation } from "@tanstack/react-query";
+import StepProgress from "@/components/ui/StepProgress";
+import PropertyValuationCalculator from "@/components/views/PropertyValuationCalculator";
+import { createProperty, getPropertyErrorMessage, updateProperty } from "@/lib/property/api";
+import { mapPropertyToDetailsState, mapPropertyToValuationState } from "@/lib/property/form";
+import { uploadPropertyMedia } from "@/lib/property/media";
+import {
+  createInitialPropertyDetailsState,
+  PROPERTY_LISTING_TYPE_OPTIONS,
+  type PropertyDetailsState,
+  type PropertyListingType,
+  type PropertyRecord,
+} from "@/lib/property/types";
+import {
+  buildCreatePropertyPayload,
+  createInitialValuationState,
+  formatNaira,
+  formatPercent,
+  type ValuationFormState,
+  type ValuationResult,
+} from "@/lib/property/valuation";
+
+const STEPS = [
+  { id: 1, label: "Basics" },
+  { id: 2, label: "Location & Media" },
+  { id: 3, label: "Valuation" },
+  { id: 4, label: "Review" },
+] as const;
+
+const inputClassName =
+  "w-full p-4 rounded-lg border border-opacityClr-50 text-opacityClr-100 outline-none focus:border-opacityClr-100 placeholder:text-opacityClr-30 placeholder:font-normal placeholder:font-Raleway transition-all duration-300 ease-in-out";
+
+const selectClassName =
+  "w-full p-4 rounded-lg border border-opacityClr-50 text-opacityClr-100 outline-none focus:border-opacityClr-100 font-Raleway transition-all duration-300 ease-in-out bg-white";
+
+const labelClassName = "text-base font-Raleway font-semibold leading-[150%] text-opacityClr-100";
+
+const sectionTitleClassName =
+  "text-primary-10 text-lg font-bold font-Raleway leading-normal border-b border-opacityClr-20 pb-3";
+
+type FieldProps = {
+  label: string;
+  required?: boolean;
+  children: React.ReactNode;
+};
+
+function Field({ label, required, children }: FieldProps) {
+  return (
+    <div className="flex flex-col gap-2 items-start w-full">
+      <label className={labelClassName}>
+        {label}
+        {required ? " *" : ""}
+      </label>
+      {children}
+    </div>
+  );
+}
+
+function getPropertyTypeLabel(value: PropertyListingType | "") {
+  return PROPERTY_LISTING_TYPE_OPTIONS.find((option) => option.value === value)?.label ?? value;
+}
+
+type PropertyListingFormProps = {
+  mode?: "create" | "edit";
+  property?: PropertyRecord;
+};
+
+export default function AddPropertyListingForm({ mode = "create", property }: PropertyListingFormProps) {
+  const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const isEditMode = mode === "edit";
+  const propertyId = property?.propertyId || property?.id || "";
+  const sharesSold = property?.sharesSold ?? property?.numberOfSharesSold ?? 0;
+
+  const [step, setStep] = useState(1);
+  const [details, setDetails] = useState<PropertyDetailsState>(createInitialPropertyDetailsState);
+  const [valuationState, setValuationState] = useState<ValuationFormState>(createInitialValuationState);
+  const [valuationResult, setValuationResult] = useState<ValuationResult | null>(null);
+  const [hasCalculated, setHasCalculated] = useState(false);
+  const [thumbnailIdx, setThumbnailIdx] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const [previousPropertyType, setPreviousPropertyType] = useState<PropertyDetailsState["propertyType"]>("");
+  const [isInitialized, setIsInitialized] = useState(!isEditMode);
+
+  const isResidential = details.propertyType === "residential";
+
+  useEffect(() => {
+    if (!isEditMode || !property) return;
+
+    const mappedDetails = mapPropertyToDetailsState(property);
+    const mappedValuation = mapPropertyToValuationState(property);
+
+    setDetails(mappedDetails);
+    setValuationState(mappedValuation.state);
+    setValuationResult(mappedValuation.result);
+    setHasCalculated(Boolean(mappedValuation.result));
+    setThumbnailIdx(0);
+    setStep(1);
+    setIsInitialized(true);
+  }, [isEditMode, property]);
+
+  const handleDetailsChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+
+    if (name === "propertyType" && value !== details.propertyType) {
+      setValuationState(createInitialValuationState());
+      setValuationResult(null);
+      setHasCalculated(false);
+      setPreviousPropertyType(details.propertyType);
+    }
+
+    setDetails((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+
+    setIsUploading(true);
+    try {
+      const urls = await Promise.all(files.map(uploadPropertyMedia));
+      setDetails((prev) => ({ ...prev, media: [...prev.media, ...urls] }));
+    } catch (error: any) {
+      toast.error(getPropertyErrorMessage(error, "Failed to upload image."));
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleRemoveImage = (idx: number) => {
+    setDetails((prev) => ({
+      ...prev,
+      media: prev.media.filter((_, i) => i !== idx),
+    }));
+    if (idx === thumbnailIdx) setThumbnailIdx(0);
+    else if (idx < thumbnailIdx) setThumbnailIdx((prev) => prev - 1);
+  };
+
+  const createPropertyMutation = useMutation({
+    mutationFn: createProperty,
+    onSuccess: (data) => {
+      toast.success(
+        data?.responseDescription ||
+          data?.responseMessage ||
+          data?.message ||
+          "Property created successfully!"
+      );
+      router.push("/properties");
+    },
+    onError: (error: any) => {
+      toast.error(getPropertyErrorMessage(error, "Failed to create property."));
+    },
+  });
+
+  const updatePropertyMutation = useMutation({
+    mutationFn: (payload: ReturnType<typeof buildCreatePropertyPayload>) => updateProperty(propertyId, payload),
+    onSuccess: (data) => {
+      toast.success(
+        data?.responseDescription ||
+          data?.responseMessage ||
+          data?.message ||
+          "Property updated successfully!"
+      );
+      router.push(`/properties/${propertyId}`);
+    },
+    onError: (error: any) => {
+      toast.error(getPropertyErrorMessage(error, "Failed to update property."));
+    },
+  });
+
+  const isSubmitting = createPropertyMutation.isPending || updatePropertyMutation.isPending;
+
+  const validateStep1 = () => {
+    if (!details.propertyType) {
+      toast.error("Please select a property type.");
+      return false;
+    }
+    if (!details.name.trim()) {
+      toast.error("Please enter a property name.");
+      return false;
+    }
+    if (!details.description.trim()) {
+      toast.error("Please enter a description.");
+      return false;
+    }
+    return true;
+  };
+
+  const validateStep2 = () => {
+    if (!details.media.length) {
+      toast.error("Please upload at least one property image.");
+      return false;
+    }
+    if (!details.propertyAddress.trim() || !details.city.trim() || !details.state.trim() || !details.zip.trim()) {
+      toast.error("Please complete all location fields.");
+      return false;
+    }
+    return true;
+  };
+
+  const validateStep3 = () => {
+    if (!isResidential) {
+      toast.error("Valuation for this property type is not available yet.");
+      return false;
+    }
+    if (!hasCalculated || !valuationResult) {
+      toast.error("Please calculate the property valuation before continuing.");
+      return false;
+    }
+    const hasValidRentalUnit = valuationState.rentalUnits.some(
+      (unit) => unit.unitType.trim() && unit.numberOfUnits > 0 && unit.monthlyRentPerUnit > 0
+    );
+    if (!hasValidRentalUnit) {
+      toast.error("Add at least one rental unit with a name, unit count, and monthly rent.");
+      return false;
+    }
+    return true;
+  };
+
+  const validateStep4 = () => {
+    const totalShares = Number(details.numberOfShares);
+    if (!totalShares || totalShares < 1) {
+      toast.error("Please enter a valid number of shares.");
+      return false;
+    }
+    if (isEditMode && totalShares < sharesSold) {
+      toast.error(`Total shares cannot be less than ${sharesSold.toLocaleString()} (already sold).`);
+      return false;
+    }
+    return true;
+  };
+
+  const goNext = () => {
+    if (step === 1 && !validateStep1()) return;
+    if (step === 2 && !validateStep2()) return;
+    if (step === 3 && !validateStep3()) return;
+    setStep((prev) => Math.min(prev + 1, 4));
+  };
+
+  const goBack = () => setStep((prev) => Math.max(prev - 1, 1));
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateStep4() || !validateStep3() || !validateStep2() || !validateStep1()) return;
+
+    const orderedMedia = [...details.media];
+    if (thumbnailIdx > 0 && orderedMedia[thumbnailIdx]) {
+      const [thumbnail] = orderedMedia.splice(thumbnailIdx, 1);
+      orderedMedia.unshift(thumbnail);
+    }
+
+    const payload = buildCreatePropertyPayload({ ...details, media: orderedMedia }, valuationState);
+    if (isEditMode) {
+      updatePropertyMutation.mutate(payload);
+      return;
+    }
+    createPropertyMutation.mutate(payload);
+  };
+
+  const stepTitle = {
+    1: "Property basics",
+    2: "Location & media",
+    3: "Valuation",
+    4: isEditMode ? "Review & save" : "Review & create",
+  }[step];
+
+  const stepDescription = {
+    1: "Choose the property type first. This determines which valuation flow you'll use.",
+    2: "Upload images and add the property location details.",
+    3: isResidential
+      ? isEditMode
+        ? "Update the valuation inputs and recalculate before saving."
+        : "Use the residential valuation calculator to estimate property value."
+      : "Valuation tools for this property type are coming soon.",
+    4: isEditMode ? "Review your changes before saving the listing." : "Review everything before creating the listing.",
+  }[step];
+
+  if (!isInitialized) {
+    return (
+      <div className="flex items-center justify-center min-h-[320px] w-full">
+        <p className="text-primary-10 font-Raleway text-base">Loading property...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-8 w-full">
+      <StepProgress steps={[...STEPS]} currentStep={step} />
+
+      <form className="flex flex-col gap-8 w-full" onSubmit={handleSubmit} autoComplete="off">
+        <div className="flex flex-col gap-2">
+          <h2 className="text-xl font-Raleway font-bold text-primary-10 capitalize">{stepTitle}</h2>
+          <p className="text-sm font-Raleway font-medium text-opacityClr-80">{stepDescription}</p>
+        </div>
+
+        {step === 1 && (
+          <section className="flex flex-col gap-6 w-full">
+            <Field label="Property Type" required>
+              <select
+                name="propertyType"
+                value={details.propertyType}
+                onChange={handleDetailsChange}
+                required
+                className={selectClassName}
+              >
+                <option value="">Select type</option>
+                {PROPERTY_LISTING_TYPE_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </Field>
+
+            {details.propertyType && details.propertyType !== "residential" && (
+              <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-Raleway text-amber-900">
+                {getPropertyTypeLabel(details.propertyType)} listings can be created after the valuation engine for this
+                type is ready. For now, only residential properties can be fully submitted.
+              </div>
+            )}
+
+            {previousPropertyType && previousPropertyType !== details.propertyType && (
+              <div className="rounded-xl border border-opacityClr-20 bg-opacityClr-10 px-4 py-3 text-sm font-Raleway text-opacityClr-80">
+                Property type changed — valuation data has been reset.
+              </div>
+            )}
+
+            <Field label="Property Name" required>
+              <input
+                type="text"
+                name="name"
+                value={details.name}
+                onChange={handleDetailsChange}
+                placeholder="Sunrise Apartments"
+                required
+                className={inputClassName}
+              />
+            </Field>
+
+            <Field label="Description" required>
+              <textarea
+                name="description"
+                value={details.description}
+                onChange={handleDetailsChange}
+                placeholder="A residential block with 12 units."
+                rows={4}
+                required
+                className={`${inputClassName} resize-none`}
+              />
+            </Field>
+          </section>
+        )}
+
+        {step === 2 && (
+          <section className="flex flex-col gap-6 w-full">
+            <div>
+              <label className={`${labelClassName} mb-2 block`}>
+                Property images *
+                <br />
+                <span className="font-normal text-opacityClr-70">Upload one or more images</span>
+              </label>
+
+              <div className="flex gap-3 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pb-2">
+                {details.media.map((img, idx) => (
+                  <div key={img} className="relative group shrink-0">
+                    <img
+                      src={img}
+                      alt={`property-${idx}`}
+                      className={`w-64 h-44 object-cover rounded-lg border-2 ${
+                        thumbnailIdx === idx
+                          ? "border-opacityClr-100 ring-2 ring-opacityClr-100"
+                          : "border-dashed border-opacityClr-60"
+                      }`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveImage(idx)}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                    >
+                      ✕
+                    </button>
+                    {thumbnailIdx !== idx && (
+                      <button
+                        type="button"
+                        onClick={() => setThumbnailIdx(idx)}
+                        className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] bg-neutral-lightGreen text-white rounded-full px-3 py-1 opacity-0 group-hover:opacity-100"
+                      >
+                        Set as thumbnail
+                      </button>
+                    )}
+                    {thumbnailIdx === idx && (
+                      <div className="absolute top-1 left-1 bg-opacityClr-100 text-white text-[10px] px-2 py-0.5 rounded-full">
+                        Thumbnail
+                      </div>
+                    )}
+                  </div>
+                ))}
+
+                <div className="relative shrink-0">
+                  <button
+                    type="button"
+                    disabled={isUploading}
+                    className={`w-64 h-44 flex flex-col items-center justify-center border-2 border-dashed rounded-lg ${
+                      isUploading
+                        ? "text-opacityClr-40 bg-opacityClr-5 cursor-wait"
+                        : "text-opacityClr-60 bg-opacityClr-10 hover:bg-opacityClr-20"
+                    }`}
+                    onClick={() => !isUploading && fileInputRef.current?.click()}
+                  >
+                    {isUploading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-opacityClr-60 mb-2" />
+                        <span className="text-sm font-Raleway">Uploading...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-2xl">+</span>
+                        <span className="text-sm mt-1 font-Raleway">Upload</span>
+                      </>
+                    )}
+                  </button>
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    ref={fileInputRef}
+                    className="hidden"
+                    onChange={handleImageUpload}
+                    disabled={isUploading}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <h3 className={sectionTitleClassName}>Location</h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+              <Field label="Street Address" required>
+                <input
+                  type="text"
+                  name="propertyAddress"
+                  value={details.propertyAddress}
+                  onChange={handleDetailsChange}
+                  placeholder="12 Admiralty Way"
+                  required
+                  className={inputClassName}
+                />
+              </Field>
+              <Field label="City" required>
+                <input
+                  type="text"
+                  name="city"
+                  value={details.city}
+                  onChange={handleDetailsChange}
+                  placeholder="Lekki"
+                  required
+                  className={inputClassName}
+                />
+              </Field>
+              <Field label="State" required>
+                <input
+                  type="text"
+                  name="state"
+                  value={details.state}
+                  onChange={handleDetailsChange}
+                  placeholder="Lagos"
+                  required
+                  className={inputClassName}
+                />
+              </Field>
+              <Field label="Zip / Postal Code" required>
+                <input
+                  type="text"
+                  name="zip"
+                  value={details.zip}
+                  onChange={handleDetailsChange}
+                  placeholder="105102"
+                  required
+                  className={inputClassName}
+                />
+              </Field>
+            </div>
+          </section>
+        )}
+
+        {step === 3 && (
+          <section className="flex flex-col gap-6 w-full">
+            {isResidential ? (
+              <PropertyValuationCalculator
+                state={valuationState}
+                onStateChange={setValuationState}
+                result={valuationResult}
+                onResultChange={setValuationResult}
+                hasCalculated={hasCalculated}
+                onHasCalculatedChange={setHasCalculated}
+                hideHeader
+                collapseAdvanced
+              />
+            ) : (
+              <div className="rounded-xl border border-opacityClr-30 bg-opacityClr-10 p-8 flex flex-col items-center gap-4 text-center">
+                <p className="text-lg font-Raleway font-bold text-primary-10">
+                  {getPropertyTypeLabel(details.propertyType)} valuation coming soon
+                </p>
+                <p className="text-sm font-Raleway text-opacityClr-80 max-w-lg">
+                  The multi-unit residential calculator is available today. Commercial and land valuation engines will
+                  use different inputs and will be added in a later phase.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setStep(1)}
+                  className="px-5 py-3 bg-neutral-lightGreen rounded-md text-primary-10 font-Raleway text-sm font-semibold"
+                >
+                  Change property type
+                </button>
+              </div>
+            )}
+          </section>
+        )}
+
+        {step === 4 && (
+          <section className="flex flex-col gap-6 w-full">
+            {isEditMode && sharesSold > 0 && (
+              <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-Raleway text-amber-900">
+                {sharesSold.toLocaleString()} share{sharesSold === 1 ? "" : "s"} already sold. Total shares cannot be set
+                below this amount.
+              </div>
+            )}
+
+            <Field label="Number of Shares" required>
+              <input
+                type="number"
+                name="numberOfShares"
+                min={isEditMode ? Math.max(sharesSold, 1) : 1}
+                value={details.numberOfShares}
+                onChange={handleDetailsChange}
+                placeholder="1000"
+                required
+                className={inputClassName}
+              />
+            </Field>
+
+            <div className="rounded-xl border border-opacityClr-20 bg-white p-6 flex flex-col gap-4">
+              <h3 className="text-lg font-Raleway font-bold text-primary-10">Listing summary</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm font-Raleway text-primary-10">
+                <p>
+                  <span className="text-opacityClr-60">Name:</span> <span className="font-semibold">{details.name}</span>
+                </p>
+                <p>
+                  <span className="text-opacityClr-60">Type:</span>{" "}
+                  <span className="font-semibold">{getPropertyTypeLabel(details.propertyType)}</span>
+                </p>
+                <p>
+                  <span className="text-opacityClr-60">Location:</span>{" "}
+                  <span className="font-semibold">
+                    {details.propertyAddress}, {details.city}, {details.state} {details.zip}
+                  </span>
+                </p>
+                <p>
+                  <span className="text-opacityClr-60">Images:</span>{" "}
+                  <span className="font-semibold">{details.media.length} uploaded</span>
+                </p>
+                {valuationResult && (
+                  <>
+                    <p>
+                      <span className="text-opacityClr-60">Cap rate:</span>{" "}
+                      <span className="font-semibold">{formatPercent(valuationResult.capRate)}</span>
+                    </p>
+                    <p>
+                      <span className="text-opacityClr-60">NOI:</span>{" "}
+                      <span className="font-semibold">{formatNaira(valuationResult.noi)}</span>
+                    </p>
+                  </>
+                )}
+              </div>
+
+              {valuationResult && (
+                <div className="mt-2 pt-4 border-t border-opacityClr-20">
+                  <p className="text-sm font-Raleway text-opacityClr-80">Final adjusted property value</p>
+                  <p className="text-[28px] font-Raleway font-bold text-primary-10">
+                    {formatNaira(valuationResult.adjustedPropertyValue)}
+                  </p>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
+        <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2 border-t border-opacityClr-20">
+          <button
+            type="button"
+            onClick={goBack}
+            disabled={step === 1 || isSubmitting}
+            className="px-6 py-3 rounded-lg border border-opacityClr-50 text-primary-10 font-Raleway font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-opacityClr-10 transition-colors"
+          >
+            Back
+          </button>
+
+          {step < 4 ? (
+            <button
+              type="button"
+              onClick={goNext}
+              disabled={isUploading || (step === 3 && !isResidential)}
+              className="px-8 py-3 bg-primary-10 text-white font-Raleway font-bold rounded-lg hover:bg-primary-20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {step === 3 ? "Continue to review" : "Continue"}
+            </button>
+          ) : (
+            <button
+              type="submit"
+              disabled={isSubmitting || isUploading || !isResidential}
+              className="px-8 py-3 bg-opacityClr-100 text-white font-Raleway font-bold rounded-lg hover:bg-opacityClr-80 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {isSubmitting
+                ? isEditMode
+                  ? "Saving Changes..."
+                  : "Creating Property..."
+                : isEditMode
+                  ? "Save Changes"
+                  : "Create Property"}
+            </button>
+          )}
+        </div>
+      </form>
+    </div>
+  );
+}
