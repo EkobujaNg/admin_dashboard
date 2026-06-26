@@ -13,9 +13,7 @@ import TableHeadAndBody from "@/components/ui/TableHeadAndBody";
 import Pagination from "@/components/ui/Pagination";
 import TabButton from "@/components/ui/TabButton";
 import Dropdown from "@/components/ui/Dropdown";
-import { IoIosArrowRoundUp } from "react-icons/io";
-import { PiDotsThreeBold } from "react-icons/pi";
-import { IoCalendarOutline } from "react-icons/io5";
+import { ArrowUpRight, Ellipsis, Calendar } from "lucide-react";
 import { profitSharingStats, upcomingDistributionsData, pastDistributionsData } from "@/data";
 
 const ProfitSharing = () => {
@@ -61,7 +59,7 @@ const ProfitSharing = () => {
         } else if (statusType === "scheduled") {
           statusStyles = "bg-[#C4D9E8] text-[#2E7DB2]";
           dotColor = "bg-[#2E7DB2]";
-          icon = <IoCalendarOutline className="w-3 h-3" />;
+          icon = <Calendar className="w-3 h-3" />;
         } else if (statusType === "pending") {
           statusStyles = "bg-[#E3DAC1] text-[#C39830]";
           dotColor = "bg-[#C39830]";
@@ -160,7 +158,7 @@ const ProfitSharing = () => {
             <div className="flex items-center justify-between w-full gap-6">
               <p className={`font-Raleway text-base font-semibold leading-[125%] ${card.textColor}`}>{card.title}</p>
               <span className={`flex items-center justify-center gap-2.5 w-5 h-5 ${card.dotBg} rounded-full`}>
-                <PiDotsThreeBold className={`w-5 h-5 ${card.textColor}`} />
+                <Ellipsis className={`w-5 h-5 ${card.textColor}`} />
               </span>
             </div>
 
@@ -169,7 +167,7 @@ const ProfitSharing = () => {
               <div className="flex items-center justify-between w-full gap-6">
                 <p className={`font-Raleway text-sm font-normal leading-[125%] ${card.textColor}`}>{card.description}</p>
                 <div className="flex items-center gap-2">
-                  <IoIosArrowRoundUp
+                  <ArrowUpRight
                     className={`w-4 h-4 ${card.arrowColor} ${card.arrowDirection === "down" ? "rotate-225" : "rotate-45"}`}
                   />
                   <span className={`font-Raleway text-sm font-normal leading-8 tracking-[-0.252px] ${card.textColor}`}>

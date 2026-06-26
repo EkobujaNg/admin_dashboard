@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { HiOutlineInformationCircle } from "react-icons/hi2";
+import { Info } from "lucide-react";
 import Tooltip from "@/components/ui/Tooltip";
 import defaultAvatar from "../../../../../public/assets/images/avatar.svg";
 import Breadcrumb from "@/components/ui/Breadcrumb";
@@ -108,7 +108,7 @@ const PersonalInformation = () => {
               Date, time, and number format{" "}
               <Tooltip text="This is for verification purposes! ">
                 <span className="ml-2 flex items-center justify-center bg-opacityClr-10 px-2 py-1 rounded-full">
-                  <HiOutlineInformationCircle className="cursor-pointer text-gray-500" size={18} />
+                  <Info className="cursor-pointer text-gray-500 w-[18px] h-[18px]" />
                   Why?
                 </span>
               </Tooltip>

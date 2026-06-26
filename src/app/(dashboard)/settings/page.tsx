@@ -4,44 +4,44 @@ import React from "react";
 import Image from "next/image";
 import { avatar } from "../../../../public/assets/images";
 import { useRouter, usePathname } from "next/navigation";
-import { FaUserTag, FaChevronRight, FaFileAlt, FaCreditCard, FaLock, FaBell, FaUserLock } from "react-icons/fa";
+import { UserRound, ChevronRight, FileText, CreditCard, Lock, Bell, Shield } from "lucide-react";
 
 const settingsLinks = [
   {
     id: 1,
     name: "Account Information",
-    icon: <FaFileAlt size={20} className="text-primary-20" />,
+    icon: <FileText className="text-primary-20 w-5 h-5" />,
     path: "/settings/account-information",
   },
   {
     id: 2,
     name: "Security",
-    icon: <FaLock size={20} className="text-primary-20" />,
+    icon: <Lock className="text-primary-20 w-5 h-5" />,
     path: "/settings/security",
   },
   {
     id: 3,
     name: "Log in Details",
-    icon: <FaUserLock size={20} className="text-primary-20" />,
+    icon: <Shield className="text-primary-20 w-5 h-5" />,
     path: "/settings/log-in-details",
   },
   {
     id: 4,
     name: "Payments",
-    icon: <FaCreditCard size={20} className="text-primary-20" />,
+    icon: <CreditCard className="text-primary-20 w-5 h-5" />,
     path: "/settings/payments",
   },
 
   {
     id: 5,
     name: "Notifications & Alerts",
-    icon: <FaBell size={20} className="text-primary-20" />,
+    icon: <Bell className="text-primary-20 w-5 h-5" />,
     path: "/settings/notifications-and-alerts",
   },
   {
     id: 6,
     name: "Account Sharing",
-    icon: <FaUserTag size={20} className="text-primary-20" />,
+    icon: <UserRound className="text-primary-20 w-5 h-5" />,
     path: "/settings/account-sharing",
   },
 ];
@@ -83,7 +83,7 @@ const SettingsLayout = () => {
                     <p className="text-primary-10 text-base font-semibold font-Raleway leading-normal">{link.name}</p>
                   </div>
 
-                  <FaChevronRight size={20} className="text-primary-20 font-light" />
+                  <ChevronRight className="text-primary-20 font-light w-5 h-5" />
                 </div>
               );
             })}

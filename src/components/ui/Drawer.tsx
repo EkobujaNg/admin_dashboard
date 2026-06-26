@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { FaTimes, FaArrowLeft } from "react-icons/fa";
+import { X, ArrowLeft } from "lucide-react";
 import { useDrawerModal } from "@/context/DrawerModalContext";
 
 const Drawer = () => {
@@ -56,10 +56,10 @@ const Drawer = () => {
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-4 border-b">
           <div className="flex items-center gap-2">
-            {canGoBack && <FaArrowLeft className="cursor-pointer text-gray-600 hover:text-black" onClick={closeDrawer} />}
+            {canGoBack && <ArrowLeft className="cursor-pointer text-gray-600 hover:text-black" onClick={closeDrawer} />}
             <h2 className="text-lg font-bold text-primary-10">{current.title}</h2>
           </div>
-          <FaTimes className="cursor-pointer text-gray-600 hover:text-black" onClick={resetDrawer} />
+          <X className="cursor-pointer text-gray-600 hover:text-black" onClick={resetDrawer} />
         </div>
 
         {/* Content */}

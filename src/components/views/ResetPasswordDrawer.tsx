@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import { Eye, EyeOff } from "lucide-react";
 
 const ResetPasswordDrawer = () => {
   const [formData, setFormData] = useState<{ otp: string; newPassword: string; confirmPassword: string }>({
@@ -142,9 +142,9 @@ const ResetPasswordDrawer = () => {
             />
             <button type="button" className="absolute right-4 top-4 cursor-pointer" onClick={() => setPasswordVisible(!passwordVisible)}>
               {passwordVisible ? (
-                <AiOutlineEye size={24} className={`${formData.newPassword ? "text-opacityClr-100" : "text-[#BBC3C3]"}`} />
+                <Eye className={`w-6 h-6 ${formData.newPassword ? "text-opacityClr-100" : "text-[#BBC3C3]"}`} />
               ) : (
-                <AiOutlineEyeInvisible size={24} className={`${formData.newPassword ? "text-opacityClr-100" : "text-[#BBC3C3]"}`} />
+                <EyeOff className={`w-6 h-6 ${formData.newPassword ? "text-opacityClr-100" : "text-[#BBC3C3]"}`} />
               )}
             </button>
           </div>
@@ -175,9 +175,9 @@ const ResetPasswordDrawer = () => {
               onClick={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
             >
               {confirmPasswordVisible ? (
-                <AiOutlineEye size={24} className={`${formData.confirmPassword ? "text-opacityClr-100" : "text-[#BBC3C3]"}`} />
+                <Eye className={`w-6 h-6 ${formData.confirmPassword ? "text-opacityClr-100" : "text-[#BBC3C3]"}`} />
               ) : (
-                <AiOutlineEyeInvisible size={24} className={`${formData.confirmPassword ? "text-opacityClr-100" : "text-[#BBC3C3]"}`} />
+                <EyeOff className={`w-6 h-6 ${formData.confirmPassword ? "text-opacityClr-100" : "text-[#BBC3C3]"}`} />
               )}
             </button>
           </div>

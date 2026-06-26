@@ -5,7 +5,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDispatch } from "react-redux";
-import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import { Eye, EyeOff } from "lucide-react";
 import CustomCheckbox from "@/components/ui/CustomCheckBox";
 import { setCookie } from "nookies";
 import { login } from "@/lib/store/slices/authSlice";
@@ -62,7 +62,7 @@ const Login = () => {
   };
 
   return (
-    <div className="flex flex-col gap-14 w-[500px] mx-auto">
+    <div className="flex flex-col gap-14 w-full max-w-[500px]">
       <div className="flex flex-col items-start gap-4">
         <h2 className="font-Raleway font-bold text-opacityClr-100 text-xl md:text-[32px] leading-[89%] tracking-[0.32px]">
           Login to your account
@@ -115,9 +115,9 @@ const Login = () => {
               onClick={() => setShowPassword(!showPassword)}
             >
               {showPassword ? (
-                <AiOutlineEye size={24} className={`${formData.password ? "text-opacityClr-100" : "text-[#BBC3C3]"}`} />
+                <Eye className={`w-6 h-6 ${formData.password ? "text-opacityClr-100" : "text-[#BBC3C3]"}`} />
               ) : (
-                <AiOutlineEyeInvisible size={24} className={`${formData.password ? "text-opacityClr-100" : "text-[#BBC3C3]"}`} />
+                <EyeOff className={`w-6 h-6 ${formData.password ? "text-opacityClr-100" : "text-[#BBC3C3]"}`} />
               )}
             </button>
           </div>

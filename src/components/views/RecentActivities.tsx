@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Image from "next/image";
-import { TiLocation } from "react-icons/ti";
+import { MapPin } from "lucide-react";
 import {
   propertyA,
   propertyB,
@@ -97,9 +97,8 @@ const RecentActivities = () => {
                     {property.name}
                   </h3>
                   <div className="flex items-center gap-2">
-                    <TiLocation
-                      className="text-[#325E62] font-bold"
-                      size={24}
+                    <MapPin
+                      className="text-[#325E62] font-bold w-6 h-6"
                     />
                     <p className="font-Raleway font-medium text-primary-10 text-base leading-normal">
                       {property.location}

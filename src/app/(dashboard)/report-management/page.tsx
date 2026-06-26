@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { MdArrowOutward } from "react-icons/md";
+import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import StatsCard from "@/components/ui/StatsCard";
 import TabButton from "@/components/ui/TabButton";
@@ -141,7 +141,7 @@ const ReportManagementPage = () => {
             className="flex items-center justify-center gap-3 px-5 py-3 bg-primary-10 rounded-[100px] border border-transparent transition hover:bg-transparent hover:border-primary-10 group cursor-pointer"
           >
             <span className="text-white font-Raleway font-semibold text-base group-hover:text-primary-10">View Task List</span>
-            <MdArrowOutward className="text-white group-hover:text-primary-10 w-5 h-5" />
+            <ArrowUpRight className="text-white group-hover:text-primary-10 w-5 h-5" />
           </Link>
 
           <Link
@@ -149,7 +149,7 @@ const ReportManagementPage = () => {
             className="flex items-center justify-center gap-3 px-5 py-3 bg-primary-10 rounded-[100px] border border-transparent transition hover:bg-transparent hover:border-primary-10 group cursor-pointer"
           >
             <span className="text-white font-Raleway font-semibold text-base group-hover:text-primary-10">View Facility Managers</span>
-            <MdArrowOutward className="text-white group-hover:text-primary-10 w-5 h-5" />
+            <ArrowUpRight className="text-white group-hover:text-primary-10 w-5 h-5" />
           </Link>
         </div>
       </div>

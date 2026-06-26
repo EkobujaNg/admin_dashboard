@@ -7,8 +7,7 @@ import {
   cardReaderGold,
   cardReaderSilver,
 } from "../../../public/assets/images";
-import { IoCheckmarkDone } from "react-icons/io5";
-import { GoPlus } from "react-icons/go";
+import { Plus } from "lucide-react";
 import { useDrawerModal } from "@/context/DrawerModalContext";
 
 const cardDetails = [
@@ -107,7 +106,7 @@ const CardContents = () => {
         className=" border border-dashed border-primary-10 w-full flex items-center justify-center py-4 px-6 gap-3 rounded-lg mt-20"
         onClick={() => openModal("Add Card", <p>Add card form contents...</p>)}
       >
-        <GoPlus size={20} className="text-primary-10 font-semibold" />
+        <Plus className="w-5 h-5 text-primary-10 font-semibold" />
         <span className="font-Geist font-semibold text-primary-10 text-base leading-[150%] tracking-[-0.16px]">Add Card</span>
       </button>
     </div>

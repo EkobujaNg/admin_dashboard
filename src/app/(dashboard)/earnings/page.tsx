@@ -8,11 +8,8 @@ import { emptyWallet } from "../../../../public/assets/images";
 import TableHeadAndBody from "@/components/ui/TableHeadAndBody";
 import ProfitSharing from "@/components/views/ProfitSharing";
 import TabButton from "@/components/ui/TabButton";
-import { IoIosArrowRoundUp } from "react-icons/io";
-import { PiDotsThreeBold } from "react-icons/pi";
-import { transactionTableData } from "@/data";
-import { statCardConfig } from "@/data";
-import { IoCheckmarkDone } from "react-icons/io5";
+import { ArrowUpRight, Ellipsis, CheckCheck } from "lucide-react";
+import { transactionTableData, statCardConfig } from "@/data";
 import {
   createColumnHelper,
   flexRender,
@@ -144,7 +141,7 @@ const EarningsPage = () => {
                 <div className="flex items-center justify-between w-full gap-6 text-white">
                   <p className={`font-Raleway text-base font-semibold leading-[125%] ${card.textColor}`}>{card.title}</p>
                   <span className={`flex items-center justify-center gap-2.5 w-5 h-5 ${card.dotBg} rounded-full`}>
-                    <PiDotsThreeBold className={`w-5 h-5 ${card.textColor}`} />
+                    <Ellipsis className={`w-5 h-5 ${card.textColor}`} />
                   </span>
                 </div>
 
@@ -154,7 +151,7 @@ const EarningsPage = () => {
                     <p className={`font-Raleway text-sm font-normal leading-[125%] ${card.textColor}`}>{card.fromLastWeek}</p>
                     <div className="flex items-center gap-2">
                       <span className={`flex w-4 h-4 ${card.dotBgColor} rounded-full`}>
-                        <IoIosArrowRoundUp
+                        <ArrowUpRight
                           className={`w-4 h-4 ${card.arrowColor} ${card.arrowDirection === "down" ? "rotate-225" : "rotate-45"}`}
                         />
                       </span>
@@ -177,7 +174,7 @@ const EarningsPage = () => {
               style={{ backgroundImage: "url(/assets/images/map.svg)" }}
             >
               <div className="flex items-center justify-between w-full gap-6">
-                <IoCheckmarkDone size={20} className="text-opacityClr-10" />
+                <CheckCheck className="text-opacityClr-10 w-5 h-5" />
               </div>
               <p className="text-white font-Raleway text-sm font-semibold leading-[140%]">Current Balance</p>
               <h3 className="text-white font-Raleway text-3xl font-bold leading-normal tracking-[-0.648px]">₦0.00</h3>

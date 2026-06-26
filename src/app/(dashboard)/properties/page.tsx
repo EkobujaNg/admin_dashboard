@@ -1,8 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Image from "next/image";
-import { MdArrowOutward } from "react-icons/md";
-import { FaSearch, FaTimes } from "react-icons/fa";
+import { ArrowUpRight, Search, X } from "lucide-react";
 import Link from "next/link";
 import PropertyCard from "@/components/views/PropertyCard";
 import TradeMarketList from "@/components/views/TradeMarketList";
@@ -57,7 +56,7 @@ const PropertiesPage = () => {
           className="flex items-center justify-center gap-3 w-[251px] h-14 bg-primary-10 rounded-[100px] border border-transparent transition hover:bg-transparent hover:border-primary-10 group"
         >
           <span className="text-white font-Raleway font-semibold text-base group-hover:text-primary-10">Add Property</span>
-          <MdArrowOutward className="text-white group-hover:text-primary-10 w-5 h-5" />
+          <ArrowUpRight className="text-white group-hover:text-primary-10 w-5 h-5" />
         </Link>
       </div>
 
@@ -104,9 +103,9 @@ const PropertiesPage = () => {
 
         <div className="flex items-center gap-2 px-6 py-[14px] bg-[#ECECEC] rounded-[100px] w-full">
           {searchQuery ? (
-            <FaTimes className="text-[#8C9394] cursor-pointer font-normal" onClick={handleClearSearch} />
+            <X className="text-[#8C9394] cursor-pointer font-normal" onClick={handleClearSearch} />
           ) : (
-            <FaSearch className="text-[#8C9394]" />
+            <Search className="text-[#8C9394]" />
           )}
           <input
             type="text"
@@ -140,7 +139,7 @@ const PropertiesPage = () => {
                   <span className="font-Geist font-semibold text-base text-primary-10 leading-[150%] tracking-[-0.16px]">
                     Add Property
                   </span>
-                  <MdArrowOutward size={20} className="text-primary-10 text-base" />
+                  <ArrowUpRight className="text-primary-10 text-base w-5 h-5" />
                 </Link>
               </div>
             ) : (

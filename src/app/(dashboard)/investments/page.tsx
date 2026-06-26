@@ -6,9 +6,7 @@ import TabButton from "@/components/ui/TabButton";
 import Pagination from "@/components/ui/Pagination";
 import TableHeader from "@/components/ui/TableHeader";
 import TableHeadAndBody from "@/components/ui/TableHeadAndBody";
-import { HiOutlineInformationCircle } from "react-icons/hi2";
-import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
-import { MdArrowOutward } from "react-icons/md";
+import { Info, EyeOff, Eye, ArrowUpRight } from "lucide-react";
 import Tooltip from "@/components/ui/Tooltip";
 import { emptyAssets } from "../../../../public/assets/images";
 import useInvestmentAPI from "@/services/useInvestmentAPI";
@@ -262,7 +260,7 @@ const InvestmentPage = () => {
             <div className="flex items-center gap-2">
               <p className="text-sm text-primary-10 font-Raleway font-medium leading-normal">Available investment balance</p>
               <Tooltip text="This shows your available balance for investments.">
-                <HiOutlineInformationCircle className="cursor-pointer text-gray-500" size={18} />
+                <Info className="cursor-pointer text-gray-500 w-[18px] h-[18px]" />
               </Tooltip>
             </div>
 
@@ -279,9 +277,9 @@ const InvestmentPage = () => {
                 aria-label={isVisible ? "Hide balance" : "Show balance"}
               >
                 {isVisible ? (
-                  <IoEyeOffOutline size={20} className="text-[#2B4242] cursor-pointer" />
+                  <EyeOff className="text-[#2B4242] cursor-pointer w-5 h-5" />
                 ) : (
-                  <IoEyeOutline size={20} className="text-[#2B4242] cursor-pointer" />
+                  <Eye className="text-[#2B4242] cursor-pointer w-5 h-5" />
                 )}
               </button>
             </div>
@@ -292,7 +290,7 @@ const InvestmentPage = () => {
             type="button"
             className="flex items-center justify-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 bg-neutral-lightGreen rounded-2xl w-full transition-all duration-300 ease-linear group hover:bg-opacity-90"
           >
-            <MdArrowOutward size={18} className="text-primary-10 flex-shrink-0" />
+            <ArrowUpRight className="text-primary-10 flex-shrink-0 w-[18px] h-[18px]" />
             <span className="font-Raleway font-semibold text-xs sm:text-sm text-primary-10 leading-normal whitespace-nowrap">
               Go to Trade Market
             </span>
@@ -306,7 +304,7 @@ const InvestmentPage = () => {
             <div className="flex items-center gap-2">
               <p className="text-sm text-primary-10 font-Raleway font-medium leading-normal">Total Net Asset Value</p>
               <Tooltip text="The total value of all assets under management">
-                <HiOutlineInformationCircle className="cursor-pointer text-gray-500" size={18} />
+                <Info className="cursor-pointer text-gray-500 w-[18px] h-[18px]" />
               </Tooltip>
             </div>
             <h2 className="font-Raleway font-bold text-[28px] text-[#1D3638] leading-[130%]">
@@ -319,7 +317,7 @@ const InvestmentPage = () => {
             <div className="flex items-center gap-2">
               <p className="text-sm text-primary-10 font-Raleway font-medium leading-normal">Co-owned Properties</p>
               <Tooltip text="Number of properties with multiple investors">
-                <HiOutlineInformationCircle className="cursor-pointer text-gray-500" size={18} />
+                <Info className="cursor-pointer text-gray-500 w-[18px] h-[18px]" />
               </Tooltip>
             </div>
             <h2 className="font-Raleway font-bold text-[28px] text-[#1D3638] leading-[130%]">

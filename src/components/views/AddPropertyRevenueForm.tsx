@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useImperativeHandle, forwardRef } from "react";
-import { HiOutlineInformationCircle } from "react-icons/hi2";
+import { Info } from "lucide-react";
 import Tooltip from "@/components/ui/Tooltip";
 
 const AddPropertyRevenueForm = forwardRef(({ onSave }: { onSave?: any }, ref) => {
@@ -73,7 +73,7 @@ const AddPropertyRevenueForm = forwardRef(({ onSave }: { onSave?: any }, ref) =>
           Occupancy Rate <span className="text-red-500">*</span>
           <Tooltip text="The percentage of time the property is occupied by tenants">
             <span className="ml-2 flex items-center justify-center bg-opacityClr-10 px-2 py-1 rounded-full">
-              <HiOutlineInformationCircle className="cursor-pointer text-gray-500" size={18} />
+              <Info className="cursor-pointer text-gray-500 w-[18px] h-[18px]" />
               Info
             </span>
           </Tooltip>
@@ -99,7 +99,7 @@ const AddPropertyRevenueForm = forwardRef(({ onSave }: { onSave?: any }, ref) =>
           Revenue Share <span className="text-red-500">*</span>
           <Tooltip text="The percentage of revenue shared with investors">
             <span className="ml-2 flex items-center justify-center bg-opacityClr-10 px-2 py-1 rounded-full">
-              <HiOutlineInformationCircle className="cursor-pointer text-gray-500" size={18} />
+              <Info className="cursor-pointer text-gray-500 w-[18px] h-[18px]" />
               Info
             </span>
           </Tooltip>

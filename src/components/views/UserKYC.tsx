@@ -1,6 +1,6 @@
 "use client";
 import React, { useRef } from "react";
-import { FiUpload, FiChevronDown } from "react-icons/fi";
+import { Upload, ChevronDown } from "lucide-react";
 
 const KYC = ({ kycDetails, onInputChange, onDocumentUpload }) => {
   const documentInputRef = useRef(null);
@@ -53,7 +53,7 @@ const KYC = ({ kycDetails, onInputChange, onDocumentUpload }) => {
               <option value="Driver's License">Driver's License</option>
               <option value="Voter's Card">Voter's Card</option>
             </select>
-            <FiChevronDown className="text-gray-500" size={18} />
+            <ChevronDown className="text-gray-500 w-[18px] h-[18px]" />
           </div>
         </div>
 
@@ -85,7 +85,7 @@ const KYC = ({ kycDetails, onInputChange, onDocumentUpload }) => {
               className="flex-1 border-none bg-transparent outline-none cursor-pointer"
               placeholder="No file selected"
             />
-            <FiUpload className="text-gray-500" size={18} />
+            <Upload className="text-gray-500 w-[18px] h-[18px]" />
           </div>
           <input type="file" ref={documentInputRef} className="hidden" onChange={handleDocumentFileChange} />
         </div>

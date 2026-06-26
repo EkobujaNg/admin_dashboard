@@ -1,8 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { MdLaptop } from "react-icons/md";
-import { AiTwotoneMinusCircle } from "react-icons/ai";
-import { FaMobileAlt } from "react-icons/fa";
+import { Laptop, MinusCircle, Smartphone } from "lucide-react";
 
 const LoginHistoryDrawer = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -28,14 +26,14 @@ const LoginHistoryDrawer = () => {
         <div className="flex flex-col items-start gap-4 border-t border-[#E8EBEB] py-4 w-full">
           <div className="flex items-center justify-between w-full">
             <span className="flex p-2.5 items-center justify-center gap-2.5 border border-opacityClr-10 rounded">
-              <MdLaptop size={32} />
+              <Laptop className="w-8 h-8" />
             </span>
 
             <div className="flex flex-col items-end gap-2">
               <p className="font-Raleway font-semibold text-base text-primary-10 leading-normal ">Current session</p>
               <div className="flex items-center justify-center gap-2">
                 <button type="button" className="outline-none bg-transparent">
-                  <AiTwotoneMinusCircle size={20} />
+                  <MinusCircle className="w-5 h-5" />
                 </button>
                 <span className="font-Raleway font-medium text-sm text-opacityClr-40 leading-normal">Remove device</span>
               </div>
@@ -63,13 +61,13 @@ const LoginHistoryDrawer = () => {
         <div className="flex flex-col items-start gap-4 border-t  border-[#E8EBEB] py-4 w-full">
           <div className="flex items-center justify-between w-full">
             <span className="flex p-2.5 items-center justify-center gap-2.5 border border-opacityClr-10 rounded">
-              <FaMobileAlt size={32} />
+              <Smartphone className="w-8 h-8" />
             </span>
 
             <div className="flex flex-col items-end gap-2">
               <div className="flex items-center justify-center gap-2">
                 <button type="button" className="outline-none bg-transparent cursor-pointer">
-                  <AiTwotoneMinusCircle size={20} />
+                  <MinusCircle className="w-5 h-5" />
                 </button>
                 <span className="font-Raleway font-medium text-sm text-opacityClr-40 leading-normal">Remove device</span>
               </div>
@@ -97,13 +95,13 @@ const LoginHistoryDrawer = () => {
         <div className="flex flex-col items-start gap-4 border-t  border-[#E8EBEB] py-4 w-full">
           <div className="flex items-center justify-between w-full">
             <span className="flex p-2.5 items-center justify-center gap-2.5 border border-opacityClr-10 rounded">
-              <FaMobileAlt size={32} />
+              <Smartphone className="w-8 h-8" />
             </span>
 
             <div className="flex flex-col items-end gap-2">
               <div className="flex items-center justify-center gap-2">
                 <button type="button" className="outline-none bg-transparent cursor-pointer">
-                  <AiTwotoneMinusCircle size={20} />
+                  <MinusCircle className="w-5 h-5" />
                 </button>
                 <span className="font-Raleway font-medium text-sm text-opacityClr-40 leading-normal">Remove device</span>
               </div>

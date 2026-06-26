@@ -1,5 +1,5 @@
 "use client";
-import { FaSearch, FaTimes } from "react-icons/fa";
+import { Search, X } from "lucide-react";
 import Dropdown from "../ui/Dropdown";
 
 function TableHeader({ searchQuery, handleInputChange, handleClear, title, isLoading = false, table }: { searchQuery?: any; handleInputChange?: any; handleClear?: any; title?: any; isLoading?: boolean; table?: any }) {
@@ -15,9 +15,9 @@ function TableHeader({ searchQuery, handleInputChange, handleClear, title, isLoa
       <div className="flex items-center gap-2 flex-1/4">
         <div className="flex items-center gap-2 px-6 py-2.5 bg-transparent rounded-4xl border border-opacityClr-50 w-full">
           {searchQuery ? (
-            <FaTimes className="text-[#8C9394] cursor-pointer" onClick={handleClear} />
+            <X className="text-[#8C9394] cursor-pointer" onClick={handleClear} />
           ) : (
-            <FaSearch className="text-[#8C9394]" />
+            <Search className="text-[#8C9394]" />
           )}
           <input
             type="text"

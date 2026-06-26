@@ -24,7 +24,7 @@ import {
   reportIcon,
   reportIconFilled,
 } from "../../../public/assets/icons";
-import { FaTimes } from "react-icons/fa"; // Import Close Icon
+import { X } from "lucide-react";
 
 // Receive isOpen and setIsOpen from Layout
 export default function Sidebar({ isOpen, setIsOpen }: { isOpen: any; setIsOpen: any }) {
@@ -37,7 +37,7 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen: any; setIsOpen:
     { href: "/earnings", label: "Earnings", normalIcon: moneyIcon, filledIcon: moneyIconFilled },
     { href: "/investments", label: "Investments", normalIcon: caseIcon, filledIcon: caseIconFilled },
     { href: "/analytics-metrics", label: "Reports Analytics", normalIcon: reportIcon, filledIcon: reportIconFilled },
-    { href: "/facility-admin", label: "FM Admins", normalIcon: fileIcon, filledIcon: fileIconFilled },
+    { href: "/facility-admin", label: "FM Manager", normalIcon: fileIcon, filledIcon: fileIconFilled },
   ];
 
   // Helper to close sidebar on mobile click
@@ -79,7 +79,7 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen: any; setIsOpen:
             </Link>
             {/* Close button for mobile only */}
             <button onClick={() => setIsOpen(false)} className="md:hidden text-gray-500">
-              <FaTimes size={20} />
+              <X className="w-5 h-5" />
             </button>
           </div>
 

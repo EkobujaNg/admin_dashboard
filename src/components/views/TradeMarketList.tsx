@@ -1,10 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Image from "next/image";
-import { TiLocation } from "react-icons/ti";
-import { FaSearch, FaTimes } from "react-icons/fa";
-import { HiOutlineChevronRight } from "react-icons/hi2";
-import { MdArrowOutward } from "react-icons/md";
+import { MapPin, ChevronRight, ArrowUpRight } from "lucide-react";
 import {
   propertyA,
   propertyB,
@@ -106,7 +103,7 @@ const TradeMarketList = () => {
                   {market.name}
                 </h3>
                 <div className="flex items-center gap-2">
-                  <TiLocation className="text-[#325E62] font-bold" size={24} />
+                  <MapPin className="text-[#325E62] font-bold w-6 h-6" />
                   <p className="font-Raleway font-medium text-primary-10 text-base leading-normal">
                     {market.location}
                   </p>
@@ -114,7 +111,7 @@ const TradeMarketList = () => {
               </div>
             </div>
 
-            <HiOutlineChevronRight size={20} className="text-primary-10" />
+            <ChevronRight className="w-5 h-5 text-primary-10" />
           </div>
         ))
       ) : (
@@ -140,7 +137,7 @@ const TradeMarketList = () => {
             <span className="font-Geist font-semibold text-base text-primary-10 leading-[150%] tracking-[-0.16px]">
               Sell Stock
             </span>
-            <MdArrowOutward size={20} className="text-primary-10 text-base" />
+            <ArrowUpRight className="w-5 h-5 text-primary-10 text-base" />
           </button>
         </div>
       )}

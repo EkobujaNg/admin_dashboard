@@ -1,9 +1,7 @@
 "use client";
 import React, { useRef } from "react";
 import Tooltip from "@/components/ui/Tooltip";
-import { HiOutlineInformationCircle } from "react-icons/hi2";
-import { RiCalendar2Line } from "react-icons/ri";
-import { FiUpload, FiChevronDown } from "react-icons/fi";
+import { Info, Calendar, Upload, ChevronDown } from "lucide-react";
 
 const AccountDetails = ({ userDetails, onInputChange, onAvatarUpload, onGovernmentIdUpload }: { userDetails?: any; onInputChange?: any; onAvatarUpload?: any; onGovernmentIdUpload?: any }) => {
   const fileInputRef = useRef(null);
@@ -124,7 +122,7 @@ const AccountDetails = ({ userDetails, onInputChange, onAvatarUpload, onGovernme
             BVN (Bank Verification Number)
             <Tooltip text="This is for verification purposes!">
               <span className="ml-2 flex items-center justify-center bg-opacityClr-10 px-2 py-1 rounded-full">
-                <HiOutlineInformationCircle className="cursor-pointer text-gray-500" size={18} />
+                <Info className="cursor-pointer text-gray-500 w-[18px] h-[18px]" />
                 Why?
               </span>
             </Tooltip>
@@ -144,7 +142,7 @@ const AccountDetails = ({ userDetails, onInputChange, onAvatarUpload, onGovernme
           {/* Placeholder for dropdown */}
           <div className="relative w-full border border-opacityClr-30 rounded-lg px-4 py-3 text-opacityClr-100 text-base leading-[150%] outline-none bg-opacityClr-10 flex items-center justify-between">
             Verified
-            <FiChevronDown/>
+            <ChevronDown />
           </div>
         </div>
 
@@ -196,7 +194,7 @@ const AccountDetails = ({ userDetails, onInputChange, onAvatarUpload, onGovernme
               onChange={onInputChange}
               className="flex-1 border-none bg-transparent outline-none"
             />
-            <FiUpload className="cursor-pointer text-gray-500" size={18} />
+            <Upload className="cursor-pointer text-gray-500 w-[18px] h-[18px]" />
           </div>
         </div>
 
@@ -211,7 +209,7 @@ const AccountDetails = ({ userDetails, onInputChange, onAvatarUpload, onGovernme
               onChange={onInputChange}
               className="flex-1 border-none bg-transparent outline-none"
             />
-            <RiCalendar2Line className="cursor-pointer text-gray-500" size={18} />
+            <Calendar className="cursor-pointer text-gray-500 w-[18px] h-[18px]" />
           </div>
         </div>
 

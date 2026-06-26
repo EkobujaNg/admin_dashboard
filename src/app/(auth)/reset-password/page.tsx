@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import { Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
@@ -173,7 +173,7 @@ const ResetPassword = () => {
               }`}
             />
             <button type="button" className="absolute right-4 top-4 cursor-pointer" onClick={() => setPasswordVisible(!passwordVisible)}>
-              {passwordVisible ? <AiOutlineEye size={24} /> : <AiOutlineEyeInvisible size={24} />}
+              {passwordVisible ? <Eye className="w-6 h-6" /> : <EyeOff className="w-6 h-6" />}
             </button>
           </div>
           <p className="text-opacityClr-50 text-sm font-Raleway">
@@ -205,7 +205,7 @@ const ResetPassword = () => {
               className="absolute right-4 top-4 cursor-pointer"
               onClick={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
             >
-              {confirmPasswordVisible ? <AiOutlineEye size={24} /> : <AiOutlineEyeInvisible size={24} />}
+              {confirmPasswordVisible ? <Eye className="w-6 h-6" /> : <EyeOff className="w-6 h-6" />}
             </button>
           </div>
           {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword}</p>}

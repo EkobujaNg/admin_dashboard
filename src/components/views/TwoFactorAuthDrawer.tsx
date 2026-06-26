@@ -1,8 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Tooltip from "@/components/ui/Tooltip";
-import { TbCopy, TbCopyCheckFilled } from "react-icons/tb";
-import { HiOutlineInformationCircle } from "react-icons/hi";
+import { Copy, CopyCheck, Info } from "lucide-react";
 
 const TwoFactorAuthDrawer = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -70,7 +69,7 @@ const TwoFactorAuthDrawer = () => {
             Verification Code <span className="text-red-500">*</span>
             <Tooltip text="This is for verification purposes! ">
               <span className="ml-2 flex items-center justify-center bg-opacityClr-10 px-2 py-1 rounded-full">
-                <HiOutlineInformationCircle className="cursor-pointer text-gray-500" size={18} />
+                <Info className="cursor-pointer text-gray-500 w-[18px] h-[18px]" />
                 Why?
               </span>
             </Tooltip>
@@ -88,9 +87,9 @@ const TwoFactorAuthDrawer = () => {
               />
               <button type="button" onClick={handleCopyCode} className="border-none bg-transparent" disabled={!formData.code}>
                 {isCopied ? (
-                  <TbCopyCheckFilled className="cursor-pointer text-opacityClr-100" size={18} />
+                  <CopyCheck className="cursor-pointer text-opacityClr-100 w-[18px] h-[18px]" />
                 ) : (
-                  <TbCopy className="cursor-pointer text-opacityClr-100" size={18} />
+                  <Copy className="cursor-pointer text-opacityClr-100 w-[18px] h-[18px]" />
                 )}
               </button>
             </div>

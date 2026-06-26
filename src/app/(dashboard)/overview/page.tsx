@@ -4,7 +4,7 @@ import React, { useState, useMemo } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
-import { MdArrowOutward } from "react-icons/md";
+import { ArrowUpRight } from "lucide-react";
 import { useDrawerModal } from "@/context/DrawerModalContext";
 import PropertyCard from "@/components/views/PropertyCard";
 import RecentActivities from "@/components/views/RecentActivities";
@@ -210,7 +210,7 @@ const Overview = () => {
                 <span className="font-Geist font-semibold text-base text-primary-10 leading-[150%] tracking-[-0.16px] group-hover:text-primary-10">
                   Add Property
                 </span>
-                <MdArrowOutward size={20} className="text-primary-10 text-base group-hover:text-primary-10" />
+                <ArrowUpRight className="text-primary-10 text-base group-hover:text-primary-10 w-5 h-5" />
               </button>
             </div>
           )}

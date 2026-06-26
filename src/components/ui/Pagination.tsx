@@ -1,5 +1,5 @@
 import React from "react";
-import { IoChevronForwardOutline, IoChevronBackOutline } from "react-icons/io5";
+import { ChevronRight, ChevronLeft } from "lucide-react";
 
 const Pagination = ({ currentPage, totalPages, onPageChange, totalRecords }: { currentPage: any; totalPages: any; onPageChange: any; totalRecords: any }) => {
   const getPageNumbers = () => {
@@ -36,7 +36,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange, totalRecords }: { c
           disabled={currentPage === 1}
           className="w-10 h-10 rounded-md border border-gray-300 bg-opacityClr-10 text-gray-800 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <IoChevronBackOutline />
+          <ChevronLeft />
         </button>
 
         {pages.map((page, idx) => (
@@ -57,7 +57,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange, totalRecords }: { c
           disabled={currentPage === totalPages}
           className="w-10 h-10 rounded-md border border-gray-300 bg-opacityClr-10 text-gray-800 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <IoChevronForwardOutline />
+          <ChevronRight />
         </button>
       </div>
     </div>

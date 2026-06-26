@@ -1,9 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { HiOutlineInformationCircle } from "react-icons/hi2";
-import { IoMdNotifications, IoIosArrowForward } from "react-icons/io";
-import { MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
+import { Info, Bell, ChevronRight, ChevronDown, ChevronUp } from "lucide-react";
 import Tooltip from "@/components/ui/Tooltip"; // Assuming Tooltip is needed here based on the image
 
 const PropertyRevenueForm = ({ property, onSave, isLoading }: { property?: any; onSave?: any; isLoading?: any }) => {
@@ -69,11 +67,11 @@ const PropertyRevenueForm = ({ property, onSave, isLoading }: { property?: any; 
         {/* price alert */}
         <div className="flex items-center gap-4 w-full">
           <span className="flex w-12 h-12 p-2.5 items-center justify-center gap-2.5 rounded-lg bg-opacityClr-10">
-            <IoMdNotifications className="text-primary-20" size={20} />
+            <Bell className="text-primary-20 w-5 h-5" />
           </span>
           <p className="text-primary-10 font-Raleway font-semibold text-sm leading-normal flex-1">Price Alert</p>
           <span className="flex w-12 h-12 p-2.5 items-center justify-center gap-2.5 rounded-lg bg-transparent">
-            <IoIosArrowForward className="text-primary-20" size={20} />
+            <ChevronRight className="text-primary-20 w-5 h-5" />
           </span>
         </div>
         {/* total revenue */}
@@ -90,7 +88,7 @@ const PropertyRevenueForm = ({ property, onSave, isLoading }: { property?: any; 
         <div className="flex flex-col items-start gap-2 px-4 py-5 border border-opacityClr-30 rounded-2xl w-full">
           <p className="text-sm text-primary-10 font-Raleway font-medium leading-normal flex items-center">
             Net Profit
-            <HiOutlineInformationCircle className="ml-2 text-[#1D3638]" />
+            <Info className="ml-2 text-[#1D3638]" />
           </p>
           <h2 className="font-Raleway font-semibold text-2xl text-primary-10 leading-[130%]">₦0.00</h2>
         </div>
@@ -104,9 +102,9 @@ const PropertyRevenueForm = ({ property, onSave, isLoading }: { property?: any; 
           <div className="flex items-center justify-between w-full px-4 py-5 cursor-pointer" onClick={toggleExpenditure}>
             <h3 className="text-primary-10 font-Raleway font-semibold text-base leading-normal">Expenditure Breakdown</h3>
             {isExpenditureOpen ? (
-              <MdKeyboardArrowUp className="text-primary-10" size={24} />
+              <ChevronUp className="text-primary-10 w-6 h-6" />
             ) : (
-              <MdKeyboardArrowDown className="text-primary-10" size={24} />
+              <ChevronDown className="text-primary-10 w-6 h-6" />
             )}
           </div>
           {isExpenditureOpen && (

@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { RiCalendar2Line } from "react-icons/ri";
+import { Calendar } from "lucide-react";
 
 const NextOfKin = ({ nextOfKinDetails, onInputChange, onGovernmentIdUpload }: { nextOfKinDetails?: any; onInputChange?: any; onGovernmentIdUpload?: any }) => {
   const handleChange = (e) => {
@@ -61,7 +61,7 @@ const NextOfKin = ({ nextOfKinDetails, onInputChange, onGovernmentIdUpload }: { 
               placeholder="XX-XX-XXXX"
               className="flex-1 border-none bg-transparent outline-none"
             />
-            <RiCalendar2Line className="cursor-pointer text-gray-500" size={18} />
+            <Calendar className="cursor-pointer text-gray-500 w-[18px] h-[18px]" />
           </div>
         </div>
 

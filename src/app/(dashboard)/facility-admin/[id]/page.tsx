@@ -1,267 +1,168 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
-import Pagination from "@/components/ui/Pagination";
-import TableHeader from "@/components/ui/TableHeader";
-import TableHeadAndBody from "@/components/ui/TableHeadAndBody";
-import { emptyWallet } from "../../../../../public/assets/images";
-import CustomCheckbox from "@/components/ui/CustomCheckBox";
-import { useDrawerModal } from "@/context/DrawerModalContext";
-import ConfirmationModal from "@/components/ui/ConfirmationModal";
-import EditTaskDrawerContent from "@/components/views/EditTaskDrawerContent";
-import CreateTaskDrawer from "@/components/views/CreateTaskDrawer";
-import { useParams, useRouter, usePathname } from "next/navigation";
-import { facilities } from "@/data/facilities";
-import { location } from "../../../../../public/assets/icons";
-import TabButton from "@/components/ui/TabButton";
+import React, { useState } from "react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { Calendar, Mail, Phone, User, ExternalLink, Loader2 } from "lucide-react";
 import Breadcrumb from "@/components/ui/Breadcrumb";
+import useFacilityManagerAPI from "@/services/useFacilityManagerAPI";
+import AssignPropertySection from "@/components/views/AssignPropertySection";
 
-import {
-  createColumnHelper,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+function formatPhoneNumber(phoneNumber?: { code?: string; number?: string }) {
+  if (!phoneNumber?.number) return "—";
+  return `${phoneNumber.code || ""} ${phoneNumber.number}`.trim();
+}
 
-const FacilityDetailsPage = () => {
-  const router = useRouter();
+function formatDate(value?: string) {
+  if (!value) return "—";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "—";
+
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+function DetailField({
+  label,
+  value,
+  icon: Icon,
+}: {
+  label: string;
+  value: React.ReactNode;
+  icon: React.ComponentType<{ className?: string }>;
+}) {
+  return (
+    <div className="flex items-start gap-3">
+      <div className="w-10 h-10 rounded-lg bg-primary-10/10 flex items-center justify-center shrink-0">
+        <Icon className="w-5 h-5 text-primary-10" />
+      </div>
+      <div className="min-w-0">
+        <p className="text-xs font-medium text-gray-500 font-Raleway">{label}</p>
+        <p className="text-sm font-semibold text-primary-10 font-Raleway break-words">{value}</p>
+      </div>
+    </div>
+  );
+}
+
+const FacilityManagerDetailPage = () => {
   const params = useParams();
-  const { id } = params;
-  const { openModal, closeModal } = useDrawerModal();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [globalFilter, setGlobalFilter] = useState("");
-  const [selectedTaskIds, setSelectedTaskIds] = useState([]);
-  const [activeTab, setActiveTab] = useState("all");
-  const columnHelper = createColumnHelper<any>();
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const managerId = String(params.id || "");
+  const [idImageError, setIdImageError] = useState(false);
 
-  const facility = facilities.find((f) => String(f.id) === String(id));
+  const { facilityManager, isLoadingFacilityManager, facilityManagerError } = useFacilityManagerAPI({
+    managerId,
+    enableDetail: true,
+  });
 
-  if (!facility) {
-    return <div className="pt-[100px] p-6 text-xl font-bold">Facility not found</div>;
+  if (isLoadingFacilityManager) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh] gap-3">
+        <Loader2 className="w-6 h-6 animate-spin text-primary-10" />
+        <p className="text-primary-10 font-Raleway text-lg">Loading facility manager...</p>
+      </div>
+    );
   }
 
-  // Filter tasks by tab
-  let filteredTasks = facility.tasks || [];
+  if (facilityManagerError || !facilityManager) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-4 min-h-[50vh]">
+        <p className="text-primary-10 font-Raleway text-lg">Facility manager not found</p>
+        <Link href="/facility-admin" className="text-sm font-Raleway font-semibold text-primary-20 hover:underline">
+          Back to FM Manager
+        </Link>
+      </div>
+    );
+  }
 
-  const filteredData = useMemo(() => {
-    if (activeTab === "approved") return filteredTasks.filter((t) => t.status === "approved");
-    if (activeTab === "pending") return filteredTasks.filter((t) => t.status === "pending");
-    if (activeTab === "rejected") return filteredTasks.filter((t) => t.status === "rejected");
-    return filteredTasks; // for 'all' and any other case
-  }, [activeTab, filteredTasks]);
-
-  // Helper for selection
-  const isAllSelected = selectedTaskIds.length > 0 && selectedTaskIds.length === filteredTasks.length;
-  const isIndeterminate = selectedTaskIds.length > 0 && selectedTaskIds.length < filteredTasks.length;
-
-  const handleDeleteSelected = () => {
-    // Implement your delete logic here (e.g., API call)
-    setShowConfirmModal(false);
-    setSelectedTaskIds([]);
-  };
-
-  const selectAllTasks = () => setSelectedTaskIds(filteredTasks.map((task) => task.id));
-  const clearAllTasks = () => setSelectedTaskIds([]);
-  const toggleTaskSelection = (id, checked) => {
-    setSelectedTaskIds((prev) => (checked ? [...prev, id] : prev.filter((taskId) => taskId !== id)));
-  };
-
-  const taskColumns = [
-    columnHelper.display({
-      id: "select",
-      header: () => (
-        <CustomCheckbox
-          checked={isAllSelected}
-          onChange={() => {
-            if (isAllSelected || isIndeterminate) {
-              clearAllTasks();
-            } else {
-              selectAllTasks();
-            }
-          }}
-        />
-      ),
-      cell: (info) => (
-        <CustomCheckbox
-          checked={selectedTaskIds.includes(info.row.original.id)}
-          onChange={(checked) => toggleTaskSelection(info.row.original.id, checked)}
-        />
-      ),
-    }),
-    columnHelper.accessor("taskName", {
-      cell: (info) => (
-        <div>
-          <div className="font-semibold">{info.getValue()}</div>
-        </div>
-      ),
-      header: "Task Name",
-    }),
-    columnHelper.accessor("assignedTo", {
-      cell: (info) => <span>{info.getValue()}</span>,
-      header: "Manager assigned to",
-    }),
-    columnHelper.accessor("assignedProperties", {
-      cell: (info) => <span>{info.getValue().join(" || ")}</span>,
-      header: "Assigned Properties",
-    }),
-    columnHelper.accessor("status", {
-      header: "Status",
-      cell: (info) => {
-        const status = info.getValue();
-        let statusStyles = "";
-        let dotColor = "";
-        if (status === "approved") {
-          statusStyles = "bg-[#CEDDB7] text-[#6D9F1B]";
-          dotColor = "bg-[#6D9F1B]";
-        } else if (status === "pending") {
-          statusStyles = "bg-[#E3DAC1] text-[#C39830]";
-          dotColor = "bg-[#C39830]";
-        } else if (status === "rejected") {
-          statusStyles = "bg-[#DBC8C0] text-[#9F471B]";
-          dotColor = "bg-[#9F471B]";
-        }
-        return (
-          <span className={`inline-flex items-center gap-2 px-2 py-[6px] text-sm leading-5 rounded-lg capitalize  ${statusStyles}`}>
-            <span className={`w-2 h-2 rounded-full ${dotColor}`} />
-            {status}
-          </span>
-        );
-      },
-    }),
-    columnHelper.accessor("date", {
-      cell: (info) => (
-        <span>
-          {new Date(info.getValue()).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-            hour: "numeric",
-            minute: "numeric",
-          })}
-        </span>
-      ),
-      header: "Date / Time",
-    }),
-    columnHelper.display({
-      id: "edit",
-      header: "Actions",
-      cell: (info) => (
-        <button
-          className="border-1 border-opacityClr-100 rounded px-4 py-1.5 font-Raleway font-normal text-opacityClr-100 text-sm cursor-pointer"
-          onClick={() => openModal("Edit Task", <EditTaskDrawerContent task={info.row.original} />)}
-        >
-          Edit
-        </button>
-      ),
-    }),
-  ];
-
-  const taskTable = useReactTable<any>({
-    data: filteredData as any[],
-    columns: taskColumns,
-    state: { globalFilter: searchQuery },
-    onGlobalFilterChange: setGlobalFilter,
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-  });
+  const fullName = [facilityManager.firstName, facilityManager.lastName].filter(Boolean).join(" ") || "Facility Manager";
 
   return (
     <section className="flex flex-col gap-6">
-      {/* Breadcrumb Navigation */}
       <Breadcrumb
         items={[
           { label: "Dashboard", href: "/" },
-          { label: "Facility Admin", href: "/facility-admin" },
-          { label: facility?.name || "Facility Details" },
+          { label: "FM Manager", href: "/facility-admin" },
+          { label: fullName },
         ]}
       />
-      {/* Header */}
+
       <div className="flex flex-wrap items-center justify-between w-full gap-4">
-        <div className="flex items-center gap-4">
-          <img src={facility.image.src} alt={facility.name} className="w-16 h-16 rounded-xl object-cover" />
-          <div>
-            <h2 className="text-[28px] font-Raleway font-bold text-primary-10">{facility.name}</h2>
-            <div className="flex items-center gap-2 mt-1">
-              <img src={location.src} alt="location" className="w-4 h-4" />
-              <span className="text-sm font-Raleway font-medium text-primary-10">{facility.location}</span>
-            </div>
+        <div>
+          <h2 className="text-[28px] font-Raleway font-bold text-primary-10">{fullName}</h2>
+          <p className="text-sm font-Raleway font-medium text-gray-600 mt-1">Facility manager profile and details</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="rounded-2xl border border-opacityClr-30 bg-white p-6 flex flex-col gap-6">
+          <h3 className="text-lg font-Raleway font-bold text-primary-10">Profile Information</h3>
+
+          <div className="flex flex-col gap-5">
+            <DetailField label="First Name" value={facilityManager.firstName || "—"} icon={User} />
+            <DetailField label="Last Name" value={facilityManager.lastName || "—"} icon={User} />
+            <DetailField label="Email Address" value={facilityManager.email || "—"} icon={Mail} />
+            <DetailField
+              label="Phone Number"
+              value={formatPhoneNumber(facilityManager.phoneNumber)}
+              icon={Phone}
+            />
+            <DetailField label="Date Added" value={formatDate(facilityManager.createdAt)} icon={Calendar} />
           </div>
         </div>
-        <div className="flex gap-2">
-          <button
-            className="flex items-center justify-center gap-3 px-5 py-3 bg-primary-10 rounded-lg border border-transparent transition hover:bg-transparent hover:border-primary-10 group cursor-pointer"
-            onClick={() => openModal("Create New Task", <CreateTaskDrawer closeModal={closeModal} />)}
-          >
-            <span className="text-white font-Raleway font-semibold text-base group-hover:text-primary-10">Create New Task</span>
-          </button>
 
-          {selectedTaskIds.length > 0 && (
-            <button
-              className="flex items-center justify-center gap-3 px-5 py-3 rounded-lg border bg-transparent transition hover:bg-transparent border-[#9F1B1B] group cursor-pointer"
-              onClick={() => setShowConfirmModal(true)}
-            >
-              <span className="text-[#9F1B1B] font-Raleway font-semibold text-base group-hover:text-[#9F1B1B]">
-                {selectedTaskIds.length > 1 ? "Bulk Delete" : "Delete Task"}
-              </span>
-            </button>
+        <div className="rounded-2xl border border-opacityClr-30 bg-white p-6 flex flex-col gap-6">
+          <h3 className="text-lg font-Raleway font-bold text-primary-10">Government Issued ID</h3>
+
+          {facilityManager.idCard ? (
+            <div className="flex flex-col gap-4">
+              {!idImageError ? (
+                <img
+                  src={facilityManager.idCard}
+                  alt="Government ID"
+                  className="w-full max-h-80 object-contain rounded-lg border border-gray-200 bg-gray-50"
+                  onError={() => setIdImageError(true)}
+                />
+              ) : (
+                <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
+                  <p className="text-sm text-gray-600 font-Raleway mb-3">Preview unavailable for this document.</p>
+                  <a
+                    href={facilityManager.idCard}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-primary-10 hover:underline"
+                  >
+                    Open ID document
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
+                </div>
+              )}
+
+              {!idImageError && (
+                <a
+                  href={facilityManager.idCard}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-primary-10 hover:underline self-start"
+                >
+                  Open full document
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              )}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500 font-Raleway">No government ID uploaded.</p>
           )}
         </div>
       </div>
 
-      {/* tab buttons */}
-      <div className="flex items-center justify-center gap-2 w-full bg-[#ECECEC] rounded-[100px]">
-        <TabButton label="Facility Report" isActive={activeTab === "all"} onClick={() => setActiveTab("all")} />
-        <TabButton label="Approved" isActive={activeTab === "approved"} onClick={() => setActiveTab("approved")} />
-        <TabButton label="Pending" isActive={activeTab === "pending"} onClick={() => setActiveTab("pending")} />
-        <TabButton label="Rejected" isActive={activeTab === "rejected"} onClick={() => setActiveTab("rejected")} />
-      </div>
-
-      <div className="flex flex-col items-start justify-center rounded-2xl border border-opacityClr-30 bg-white">
-        <TableHeader
-          title={`Tasks (${taskTable.getRowModel().rows.length})`}
-          searchQuery={searchQuery}
-          handleInputChange={(e) => setSearchQuery(e.target.value)}
-          handleClear={() => setSearchQuery("")}
-        />
-        <TableHeadAndBody
-          table={taskTable}
-          emptyState={{
-            image: emptyWallet,
-            alt: "Empty User Data",
-            message: activeTab === "all" ? "No tasks assigned to this facility yet" : `No ${activeTab} tasks for this facility`,
-            ...(activeTab === "all"
-              ? {
-                  action: {
-                    label: "Create Task",
-                    onClick: () => openModal("Create New Task", <CreateTaskDrawer closeModal={closeModal} />),
-                  },
-                }
-              : {}),
-          }}
-        />
-        <Pagination
-          currentPage={taskTable.getState().pagination.pageIndex + 1}
-          totalPages={taskTable.getPageCount()}
-          onPageChange={(page: number) => taskTable.setPageIndex(page - 1)}
-          totalRecords={taskTable.getRowCount()}
-        />
-      </div>
-
-      <ConfirmationModal
-        isOpen={showConfirmModal}
-        onClose={() => setShowConfirmModal(false)}
-        onConfirm={handleDeleteSelected}
-        message="Are you sure you want to delete task record?"
-        confirmMsg="Yes, Delete"
-        cancelMsg="No, Cancel"
-      />
+      <AssignPropertySection managerId={managerId} />
     </section>
   );
 };
 
-export default FacilityDetailsPage;
+export default FacilityManagerDetailPage;

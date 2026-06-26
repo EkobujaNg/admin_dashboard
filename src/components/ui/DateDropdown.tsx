@@ -1,6 +1,6 @@
 // components/DateDropdown.js
 import React, { useState } from "react";
-import { HiChevronDown } from "react-icons/hi";
+import { ChevronDown } from "lucide-react";
 
 const DateDropdown = ({ options, defaultOption, onChange }) => {
   const [selectedOption, setSelectedOption] = useState(defaultOption);
@@ -21,7 +21,7 @@ const DateDropdown = ({ options, defaultOption, onChange }) => {
         onClick={() => setIsOpen(!isOpen)}
       >
         <span className="text-sm font-normal text-primary-10 leading-5">{selectedOption}</span>
-        <HiChevronDown />
+        <ChevronDown />
       </div>
 
       {isOpen && (

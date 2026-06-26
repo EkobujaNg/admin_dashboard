@@ -13,18 +13,17 @@ const AuthLayout = ({ children }) => {
   };
 
   return (
-    <main className="flex flex-col md:flex-row items-center justify-center md:h-screen bg-white container mx-auto">
+    <main className="flex flex-col md:flex-row w-full min-h-screen bg-white">
       <figure className="md:hidden self-start px-5 pt-12 pb-4 md:px-24 md:py-16">
         <Image src={LogoColored} alt="logo white" className="" />
       </figure>
 
-      <section className=" hidden px-5 py-12 md:px-24 md:py-16 bg-opacityClr-100 rounded-tr-[128px] h-full md:flex gap-24 justify-center flex-col relative w-[704px]">
+      <section className="hidden px-5 py-12 md:px-16 lg:px-24 md:py-16 bg-opacityClr-100 rounded-tr-[128px] min-h-screen md:flex gap-16 lg:gap-24 justify-center flex-col relative md:w-1/2 xl:w-[704px] xl:shrink-0">
         <Image src={FooterLogo} alt="logo white" className="" />
 
         <div className="flex flex-col items-start gap-6">
-          {/* Animated H1 */}
           <motion.h1
-            className="font-Raleway font-bold text-[64px] text-white leading-[96%] tracking-[-3.2px] w-[530px]"
+            className="font-Raleway font-bold text-4xl lg:text-[64px] text-white leading-[96%] tracking-[-3.2px] max-w-xl"
             variants={textVariants}
             initial="hidden"
             animate="visible"
@@ -33,9 +32,8 @@ const AuthLayout = ({ children }) => {
             Are My Funds & Assets Safe on <span className="text-neutral-lightGreen">EkoBuja?</span>
           </motion.h1>
 
-          {/* Animated Paragraph */}
           <motion.p
-            className="text-white font-Raleway text-lg font-light leading-[150%] w-[566px]"
+            className="text-white font-Raleway text-base lg:text-lg font-light leading-[150%] max-w-xl"
             variants={textVariants}
             initial="hidden"
             animate="visible"
@@ -47,7 +45,7 @@ const AuthLayout = ({ children }) => {
         </div>
       </section>
 
-      <section className="md:flex-1 flex items-center justify-center overflow-y-scroll  px-5 py-12 md:px-24 md:py-16 h-full bg-white w-full md:w-auto">
+      <section className="flex-1 flex items-center justify-center overflow-y-auto px-5 py-12 md:px-16 lg:px-24 md:py-16 min-h-screen bg-white w-full">
         {children}
       </section>
     </main>

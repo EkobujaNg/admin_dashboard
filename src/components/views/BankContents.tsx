@@ -2,8 +2,7 @@
 import React, { useState, useRef } from "react";
 import Image from "next/image";
 import { map, emptyBank } from "../../../public/assets/images";
-import { IoCheckmarkDone } from "react-icons/io5";
-import { GoPlus } from "react-icons/go";
+import { CheckCheck, Plus } from "lucide-react";
 import { useDrawerModal } from "@/context/DrawerModalContext";
 
 const bankDetails = [
@@ -68,9 +67,8 @@ const BankContents = () => {
             >
               <div className="w-[255px] h-[156px] rounded-2xl custom-gradient relative">
                 {/* Checkmark */}
-                <IoCheckmarkDone
-                  size={20}
-                  className="text-opacityClr-10 absolute top-4 right-4"
+                <CheckCheck
+                  className="text-opacityClr-10 absolute top-4 right-4 w-5 h-5"
                 />
 
                 {/* Background Image */}
@@ -121,7 +119,7 @@ const BankContents = () => {
         className=" border border-dashed border-primary-10 w-full flex items-center justify-center py-4 px-6 gap-3 rounded-lg mt-10"
         onClick={() => openModal("Add Bank", <p>Add bank form contents...</p>)}
       >
-        <GoPlus size={20} className="text-primary-10 font-semibold" />
+        <Plus className="w-5 h-5 text-primary-10 font-semibold" />
         <span className="font-Geist font-semibold text-primary-10 text-base leading-[150%] tracking-[-0.16px]">
           Add Bank
         </span>

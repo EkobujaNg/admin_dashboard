@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaChevronDown } from "react-icons/fa";
+import { ChevronDown } from "lucide-react";
 
 const Dropdown = ({ label, options, onSelect = () => {} }: { label: any; options: any; onSelect?: any }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,7 +18,7 @@ const Dropdown = ({ label, options, onSelect = () => {} }: { label: any; options
         className="w-full flex items-center justify-between gap-2 px-4 py-2.5 rounded-4xl border border-opacityClr-50 bg-transparent text-sm text-primary-10 whitespace-nowrap"
       >
         {selected}
-        <FaChevronDown size={12} />
+        <ChevronDown className="w-3 h-3" />
       </button>
 
       {isOpen && (

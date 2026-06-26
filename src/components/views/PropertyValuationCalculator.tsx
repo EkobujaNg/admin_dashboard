@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { FaPlus, FaTrash } from "react-icons/fa";
+import { Plus, Trash2 } from "lucide-react";
 import {
   ADMIN_ADJUST_WITH_OPTIONS,
   buildValuationPayload,
@@ -222,7 +222,7 @@ export default function PropertyValuationCalculator({
                       disabled={state.rentalUnits.length === 1}
                       className="flex items-center justify-center w-9 h-9 rounded-lg border border-red-200 bg-transparent hover:bg-red-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                     >
-                      <FaTrash className="text-red-500" size={14} />
+                      <Trash2 className="text-red-500 w-[14px] h-[14px]" />
                     </button>
                   </td>
                 </tr>
@@ -237,7 +237,7 @@ export default function PropertyValuationCalculator({
             onClick={handleAddUnit}
             className="flex items-center justify-center gap-2 px-5 py-3 bg-neutral-lightGreen rounded-md text-primary-10 font-Raleway text-base font-semibold leading-[150%] cursor-pointer"
           >
-            <FaPlus size={14} />
+            <Plus className="w-[14px] h-[14px]" />
             Add Unit
           </button>
           <p className="text-sm font-Raleway font-medium text-opacityClr-80">

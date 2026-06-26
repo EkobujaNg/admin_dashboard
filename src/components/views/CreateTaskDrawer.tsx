@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FiCalendar } from "react-icons/fi";
+import { Calendar } from "lucide-react";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
 import { customSelectStyles } from "@/lib/utils";
@@ -90,7 +90,7 @@ const CreateTaskDrawer = ({ closeModal }) => {
               onChange={handleInputChange}
               className="w-full border border-opacityClr-30 rounded-lg px-4 py-3 pr-10 text-opacityClr-100 text-base leading-[150%] outline-none bg-transparent placeholder:text-opacityClr-10"
             />
-            <FiCalendar className="absolute right-3 top-1/2 transform -translate-y-1/2 text-opacityClr-40 pointer-events-none" size={20} />
+            <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 text-opacityClr-40 pointer-events-none w-5 h-5" />
           </div>
         </div>
 

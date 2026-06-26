@@ -3,9 +3,8 @@
 import React, { useState, useCallback, useEffect, memo } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { BsArrowUpRight } from "react-icons/bs";
+import { ArrowUpRight, Eye, EyeOff } from "lucide-react";
 import { location, info } from "../../../public/assets/icons";
-import { Eye, EyeOff } from "lucide-react";
 import { usePropertyAPI } from "@/services/usePropertyAPI";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
 
@@ -90,7 +89,7 @@ const PropertyCard = memo(({ property }: { property?: any }) => {
               onClick={() => router.push(`/properties/${property.propertyId}`)}
               className="bg-[#C2DF93] hidden md:flex items-center justify-center gap-2 p-2 h-[50px] w-[50px] rounded-full border border-neutral-lightGreen transition-all duration-500 hover:bg-transparent hover:border-[#E8EBEB] group cursor-pointer"
             >
-              <BsArrowUpRight className="group-hover:text-opacityClr-10" />
+              <ArrowUpRight className="group-hover:text-opacityClr-10" />
             </button>
           </div>
 

@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { MdArrowBack } from "react-icons/md";
+import { ArrowLeft } from "lucide-react";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import AddPropertyListingForm from "@/components/views/AddPropertyListingForm";
 import { usePropertyAPI } from "@/services/usePropertyAPI";
@@ -54,7 +54,7 @@ const EditPropertyPage = () => {
         href={`/properties/${propertyId}`}
         className="inline-flex items-center gap-2 text-sm font-Raleway font-semibold text-opacityClr-60 hover:text-primary-10 transition-colors w-fit"
       >
-        <MdArrowBack className="w-4 h-4" />
+        <ArrowLeft className="w-4 h-4" />
         Back to property
       </Link>
 

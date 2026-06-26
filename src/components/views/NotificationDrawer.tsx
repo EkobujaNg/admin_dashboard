@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { FaEnvelope, FaEnvelopeOpen } from "react-icons/fa6";
+import { Mail, MailOpen } from "lucide-react";
 import { useDrawerModal } from "@/context/DrawerModalContext";
 
 const notificationsData = [
@@ -61,9 +61,9 @@ const NotificationDrawer = () => {
         >
           <span className="flex w-10 h-10 p-[10px] items-center justify-center rounded-lg bg-opacityClr-10">
             {notif.isRead ? (
-              <FaEnvelopeOpen size={20} className="text-primary-20" />
+              <MailOpen className="text-primary-20 w-5 h-5" />
             ) : (
-              <FaEnvelope size={20} className="text-primary-20" />
+              <Mail className="text-primary-20 w-5 h-5" />
             )}
           </span>
           <p className="text-primary-10 text-sm font-Raleway font-medium leading-normal">

@@ -1,7 +1,7 @@
 // HEADER CODE
 "use client";
 import React, { useState, useEffect, memo } from "react";
-import { FaBell, FaBars } from "react-icons/fa"; // Added FaBars
+import { Bell, Menu } from "lucide-react";
 import Drawer from "../ui/Drawer";
 import { useDrawerModal } from "@/context/DrawerModalContext";
 
@@ -50,7 +50,7 @@ const Header = memo(({ toggleSidebar }: { toggleSidebar: any }) => {
         <div className="flex items-center gap-3">
           {/* Mobile Toggle Button */}
           <button onClick={toggleSidebar} className="block md:hidden text-gray-600 focus:outline-none">
-            <FaBars className="w-6 h-6" />
+            <Menu className="w-6 h-6" />
           </button>
 
           <div className="">
@@ -62,7 +62,7 @@ const Header = memo(({ toggleSidebar }: { toggleSidebar: any }) => {
 
         <div className="flex items-center gap-4">
           <div className="relative cursor-pointer" onClick={() => openModal("Notifications Main", <p>Notification drawer...</p>)}>
-            <FaBell className="w-5 h-5 md:w-6 md:h-6 text-gray-600 hover:text-black" />
+            <Bell className="w-5 h-5 md:w-6 md:h-6 text-gray-600 hover:text-black" />
             <span className="absolute top-0 right-0 w-2 h-2 bg-orange-500 rounded-full"></span>
           </div>
         </div>
