@@ -1,10 +1,8 @@
 // src/components/views/PropertyCard.jsx
 "use client";
 import React, { useState, useCallback, useEffect, memo } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { ArrowUpRight, Eye, EyeOff } from "lucide-react";
-import { location, info } from "../../../public/assets/icons";
+import { ArrowUpRight, Eye, EyeOff, MapPin, Info } from "lucide-react";
 import { usePropertyAPI } from "@/services/usePropertyAPI";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
 
@@ -95,11 +93,11 @@ const PropertyCard = memo(({ property }: { property?: any }) => {
 
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
-              <Image src={location} alt="location" />
+              <MapPin className="w-4 h-4 text-primary-10 shrink-0" />
               <p className="text-primary-10 font-Geist font-normal text-base leading-normal">{property.propertyLocation}</p>
             </div>
             <div className="flex items-center gap-2">
-              <Image src={info} alt="yield" />
+              <Info className="w-4 h-4 text-primary-10 shrink-0" />
               <p className="text-primary-10 font-Geist font-normal text-base leading-normal">
                 Estimate to yield up to <span className="text-[#6D9F1B]">{yieldPercent}</span> annually
               </p>

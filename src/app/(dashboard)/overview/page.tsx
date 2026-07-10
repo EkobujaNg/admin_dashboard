@@ -4,14 +4,13 @@ import React, { useState, useMemo } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Building2, Users, Briefcase, ChartColumn } from "lucide-react";
 import { useDrawerModal } from "@/context/DrawerModalContext";
 import PropertyCard from "@/components/views/PropertyCard";
 import RecentActivities from "@/components/views/RecentActivities";
 import AddPropertyCardDrawer from "@/components/views/AddPropertyCardDrawer";
 import { usePropertyAPI } from "@/services/usePropertyAPI";
 import { emptyAssets } from "../../../../public/assets/images";
-import { companyFilledIcon, userIconFilled, bagIconFilled, chartIconFilled } from "../../../../public/assets/icons";
 const InvestmentRevenueChart = dynamic(() => import("@/components/views/InvestmentRevenueChart"), {
   ssr: false,
   loading: () => <div className="spinner"></div>,
@@ -57,7 +56,7 @@ const Overview = () => {
         >
           <div className="flex flex-col gap-4 px-6 py-4">
             <span className="w-12 h-12 flex p-2.5 items-center justify-center gap-2.5 rounded-[10px] bg-opacityClr-10">
-              <Image src={companyFilledIcon} alt="company" width={24} height={24} />
+              <Building2 className="w-6 h-6 text-opacityClr-10" />
             </span>
             <div className="flex flex-col items-start">
               <p className="font-Raleway font-semibold text-base text-opacityClr-10">Total Properties</p>
@@ -75,7 +74,7 @@ const Overview = () => {
         <div className="w-full rounded-lg flex flex-col bg-[#EFF1F1] ">
           <div className="flex flex-col gap-4 px-6 py-4">
             <span className="w-12 h-12 flex p-2.5 items-center justify-center gap-2.5 rounded-[10px] bg-[#E1E7E7]">
-              <Image src={userIconFilled} alt="company" width={24} height={24} />
+              <Users className="w-6 h-6 text-primary-10" />
             </span>
             <div className="flex flex-col items-start">
               <p className="font-Raleway font-semibold text-base text-primary-10">Active Users</p>
@@ -92,7 +91,7 @@ const Overview = () => {
         <div className="w-full rounded-lg flex flex-col bg-[#EFF1F1] ">
           <div className="flex flex-col gap-4 px-6 py-4">
             <span className="w-12 h-12 flex p-2.5 items-center justify-center gap-2.5 rounded-[10px] bg-[#E1E7E7]">
-              <Image src={bagIconFilled} alt="company" width={24} height={24} />
+              <Briefcase className="w-6 h-6 text-primary-10" />
             </span>
             <div className="flex flex-col items-start">
               <p className="font-Raleway font-semibold text-base text-primary-10">Revenue Generated</p>
@@ -109,7 +108,7 @@ const Overview = () => {
         <div className="w-full rounded-lg flex flex-col bg-[#EFF1F1] ">
           <div className="flex flex-col gap-4 px-6 py-4">
             <span className="w-12 h-12 flex p-2.5 items-center justify-center gap-2.5 rounded-[10px] bg-[#E1E7E7]">
-              <Image src={chartIconFilled} alt="company" width={24} height={24} />
+              <ChartColumn className="w-6 h-6 text-primary-10" />
             </span>
             <div className="flex flex-col items-start">
               <p className="font-Raleway font-semibold text-base text-primary-10">Total Stock</p>
@@ -127,7 +126,7 @@ const Overview = () => {
       <div className="flex gap-6 items-center justify-between py-4 px-6 w-full rounded-2xl bg-primary-10">
         <div className="flex gap-6 items-center">
           <span className="w-14 h-14 flex p-2.5 items-center justify-center gap-2.5 rounded-[10px] bg-opacityClr-10">
-            <Image src={companyFilledIcon} alt="company" width={24} height={24} />
+            <Building2 className="w-6 h-6 text-opacityClr-10" />
           </span>
 
           <div className="flex flex-col gap-1.5 items-start">

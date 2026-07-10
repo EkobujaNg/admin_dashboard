@@ -63,7 +63,7 @@ const Drawer = () => {
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto px-4 pb-6">{current.content}</div>
+        <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-0 flex flex-col">{current.content}</div>
       </motion.div>
     </>
   );

@@ -52,7 +52,7 @@ const ActionDropdown = ({ actions = [], className = "", triggerClassName = "", d
                 action.variant === "warning" && "text-orange-600 hover:bg-orange-50"
               )}
             >
-              {action.icon && <action.icon size={16} />}
+              {action.icon && <action.icon className="w-4 h-4" />}
               {action.label}
             </button>
           ))}

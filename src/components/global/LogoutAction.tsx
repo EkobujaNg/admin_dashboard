@@ -1,15 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 import nookies from "nookies";
+import { LogOut } from "lucide-react";
 import { logout } from "@/lib/store/slices/authSlice";
 import { signOut } from "@/lib/auth/api";
 import { AUTH_COOKIE_NAME } from "@/lib/auth/routes";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
-import { logoutIcon, logoutIconFilled } from "../../../public/assets/icons";
 
 type LogoutActionProps = {
   variant?: "sidebar" | "session-reset";
@@ -49,10 +48,7 @@ export default function LogoutAction({
           className="flex items-center space-x-4 px-4 py-2 group w-full hover:bg-red-50/60 hover:rounded-[100px] cursor-pointer"
           onClick={() => setIsOpen(true)}
         >
-          <span className="text-[15px]">
-            <Image src={logoutIcon} alt="Logout" width={18} height={18} className="h-auto group-hover:hidden" />
-            <Image src={logoutIconFilled} alt="Logout" width={18} height={18} className="h-auto hidden group-hover:block" />
-          </span>
+          <LogOut className="w-[18px] h-[18px] text-red-600 group-hover:text-red-700" strokeWidth={1.75} />
           <span className="text-[15px] text-red-600 font-Raleway font-semibold leading-normal group-hover:text-red-700">
             Log Out
           </span>
@@ -66,7 +62,7 @@ export default function LogoutAction({
           <span className="text-base font-Raleway font-semibold leading-normal text-primary-10">
             Log Out Of All Sessions
           </span>
-          <Image src="/assets/icons/logoutIconFilled.svg" alt="logout" width={20} height={20} className="w-5 h-5" />
+          <LogOut className="w-5 h-5 text-primary-10" />
         </button>
       )}
 

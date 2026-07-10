@@ -11,6 +11,8 @@ type ConfirmationModalProps = {
   cancelMsg: string;
   confirmMsg: string;
   confirmButtonColor?: "red" | "green";
+  children?: React.ReactNode;
+  confirmDisabled?: boolean;
 };
 
 const ConfirmationModal = ({
@@ -21,6 +23,8 @@ const ConfirmationModal = ({
   cancelMsg,
   confirmMsg,
   confirmButtonColor = "red",
+  children,
+  confirmDisabled = false,
 }: ConfirmationModalProps) => {
   useEffect(() => {
     if (!isOpen) return;
@@ -63,6 +67,7 @@ const ConfirmationModal = ({
           <p className="mt-4 text-primary-10 font-Raleway text-base font-medium leading-normal text-center">
             {message}
           </p>
+          {children ? <div className="mt-4">{children}</div> : null}
         </div>
 
         <div className="flex flex-col-reverse sm:flex-row items-stretch gap-3 px-6 py-6">
@@ -74,7 +79,12 @@ const ConfirmationModal = ({
             {cancelMsg}
           </button>
 
-          <button type="button" onClick={onConfirm} className={confirmButtonClasses}>
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={confirmDisabled}
+            className={`${confirmButtonClasses} disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-inherit`}
+          >
             {confirmMsg}
           </button>
         </div>
