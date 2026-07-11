@@ -41,9 +41,14 @@ function matchSelectOption<T extends string | number>(
 }
 
 export function mapPropertyToDetailsState(property: PropertyRecord): PropertyDetailsState {
+  const aboutProperty = (property.aboutProperty ?? []).map(String).filter(Boolean);
+
+  const presaleValue = property.presale ?? property.amountRaisedDuringPresale;
+
   return {
     name: property.name || property.propertyName || "",
-    description: property.description || property.aboutProperty || "",
+    description: property.description || "",
+    aboutProperty: aboutProperty.length > 0 ? aboutProperty : [""],
     propertyType: (property.propertyType as PropertyListingType) || "",
     media: property.media?.length ? property.media : property.imageUrls || [],
     propertyAddress: property.propertyAddress || "",
@@ -51,6 +56,7 @@ export function mapPropertyToDetailsState(property: PropertyRecord): PropertyDet
     state: property.state || "",
     zip: property.zip || "",
     numberOfShares: String(property.numberOfShares ?? ""),
+    presale: presaleValue != null ? String(presaleValue) : "",
   };
 }
 

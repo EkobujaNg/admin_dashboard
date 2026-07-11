@@ -13,112 +13,97 @@ const dummySummary = {
 
 const dummyActiveInvestments = [
   {
-    id: "inv-001",
-    investorName: "Adewale Okonkwo",
-    propertyName: "Sunset Heights",
-    amountInvested: 5000000,
-    units: 1,
-    roi: 15,
-    startDate: "2026-01-20T00:00:00Z",
+    investmentId: "INV-E001",
+    userName: "Adewale Okonkwo",
+    email: "adewale.okonkwo@gmail.com",
+    assetOwned: "Sunset Heights",
+    ownedPercentage: 5,
+    amount: 5000000,
     maturityDate: "2027-01-20T00:00:00Z",
-    status: "Active",
-    earnings: 187500,
   },
   {
-    id: "inv-002",
-    investorName: "Fatima Al-Hassan",
-    propertyName: "Green Meadows Estate",
-    amountInvested: 24000000,
-    units: 2,
-    roi: 18,
-    startDate: "2026-02-15T00:00:00Z",
+    investmentId: "INV-E002",
+    userName: "Fatima Al-Hassan",
+    email: "fatima.alhassan@gmail.com",
+    assetOwned: "Green Meadows Estate",
+    ownedPercentage: 10,
+    amount: 24000000,
     maturityDate: "2027-02-15T00:00:00Z",
-    status: "Active",
-    earnings: 1080000,
   },
   {
-    id: "inv-003",
-    investorName: "Chukwuemeka Nwosu",
-    propertyName: "Blue Waters Residence",
-    amountInvested: 25000000,
-    units: 1,
-    roi: 20,
-    startDate: "2026-03-10T00:00:00Z",
+    investmentId: "INV-E003",
+    userName: "Chukwuemeka Nwosu",
+    email: "chukwuemeka.nwosu@gmail.com",
+    assetOwned: "Blue Waters Residence",
+    ownedPercentage: 8,
+    amount: 25000000,
     maturityDate: "2027-03-10T00:00:00Z",
-    status: "Active",
-    earnings: 1250000,
   },
   {
-    id: "inv-004",
-    investorName: "Ngozi Eze",
-    propertyName: "Sunset Heights",
-    amountInvested: 10000000,
-    units: 2,
-    roi: 15,
-    startDate: "2026-01-25T00:00:00Z",
+    investmentId: "INV-E004",
+    userName: "Ngozi Eze",
+    email: "ngozi.eze@gmail.com",
+    assetOwned: "Sunset Heights",
+    ownedPercentage: 12,
+    amount: 10000000,
     maturityDate: "2027-01-25T00:00:00Z",
-    status: "Active",
-    earnings: 375000,
   },
   {
-    id: "inv-005",
-    investorName: "Babatunde Adeyemi",
-    propertyName: "Palm Court Gardens",
-    amountInvested: 8000000,
-    units: 1,
-    roi: 14,
-    startDate: "2025-12-01T00:00:00Z",
+    investmentId: "INV-E005",
+    userName: "Babatunde Adeyemi",
+    email: "babatunde.adeyemi@gmail.com",
+    assetOwned: "Palm Court Gardens",
+    ownedPercentage: 6,
+    amount: 8000000,
     maturityDate: "2026-12-01T00:00:00Z",
-    status: "Active",
-    earnings: 280000,
   },
 ];
 
 const dummyEarningReports = [
   {
-    id: "rep-001",
-    investorName: "Adewale Okonkwo",
-    propertyName: "Palm Court Gardens",
-    amountEarned: 1120000,
-    disbursementDate: "2026-05-01T00:00:00Z",
-    status: "Disbursed",
-    period: "Q1 2026",
+    investmentId: "INV-E001",
+    userName: "Adewale Okonkwo",
+    email: "adewale.okonkwo@gmail.com",
+    propertyCode: "Palm Court Gardens",
+    roi: 14,
+    earnings: 1120000,
+    distributedEarnings: 960000,
   },
   {
-    id: "rep-002",
-    investorName: "Fatima Al-Hassan",
-    propertyName: "Sunset Heights",
-    amountEarned: 750000,
-    disbursementDate: "2026-05-05T00:00:00Z",
-    status: "Disbursed",
-    period: "Q1 2026",
+    investmentId: "INV-E002",
+    userName: "Fatima Al-Hassan",
+    email: "fatima.alhassan@gmail.com",
+    propertyCode: "Sunset Heights",
+    roi: 15,
+    earnings: 750000,
+    distributedEarnings: 750000,
   },
   {
-    id: "rep-003",
-    investorName: "Chukwuemeka Nwosu",
-    propertyName: "Green Meadows Estate",
-    amountEarned: 2160000,
-    disbursementDate: "2026-05-10T00:00:00Z",
-    status: "Disbursed",
-    period: "Q1 2026",
+    investmentId: "INV-E003",
+    userName: "Chukwuemeka Nwosu",
+    email: "chukwuemeka.nwosu@gmail.com",
+    propertyCode: "Green Meadows Estate",
+    roi: 18,
+    earnings: 2160000,
+    distributedEarnings: 1800000,
   },
   {
-    id: "rep-004",
-    investorName: "Ngozi Eze",
-    propertyName: "Blue Waters Residence",
-    amountEarned: 5000000,
-    disbursementDate: "2026-05-15T00:00:00Z",
-    status: "Pending",
-    period: "Q1 2026",
+    investmentId: "INV-E004",
+    userName: "Ngozi Eze",
+    email: "ngozi.eze@gmail.com",
+    propertyCode: "Blue Waters Residence",
+    roi: 20,
+    earnings: 5000000,
+    distributedEarnings: 0,
   },
   {
-    id: "rep-005",
-    investorName: "Babatunde Adeyemi",
-    propertyName: "Palm Court Gardens",
-    amountEarned: 1120000,
-    disbursementDate: "2026-05-20T00:00:00Z",
-    status: "Pending",
-    period: "Q1 2026",
+    investmentId: "INV-E005",
+    userName: "Babatunde Adeyemi",
+    email: "babatunde.adeyemi@gmail.com",
+    propertyCode: "Palm Court Gardens",
+    roi: 14,
+    earnings: 1120000,
+    distributedEarnings: 800000,
   },
 ];
 
@@ -136,16 +121,20 @@ export default function useInvestmentAPI({
   const filteredActive = activeSearch
     ? dummyActiveInvestments.filter(
         (inv) =>
-          inv.investorName.toLowerCase().includes(activeSearch.toLowerCase()) ||
-          inv.propertyName.toLowerCase().includes(activeSearch.toLowerCase())
+          inv.userName.toLowerCase().includes(activeSearch.toLowerCase()) ||
+          inv.email.toLowerCase().includes(activeSearch.toLowerCase()) ||
+          inv.assetOwned.toLowerCase().includes(activeSearch.toLowerCase()) ||
+          inv.investmentId.toLowerCase().includes(activeSearch.toLowerCase())
       )
     : dummyActiveInvestments;
 
   const filteredReports = reportSearch
     ? dummyEarningReports.filter(
         (rep) =>
-          rep.investorName.toLowerCase().includes(reportSearch.toLowerCase()) ||
-          rep.propertyName.toLowerCase().includes(reportSearch.toLowerCase())
+          rep.userName.toLowerCase().includes(reportSearch.toLowerCase()) ||
+          rep.email.toLowerCase().includes(reportSearch.toLowerCase()) ||
+          rep.propertyCode.toLowerCase().includes(reportSearch.toLowerCase()) ||
+          rep.investmentId.toLowerCase().includes(reportSearch.toLowerCase())
       )
     : dummyEarningReports;
 
@@ -161,7 +150,7 @@ export default function useInvestmentAPI({
     activeInvestments: (enableActive ? activeSlice : []) as any[],
     activeMeta: {
       totalRecords: filteredActive.length,
-      totalPages: Math.ceil(filteredActive.length / activeSize),
+      totalPages: Math.ceil(filteredActive.length / activeSize) || 1,
       pageNumber: activePage,
       pageSize: activeSize,
     },
@@ -172,7 +161,7 @@ export default function useInvestmentAPI({
     earningReports: (enableReports ? reportsSlice : []) as any[],
     reportsMeta: {
       totalRecords: filteredReports.length,
-      totalPages: Math.ceil(filteredReports.length / reportSize),
+      totalPages: Math.ceil(filteredReports.length / reportSize) || 1,
       pageNumber: reportPage,
       pageSize: reportSize,
     },

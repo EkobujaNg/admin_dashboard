@@ -84,6 +84,15 @@ export function normalizeProperty(property: ApiProperty): PropertyRecord {
     parseDecimal(property.ekobujaValue) ??
     parseDecimal(property.amountRaisedDuringPresale);
   const capRate = propertyValuation?.capRate ?? parseDecimal(property.capRate);
+  const aboutProperty = Array.isArray(property.aboutProperty)
+    ? property.aboutProperty.map(String).map((item) => item.trim()).filter(Boolean)
+    : typeof property.aboutProperty === "string" && property.aboutProperty.trim()
+      ? [property.aboutProperty.trim()]
+      : [];
+  const presale =
+    parseDecimal(property.presale) ??
+    parseDecimal(property.amountRaisedDuringPresale) ??
+    null;
 
   return {
     ...property,
@@ -91,8 +100,8 @@ export function normalizeProperty(property: ApiProperty): PropertyRecord {
     id: propertyId,
     propertyName: property.propertyName || property.name || "Untitled Property",
     name: property.name || property.propertyName || "Untitled Property",
-    description: property.description || property.aboutProperty || "",
-    aboutProperty: property.aboutProperty || property.description || "",
+    description: property.description || "",
+    aboutProperty,
     imageUrls: media,
     media,
     pricePerStock: property.pricePerStock ?? property.shareValue ?? 0,
@@ -110,7 +119,11 @@ export function normalizeProperty(property: ApiProperty): PropertyRecord {
     features: property.features || [],
     estimatedYieldPerAnnum:
       property.estimatedYieldPerAnnum ?? (capRate != null ? capRate * 100 : null),
-    amountRaisedDuringPresale: ekobujaValue,
+    amountRaisedDuringPresale: presale ?? ekobujaValue,
+    presale,
+    commission: parseDecimal(property.commission),
+    ekobujaBuyBack:
+      parseDecimal(property.ekobujaBuyBack) ?? parseDecimal(property.ekbujaBuyBack),
     ekobujaValue,
     propertyValuation,
     rentalUnits: propertyValuation?.rentalUnits || [],

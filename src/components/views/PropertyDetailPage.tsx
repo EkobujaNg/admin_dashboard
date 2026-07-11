@@ -1,12 +1,18 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { ArrowLeft, Eye, EyeOff, MapPin, ArrowUpRight, Pencil } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, MapPin, ArrowUpRight, Pencil, Percent, RefreshCw } from "lucide-react";
 import TabButton from "@/components/ui/TabButton";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
+import ActionDropdown from "@/components/ui/ActionDropdown";
+import PropertyTasksTab from "@/components/views/PropertyTasksTab";
+import PropertyTransactionsTab from "@/components/views/PropertyTransactionsTab";
+import PropertyReportsTab from "@/components/views/PropertyReportsTab";
+import UpdatePropertyCommissionDrawer from "@/components/views/UpdatePropertyCommissionDrawer";
+import UpdatePropertyBuybackDrawer from "@/components/views/UpdatePropertyBuybackDrawer";
+import { useDrawerModal } from "@/context/DrawerModalContext";
 import { formatNaira, formatPercent } from "@/lib/property/valuation";
 import { PROPERTY_LISTING_TYPE_OPTIONS, type PropertyRecord } from "@/lib/property/types";
 import { usePropertyAPI } from "@/services/usePropertyAPI";
@@ -51,6 +57,7 @@ function formatUnitType(unitType: string) {
 
 const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
   const router = useRouter();
+  const { openModal } = useDrawerModal();
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isHidden, setIsHidden] = useState(Boolean(property?.isHidden));
@@ -63,6 +70,56 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
   useEffect(() => {
     setIsHidden(Boolean(property?.isHidden));
   }, [property?.isHidden]);
+
+  const headerActions = useMemo(
+    () => [
+      {
+        label: "Edit Property",
+        icon: Pencil,
+        onClick: () => router.push(`/properties/${property.propertyId}/edit`),
+      },
+      {
+        label: "Update Commission",
+        icon: Percent,
+        onClick: () =>
+          openModal(
+            "Update Commission",
+            <UpdatePropertyCommissionDrawer
+              propertyId={property.propertyId}
+              currentCommission={property.commission}
+            />
+          ),
+      },
+      {
+        label: "Update Ekobuja Buyback",
+        icon: RefreshCw,
+        onClick: () =>
+          openModal(
+            "Update Ekobuja Buyback",
+            <UpdatePropertyBuybackDrawer
+              propertyId={property.propertyId}
+              currentBuyback={property.ekobujaBuyBack}
+            />
+          ),
+      },
+      {
+        label: isHidden ? "Show Property" : "Hide Property",
+        icon: isHidden ? Eye : EyeOff,
+        variant: isHidden ? ("success" as const) : ("warning" as const),
+        disabled: isUpdatingPropertyVisibility,
+        onClick: () => setIsConfirmOpen(true),
+      },
+    ],
+    [
+      isHidden,
+      isUpdatingPropertyVisibility,
+      openModal,
+      property.commission,
+      property.ekobujaBuyBack,
+      property.propertyId,
+      router,
+    ]
+  );
 
   if (!property) return null;
 
@@ -106,27 +163,7 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
         </div>
 
         <div className="flex items-center gap-3 shrink-0">
-          <button
-            type="button"
-            onClick={() => setIsConfirmOpen(true)}
-            disabled={isUpdatingPropertyVisibility}
-            className={`inline-flex items-center gap-2 px-5 py-3 rounded-lg font-Raleway font-semibold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-              isHidden
-                ? "border border-neutral-lightGreen bg-white text-primary-10 hover:bg-neutral-lightGreen"
-                : "border border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100"
-            }`}
-          >
-            {isHidden ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-            {isUpdatingPropertyVisibility ? "Updating..." : isHidden ? "Show Property" : "Hide Property"}
-          </button>
-
-          <Link
-            href={`/properties/${property.propertyId}/edit`}
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-neutral-lightGreen text-primary-10 font-Raleway font-semibold text-sm hover:bg-primary-10 hover:text-white transition-colors"
-          >
-            <Pencil className="w-4 h-4" />
-            Edit Property
-          </Link>
+          <ActionDropdown label="Actions" actions={headerActions} />
         </div>
       </div>
 
@@ -206,15 +243,37 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
       <div className="flex items-center justify-center gap-2 w-full bg-[#ECECEC] rounded-[100px]">
         <TabButton label="Overview" isActive={activeTab === "overview"} onClick={() => setActiveTab("overview")} />
         <TabButton label="Valuation" isActive={activeTab === "valuation"} onClick={() => setActiveTab("valuation")} />
+        <TabButton label="Tasks" isActive={activeTab === "tasks"} onClick={() => setActiveTab("tasks")} />
+        <TabButton
+          label="Transactions"
+          isActive={activeTab === "transactions"}
+          onClick={() => setActiveTab("transactions")}
+        />
+        <TabButton label="Reports" isActive={activeTab === "reports"} onClick={() => setActiveTab("reports")} />
       </div>
 
       <div className="flex flex-col gap-6 w-full">
         {activeTab === "overview" && (
           <>
-            <SectionCard title="About">
+            <SectionCard title="Description">
               <p className="text-base font-Raleway text-primary-10 leading-relaxed">
-                {property.description || "No description provided."}
+                {property.description?.trim() || "No description provided."}
               </p>
+            </SectionCard>
+
+            <SectionCard title="About Property">
+              {Array.isArray(property.aboutProperty) && property.aboutProperty.some((item) => item.trim()) ? (
+                <ul className="list-disc pl-5 flex flex-col gap-2 text-base font-Raleway text-primary-10 leading-relaxed">
+                  {property.aboutProperty
+                    .map((item) => item.trim())
+                    .filter(Boolean)
+                    .map((item, index) => (
+                      <li key={`${index}-${item}`}>{item}</li>
+                    ))}
+                </ul>
+              ) : (
+                <p className="text-base font-Raleway text-opacityClr-60">No property highlights provided.</p>
+              )}
             </SectionCard>
 
             <SectionCard title="Property Details">
@@ -225,6 +284,18 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
               <DetailRow label="ZIP" value={property.zip || "—"} />
               <DetailRow label="Total Shares" value={property.numberOfShares.toLocaleString()} />
               <DetailRow label="Shares Sold" value={property.sharesSold.toLocaleString()} />
+              <DetailRow
+                label="Presale"
+                value={property.presale != null ? formatNaira(property.presale) : "—"}
+              />
+              <DetailRow
+                label="Commission"
+                value={property.commission != null ? `${Number(property.commission)}%` : "—"}
+              />
+              <DetailRow
+                label="Ekobuja Buyback"
+                value={property.ekobujaBuyBack != null ? `${Number(property.ekobujaBuyBack)}%` : "—"}
+              />
               <DetailRow label="Visibility" value={isHidden ? "Hidden" : "Visible"} />
               <DetailRow label="Created" value={formatDate(property.createdAt)} />
               <DetailRow label="Last Updated" value={formatDate(property.updatedAt)} />
@@ -311,6 +382,11 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
             )}
           </>
         )}
+        {activeTab === "tasks" && <PropertyTasksTab propertyId={property.propertyId} />}
+        {activeTab === "transactions" && (
+          <PropertyTransactionsTab propertyId={property.propertyId} />
+        )}
+        {activeTab === "reports" && <PropertyReportsTab propertyId={property.propertyId} />}
       </div>
 
       <ConfirmationModal

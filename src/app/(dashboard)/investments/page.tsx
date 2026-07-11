@@ -106,18 +106,26 @@ const InvestmentPage = () => {
     }),
 
     columnHelper.accessor("ownedPercentage", {
-      cell: (info) => <span>{info.getValue()}%</span>,
+      cell: (info) => <span>{Number(info.getValue() ?? 0)}%</span>,
       header: "Owned (%)",
     }),
 
     columnHelper.accessor("amount", {
-      cell: (info) => <span className="font-medium">₦{info.getValue().toLocaleString()}</span>,
+      cell: (info) => {
+        const amount = Number(info.getValue() ?? 0);
+        return <span className="font-medium">₦{(Number.isFinite(amount) ? amount : 0).toLocaleString()}</span>;
+      },
       header: "Amount",
     }),
 
     columnHelper.accessor("maturityDate", {
       cell: (info) => {
-        const date = new Date(info.getValue());
+        const raw = info.getValue();
+        if (!raw) return <span className="text-gray-500">—</span>;
+
+        const date = new Date(raw);
+        if (Number.isNaN(date.getTime())) return <span className="text-gray-500">—</span>;
+
         return (
           <div className="flex flex-col">
             <span>{date.toLocaleDateString("en-US", { day: "2-digit", month: "short" })}</span>
@@ -165,12 +173,19 @@ const InvestmentPage = () => {
 
     columnHelper.accessor("earnings", {
       header: "Earnings",
-      cell: (info) => (
-        <div className="flex flex-col">
-          <span className="font-medium">₦{info.getValue().toLocaleString()}</span>
-          <span className="text-xs text-gray-500">₦{info.row.original.distributedEarnings?.toLocaleString()} distributed</span>
-        </div>
-      ),
+      cell: (info) => {
+        const earnings = Number(info.getValue() ?? 0);
+        const distributed = Number(info.row.original.distributedEarnings ?? 0);
+
+        return (
+          <div className="flex flex-col">
+            <span className="font-medium">₦{(Number.isFinite(earnings) ? earnings : 0).toLocaleString()}</span>
+            <span className="text-xs text-gray-500">
+              ₦{(Number.isFinite(distributed) ? distributed : 0).toLocaleString()} distributed
+            </span>
+          </div>
+        );
+      },
     }),
   ];
 

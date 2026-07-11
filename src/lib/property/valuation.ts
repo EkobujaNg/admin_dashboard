@@ -1,4 +1,4 @@
-import type { CreatePropertyPayload, PropertyListingType } from "./types";
+import type { CreatePropertyPayload, PropertyListingType, UpdatePropertyPayload } from "./types";
 
 export type SelectOption<T extends string | number = number> = {
   value: T;
@@ -239,23 +239,28 @@ export function formatPercent(rate: number): string {
   return `${(rate * 100).toFixed(2)}%`;
 }
 
+type PropertyDetailsPayloadInput = {
+  name: string;
+  description: string;
+  aboutProperty: string[];
+  propertyType: PropertyListingType | "";
+  media: string[];
+  propertyAddress: string;
+  city: string;
+  state: string;
+  zip: string;
+  numberOfShares: string | number;
+  presale: string | number;
+};
+
 export function buildCreatePropertyPayload(
-  details: {
-    name: string;
-    description: string;
-    propertyType: PropertyListingType | "";
-    media: string[];
-    propertyAddress: string;
-    city: string;
-    state: string;
-    zip: string;
-    numberOfShares: string | number;
-  },
+  details: PropertyDetailsPayloadInput,
   valuationState: ValuationFormState
 ): CreatePropertyPayload {
   return {
     name: details.name.trim(),
     description: details.description.trim(),
+    aboutProperty: details.aboutProperty.map((item) => item.trim()).filter(Boolean),
     propertyType: details.propertyType as PropertyListingType,
     media: details.media,
     propertyAddress: details.propertyAddress.trim(),
@@ -263,6 +268,18 @@ export function buildCreatePropertyPayload(
     state: details.state.trim(),
     zip: details.zip.trim(),
     numberOfShares: Number(details.numberOfShares) || 0,
+    presale: Number(details.presale) || 0,
     valuation: buildValuationPayload(valuationState),
   };
+}
+
+export function buildUpdatePropertyPayload(
+  details: PropertyDetailsPayloadInput,
+  valuationState: ValuationFormState
+): UpdatePropertyPayload {
+  const { numberOfShares: _shares, presale: _presale, ...rest } = buildCreatePropertyPayload(
+    details,
+    valuationState
+  );
+  return rest;
 }

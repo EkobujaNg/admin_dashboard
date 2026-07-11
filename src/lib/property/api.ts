@@ -2,6 +2,7 @@ import http from "@/lib/http";
 import { derivePropertyStatistics, normalizePaginatedProperties, normalizeProperty } from "./mappers";
 import type {
   CreatePropertyPayload,
+  UpdatePropertyPayload,
   GetPropertiesParams,
   PaginatedProperties,
   PropertyRecord,
@@ -70,7 +71,7 @@ export async function createProperty(payload: CreatePropertyPayload): Promise<Cr
   return unwrapData(data);
 }
 
-export async function updateProperty(id: string, payload: CreatePropertyPayload): Promise<CreatePropertyResponse> {
+export async function updateProperty(id: string, payload: UpdatePropertyPayload): Promise<CreatePropertyResponse> {
   const { data } = await http.patch<CreatePropertyResponse | { data: CreatePropertyResponse }>(
     `/properties/${id}`,
     payload
@@ -82,6 +83,28 @@ export async function setPropertyVisibility(id: string, isHidden: boolean): Prom
   const { data } = await http.patch<CreatePropertyResponse | { data: CreatePropertyResponse }>(
     `/properties/${id}/hide`,
     { isHidden }
+  );
+  return unwrapData(data);
+}
+
+export async function updatePropertyCommission(
+  id: string,
+  commission: number
+): Promise<CreatePropertyResponse> {
+  const { data } = await http.patch<CreatePropertyResponse | { data: CreatePropertyResponse }>(
+    `/properties/${id}/commission`,
+    { commission }
+  );
+  return unwrapData(data);
+}
+
+export async function updatePropertyEkobujaBuyback(
+  id: string,
+  ekobujaBuyBack: number
+): Promise<CreatePropertyResponse> {
+  const { data } = await http.patch<CreatePropertyResponse | { data: CreatePropertyResponse }>(
+    `/properties/${id}/ekobuja-buyback`,
+    { ekobujaBuyBack }
   );
   return unwrapData(data);
 }

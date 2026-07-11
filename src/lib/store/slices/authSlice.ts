@@ -28,8 +28,15 @@ const authSlice = createSlice({
         email: action.payload.email,
         fullName: action.payload.fullName,
         role: action.payload.role ?? action.payload.accountType,
+        roles: action.payload.roles ?? [],
         profilePicture: action.payload.profilePicture ?? null,
       };
+    },
+    setAccessToken: (state, action: { payload: { accessToken: string; refreshToken?: string } }) => {
+      state.authToken = action.payload.accessToken;
+      if (action.payload.refreshToken) {
+        state.refreshToken = action.payload.refreshToken;
+      }
     },
     logout: (state) => {
       state.isAuthenticated = false;
@@ -46,6 +53,13 @@ const authSlice = createSlice({
   },
 });
 
-export const { login, logout, setForgotPasswordEmail, clearForgotPasswordFlow, updateProfileLocally } = authSlice.actions;
+export const {
+  login,
+  setAccessToken,
+  logout,
+  setForgotPasswordEmail,
+  clearForgotPasswordFlow,
+  updateProfileLocally,
+} = authSlice.actions;
 
 export default authSlice.reducer;

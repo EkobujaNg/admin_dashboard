@@ -5,6 +5,7 @@ export type PropertyListingType = "residential" | "commercial" | "land";
 export type PropertyDetailsState = {
   name: string;
   description: string;
+  aboutProperty: string[];
   propertyType: PropertyListingType | "";
   media: string[];
   propertyAddress: string;
@@ -12,11 +13,13 @@ export type PropertyDetailsState = {
   state: string;
   zip: string;
   numberOfShares: string;
+  presale: string;
 };
 
 export type CreatePropertyPayload = {
   name: string;
   description: string;
+  aboutProperty: string[];
   propertyType: PropertyListingType;
   media: string[];
   propertyAddress: string;
@@ -24,8 +27,12 @@ export type CreatePropertyPayload = {
   state: string;
   zip: string;
   numberOfShares: number;
+  presale: number;
   valuation: ValuationPayload;
 };
+
+/** PATCH body — API rejects numberOfShares and presale on update. */
+export type UpdatePropertyPayload = Omit<CreatePropertyPayload, "numberOfShares" | "presale">;
 
 export const PROPERTY_LISTING_TYPE_OPTIONS: Array<{ value: PropertyListingType; label: string }> = [
   { value: "residential", label: "Residential" },
@@ -89,7 +96,7 @@ export type PropertyRecord = {
   state?: string;
   zip?: string;
   description?: string;
-  aboutProperty?: string;
+  aboutProperty: string[];
   imageUrls: string[];
   media: string[];
   pricePerStock: number;
@@ -103,6 +110,9 @@ export type PropertyRecord = {
   features: string[];
   estimatedYieldPerAnnum?: number | null;
   amountRaisedDuringPresale?: number | null;
+  presale?: number | null;
+  commission?: number | null;
+  ekobujaBuyBack?: number | null;
   isActive?: boolean;
   dateCreated?: string | null;
   createdAt?: string | null;
@@ -138,6 +148,7 @@ export function createInitialPropertyDetailsState(): PropertyDetailsState {
   return {
     name: "",
     description: "",
+    aboutProperty: [""],
     propertyType: "",
     media: [],
     propertyAddress: "",
@@ -145,5 +156,6 @@ export function createInitialPropertyDetailsState(): PropertyDetailsState {
     state: "",
     zip: "",
     numberOfShares: "",
+    presale: "",
   };
 }

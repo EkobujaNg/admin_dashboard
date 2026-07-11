@@ -64,3 +64,49 @@ export type GetCommissionsParams = {
   limit?: number;
   propertyId?: string;
 };
+
+export type PropertyMarketType = "primary" | "secondary";
+
+export type PropertyMarketTransaction = {
+  id: string;
+  propertyId: string;
+  propertyName: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  units: number;
+  amount: number;
+  pricePerUnit: number;
+  currency: string;
+  status: string;
+  type: string;
+  title: string;
+  description: string;
+  action: string;
+  provider: string;
+  reference: string;
+  providerReference: string | null;
+  listingId: string | null;
+  listerId: string | null;
+  sharesAmount: number | null;
+  commissionAmount: number | null;
+  commissionPercent: number | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  market: PropertyMarketType;
+};
+
+export type PaginatedPropertyMarketTransactions = {
+  pageItems: PropertyMarketTransaction[];
+  currentPage: number;
+  numberOfPages: number;
+  totalItems: number;
+  hasMore: boolean;
+  pageSize: number;
+};
+
+export type GetPropertyMarketTransactionsParams = {
+  propertyId: string;
+  page?: number;
+  limit?: number;
+};

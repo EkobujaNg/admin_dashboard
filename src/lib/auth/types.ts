@@ -9,6 +9,7 @@ export type LoginResponse = {
   email: string;
   accountType?: string;
   role?: string;
+  roles?: string[];
   fullName?: string;
   profilePicture?: string | null;
   hasPin?: boolean;
@@ -21,6 +22,7 @@ export type AuthUser = {
   email: string;
   fullName?: string;
   role?: string;
+  roles?: string[];
   profilePicture?: string | null;
 };
 

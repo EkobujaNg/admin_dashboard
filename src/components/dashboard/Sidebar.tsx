@@ -19,6 +19,7 @@ import {
   Settings,
   PieChart,
   RefreshCcw,
+  Shield,
   type LucideIcon,
 } from "lucide-react";
 
@@ -29,13 +30,14 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen: any; setIsOpen:
     { href: "/overview", label: "Overview", icon: LayoutDashboard },
     { href: "/accounts", label: "Accounts", icon: Users },
     { href: "/properties", label: "Properties", icon: Building2 },
+    { href: "/investments", label: "Investments", icon: Briefcase },
     { href: "/earnings", label: "Earnings", icon: Banknote },
     { href: "/profit-sharing", label: "Profit Sharing", icon: PieChart },
-    { href: "/investments", label: "Investments", icon: Briefcase },
-    { href: "/analytics-metrics", label: "Reports Analytics", icon: ChartColumn },
-    { href: "/facility-admin", label: "FM Manager", icon: ClipboardList },
     { href: "/withdrawals", label: "Withdrawals", icon: ArrowDownToLine },
     { href: "/buyback", label: "Buyback", icon: RefreshCcw },
+    { href: "/admins", label: "Admins", icon: Shield },
+    { href: "/facility-admin", label: "FM Manager", icon: ClipboardList },
+    { href: "/analytics-metrics", label: "Reports Analytics", icon: ChartColumn },
   ];
 
   const handleLinkClick = () => {
@@ -49,6 +51,20 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen: any; setIsOpen:
       isActive ? "text-primary-20" : "text-opacityClr-40 group-hover:text-primary-20"
     }`;
 
+  const linkClass = (isActive: boolean) =>
+    `group flex items-center gap-4 px-4 py-3 w-full font-Raleway transition-all duration-300 ease-in-out ${
+      isActive
+        ? "bg-[#EFF1F1] text-primary-20 rounded-[100px]"
+        : "hover:bg-[#EFF1F1] hover:text-primary-20 hover:rounded-[100px]"
+    }`;
+
+  const labelClass = (isActive: boolean) =>
+    `text-[15px] font-semibold leading-normal group-hover:text-primary-20 ${
+      isActive ? "text-primary-20" : "text-opacityClr-40"
+    }`;
+
+  const isSettingsActive = pathname === "/settings" || pathname.startsWith("/settings/");
+
   return (
     <>
       <div
@@ -59,77 +75,48 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen: any; setIsOpen:
       />
 
       <aside
-        className={`fixed top-0 left-0 w-[256px] h-full bg-white text-white flex flex-col justify-between px-4 border-r border-[#D2D7D7] z-50 transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 w-[256px] h-full bg-white flex flex-col px-4 border-r border-[#D2D7D7] z-50 transition-transform duration-300 ease-in-out ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0`}
       >
-        <div className="flex flex-col items-center gap-14 pt-8">
-          <div className="px-4 self-start w-full flex justify-between items-center">
-            <Link href="/" className="text-white flex items-center space-x-2">
-              <Image src={Logo} alt="EkoBuja Logo" />
-            </Link>
-            <button onClick={() => setIsOpen(false)} className="md:hidden text-gray-500">
-              <X className="w-5 h-5" />
-            </button>
-          </div>
+        <div className="px-4 pt-8 pb-6 self-start w-full flex justify-between items-center shrink-0">
+          <Link href="/" className="flex items-center space-x-2">
+            <Image src={Logo} alt="EkoBuja Logo" />
+          </Link>
+          <button onClick={() => setIsOpen(false)} className="md:hidden text-gray-500">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
 
-          <ul className="flex flex-col gap-3 items-start w-full border-b border-dashed border-[#D2D7D7] pb-2 overflow-y-auto max-h-[60vh]">
+        <nav className="flex-1 min-h-0 overflow-y-auto">
+          <ul className="flex flex-col gap-2 items-start w-full">
             {links.map((link) => {
-              const isActive = pathname === link.href;
+              const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
               const Icon = link.icon;
 
               return (
                 <li key={link.href} className="w-full">
-                  <Link
-                    href={link.href}
-                    onClick={handleLinkClick}
-                    className={`group flex items-center gap-4 px-4 py-3 w-full font-Raleway transition-all duration-300 ease-in-out ${
-                      isActive
-                        ? "bg-[#EFF1F1] text-primary-20 rounded-[100px]"
-                        : "hover:bg-[#EFF1F1] hover:text-primary-20 hover:rounded-[100px]"
-                    }`}
-                  >
+                  <Link href={link.href} onClick={handleLinkClick} className={linkClass(isActive)}>
                     <Icon className={iconClass(isActive)} strokeWidth={isActive ? 2.25 : 1.75} />
-                    <span
-                      className={`text-[15px] font-semibold leading-normal ${
-                        isActive ? " text-primary-20" : "text-opacityClr-40"
-                      } group-hover:text-primary-20`}
-                    >
-                      {link.label}
-                    </span>
+                    <span className={labelClass(isActive)}>{link.label}</span>
                   </Link>
                 </li>
               );
             })}
           </ul>
-        </div>
+        </nav>
 
-        <div className="mb-14 w-full">
-          <ul className="flex flex-col gap-3 items-start w-full">
+        <div className="shrink-0 pt-4 pb-8 mt-auto border-t border-[#D2D7D7]">
+          <ul className="flex flex-col gap-2 items-start w-full">
             <li className="w-full">
-              <Link
-                href="/settings"
-                onClick={handleLinkClick}
-                className={`group flex items-center space-x-4 px-4 py-2 ${
-                  pathname === "/settings"
-                    ? "bg-[#EFF1F1] text-primary-20 rounded-[100px]"
-                    : "hover:bg-[#EFF1F1] hover:text-primary-20 hover:rounded-[100px]"
-                }`}
-              >
+              <Link href="/settings" onClick={handleLinkClick} className={linkClass(isSettingsActive)}>
                 <Settings
-                  className={iconClass(pathname === "/settings")}
-                  strokeWidth={pathname === "/settings" ? 2.25 : 1.75}
+                  className={iconClass(isSettingsActive)}
+                  strokeWidth={isSettingsActive ? 2.25 : 1.75}
                 />
-                <span
-                  className={`text-[15px] font-Raleway font-semibold leading-normal group-hover:text-primary-20 ${
-                    pathname === "/settings" ? " text-primary-20" : "text-opacityClr-40"
-                  }`}
-                >
-                  Settings
-                </span>
+                <span className={labelClass(isSettingsActive)}>Settings</span>
               </Link>
             </li>
-
             <li className="w-full">
               <LogoutAction variant="sidebar" />
             </li>

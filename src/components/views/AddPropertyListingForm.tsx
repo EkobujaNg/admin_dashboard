@@ -18,6 +18,7 @@ import {
 } from "@/lib/property/types";
 import {
   buildCreatePropertyPayload,
+  buildUpdatePropertyPayload,
   createInitialValuationState,
   formatNaira,
   formatPercent,
@@ -117,6 +118,30 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
     setDetails((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleAboutPropertyChange = (index: number, value: string) => {
+    setDetails((prev) => ({
+      ...prev,
+      aboutProperty: prev.aboutProperty.map((item, i) => (i === index ? value : item)),
+    }));
+  };
+
+  const handleAddAboutProperty = () => {
+    setDetails((prev) => ({
+      ...prev,
+      aboutProperty: [...prev.aboutProperty, ""],
+    }));
+  };
+
+  const handleRemoveAboutProperty = (index: number) => {
+    setDetails((prev) => {
+      const next = prev.aboutProperty.filter((_, i) => i !== index);
+      return {
+        ...prev,
+        aboutProperty: next.length > 0 ? next : [""],
+      };
+    });
+  };
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
@@ -159,7 +184,7 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
   });
 
   const updatePropertyMutation = useMutation({
-    mutationFn: (payload: ReturnType<typeof buildCreatePropertyPayload>) => updateProperty(propertyId, payload),
+    mutationFn: (payload: ReturnType<typeof buildUpdatePropertyPayload>) => updateProperty(propertyId, payload),
     onSuccess: (data) => {
       toast.success(
         data?.responseDescription ||
@@ -187,6 +212,10 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
     }
     if (!details.description.trim()) {
       toast.error("Please enter a description.");
+      return false;
+    }
+    if (!details.aboutProperty.some((item) => item.trim())) {
+      toast.error("Please add at least one about-property highlight.");
       return false;
     }
     return true;
@@ -224,13 +253,16 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
   };
 
   const validateStep4 = () => {
+    // Shares and presale are create-only; the API rejects them on update.
+    if (isEditMode) return true;
+
     const totalShares = Number(details.numberOfShares);
     if (!totalShares || totalShares < 1) {
       toast.error("Please enter a valid number of shares.");
       return false;
     }
-    if (isEditMode && totalShares < sharesSold) {
-      toast.error(`Total shares cannot be less than ${sharesSold.toLocaleString()} (already sold).`);
+    if (details.presale === "" || Number(details.presale) < 0 || Number.isNaN(Number(details.presale))) {
+      toast.error("Please enter a valid presale amount (0 or more).");
       return false;
     }
     return true;
@@ -255,12 +287,15 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
       orderedMedia.unshift(thumbnail);
     }
 
-    const payload = buildCreatePropertyPayload({ ...details, media: orderedMedia }, valuationState);
     if (isEditMode) {
-      updatePropertyMutation.mutate(payload);
+      updatePropertyMutation.mutate(
+        buildUpdatePropertyPayload({ ...details, media: orderedMedia }, valuationState)
+      );
       return;
     }
-    createPropertyMutation.mutate(payload);
+    createPropertyMutation.mutate(
+      buildCreatePropertyPayload({ ...details, media: orderedMedia }, valuationState)
+    );
   };
 
   const stepTitle = {
@@ -348,12 +383,52 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
                 name="description"
                 value={details.description}
                 onChange={handleDetailsChange}
-                placeholder="A residential block with 12 units."
+                placeholder="A premium residential block in Lekki with strong rental demand."
                 rows={4}
                 required
                 className={`${inputClassName} resize-none`}
               />
             </Field>
+
+            <div className="flex flex-col gap-3 w-full">
+              <div className="flex items-center justify-between gap-3">
+                <label className={labelClassName}>About property *</label>
+                <button
+                  type="button"
+                  onClick={handleAddAboutProperty}
+                  className="text-sm font-Raleway font-semibold text-primary-20 hover:underline"
+                >
+                  + Add highlight
+                </button>
+              </div>
+              <p className="text-sm font-Raleway text-opacityClr-70 -mt-1">
+                Short bullet points shown on the property details page.
+              </p>
+              {details.aboutProperty.map((item, index) => (
+                <div key={`about-${index}`} className="flex items-start gap-2 w-full">
+                  <input
+                    type="text"
+                    value={item}
+                    onChange={(e) => handleAboutPropertyChange(index, e.target.value)}
+                    placeholder={
+                      index === 0
+                        ? "A residential block with 12 units."
+                        : "24/7 security and dedicated parking."
+                    }
+                    className={inputClassName}
+                  />
+                  {details.aboutProperty.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveAboutProperty(index)}
+                      className="shrink-0 px-3 py-4 rounded-lg border border-opacityClr-30 text-sm font-Raleway text-red-500 hover:bg-red-50"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
           </section>
         )}
 
@@ -525,23 +600,43 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
 
         {step === 4 && (
           <section className="flex flex-col gap-6 w-full">
-            {isEditMode && sharesSold > 0 && (
-              <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-Raleway text-amber-900">
-                {sharesSold.toLocaleString()} share{sharesSold === 1 ? "" : "s"} already sold. Total shares cannot be set
-                below this amount.
+            {isEditMode && (
+              <div className="rounded-xl border border-opacityClr-20 bg-opacityClr-10 px-4 py-3 text-sm font-Raleway text-opacityClr-80">
+                Number of shares and presale amount cannot be changed after a property is created
+                {sharesSold > 0
+                  ? ` (${sharesSold.toLocaleString()} share${sharesSold === 1 ? "" : "s"} already sold).`
+                  : "."}
               </div>
             )}
 
-            <Field label="Number of Shares" required>
+            <Field label="Number of Shares" required={!isEditMode}>
               <input
                 type="number"
                 name="numberOfShares"
-                min={isEditMode ? Math.max(sharesSold, 1) : 1}
+                min={1}
                 value={details.numberOfShares}
                 onChange={handleDetailsChange}
                 placeholder="1000"
-                required
-                className={inputClassName}
+                required={!isEditMode}
+                disabled={isEditMode}
+                readOnly={isEditMode}
+                className={`${inputClassName} ${isEditMode ? "bg-opacityClr-10 cursor-not-allowed opacity-70" : ""}`}
+              />
+            </Field>
+
+            <Field label="Presale Amount (₦)" required={!isEditMode}>
+              <input
+                type="number"
+                name="presale"
+                min={0}
+                step="any"
+                value={details.presale}
+                onChange={handleDetailsChange}
+                placeholder="5000"
+                required={!isEditMode}
+                disabled={isEditMode}
+                readOnly={isEditMode}
+                className={`${inputClassName} ${isEditMode ? "bg-opacityClr-10 cursor-not-allowed opacity-70" : ""}`}
               />
             </Field>
 
@@ -565,6 +660,16 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
                   <span className="text-opacityClr-60">Images:</span>{" "}
                   <span className="font-semibold">{details.media.length} uploaded</span>
                 </p>
+                <p>
+                  <span className="text-opacityClr-60">Shares:</span>{" "}
+                  <span className="font-semibold">{details.numberOfShares || "—"}</span>
+                </p>
+                <p>
+                  <span className="text-opacityClr-60">Presale:</span>{" "}
+                  <span className="font-semibold">
+                    {details.presale !== "" ? formatNaira(Number(details.presale) || 0) : "—"}
+                  </span>
+                </p>
                 {valuationResult && (
                   <>
                     <p>
@@ -578,6 +683,27 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
                   </>
                 )}
               </div>
+
+              {details.description.trim() && (
+                <div className="pt-4 border-t border-opacityClr-20">
+                  <p className="text-sm font-Raleway text-opacityClr-60 mb-2">Description</p>
+                  <p className="text-sm font-Raleway text-primary-10 leading-relaxed">{details.description.trim()}</p>
+                </div>
+              )}
+
+              {details.aboutProperty.some((item) => item.trim()) && (
+                <div className="pt-4 border-t border-opacityClr-20">
+                  <p className="text-sm font-Raleway text-opacityClr-60 mb-2">About property</p>
+                  <ul className="list-disc pl-5 flex flex-col gap-1 text-sm font-Raleway text-primary-10">
+                    {details.aboutProperty
+                      .map((item) => item.trim())
+                      .filter(Boolean)
+                      .map((item, index) => (
+                        <li key={`${index}-${item}`}>{item}</li>
+                      ))}
+                  </ul>
+                </div>
+              )}
 
               {valuationResult && (
                 <div className="mt-2 pt-4 border-t border-opacityClr-20">

@@ -1,9 +1,15 @@
 import http from "@/lib/http";
-import { normalizePaginatedCommissions, normalizePaginatedWalletTransactions } from "./mappers";
+import {
+  normalizePaginatedCommissions,
+  normalizePaginatedPropertyMarketTransactions,
+  normalizePaginatedWalletTransactions,
+} from "./mappers";
 import type {
   GetCommissionsParams,
+  GetPropertyMarketTransactionsParams,
   GetWalletTransactionsParams,
   PaginatedCommissions,
+  PaginatedPropertyMarketTransactions,
   PaginatedWalletTransactions,
 } from "./types";
 
@@ -58,4 +64,42 @@ export async function getCommissionRecords(
   );
 
   return normalizePaginatedCommissions(unwrapData(data) as Record<string, unknown>, page, limit);
+}
+
+export async function getPrimaryMarketPropertyTransactions(
+  params: GetPropertyMarketTransactionsParams
+): Promise<PaginatedPropertyMarketTransactions> {
+  const page = params.page ?? 1;
+  const limit = params.limit ?? 10;
+
+  const { data } = await http.get<Record<string, unknown> | { data: Record<string, unknown> }>(
+    `${ADMIN_TRANSACTIONS_BASE}/primary-market/property/${params.propertyId}`,
+    { params: { page, limit } }
+  );
+
+  return normalizePaginatedPropertyMarketTransactions(
+    unwrapData(data) as Record<string, unknown>,
+    "primary",
+    page,
+    limit
+  );
+}
+
+export async function getSecondaryMarketPropertyTransactions(
+  params: GetPropertyMarketTransactionsParams
+): Promise<PaginatedPropertyMarketTransactions> {
+  const page = params.page ?? 1;
+  const limit = params.limit ?? 10;
+
+  const { data } = await http.get<Record<string, unknown> | { data: Record<string, unknown> }>(
+    `${ADMIN_TRANSACTIONS_BASE}/secondary-market/property/${params.propertyId}`,
+    { params: { page, limit } }
+  );
+
+  return normalizePaginatedPropertyMarketTransactions(
+    unwrapData(data) as Record<string, unknown>,
+    "secondary",
+    page,
+    limit
+  );
 }

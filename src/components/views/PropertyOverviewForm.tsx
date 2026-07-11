@@ -18,9 +18,11 @@ const PropertyOverviewForm = ({ property, onSave, isLoading }: { property?: any;
     propertyCode: p?.propertyCode || "FXTR56",
     pricePerStock: p?.pricePerStock?.toString() || "",
     propertySize: p?.propertySize || "",
-    aboutProperty: p?.aboutProperty || "",
+    aboutProperty: Array.isArray(p?.aboutProperty)
+      ? p.aboutProperty.join("\n")
+      : p?.aboutProperty || "",
     propertyLocation: p?.propertyLocation || "",
-    amountRaisedDuringPresale: p?.amountRaisedDuringPresale?.toString() || "",
+    amountRaisedDuringPresale: p?.amountRaisedDuringPresale?.toString() || p?.presale?.toString() || "",
     propertyValue: p?.propertyValue?.toString() || "",
     beds: p?.features?.find((f) => f.includes("Bed"))?.match(/\d+/)?.[0] || "",
     baths: p?.features?.find((f) => f.includes("Bath"))?.match(/\d+/)?.[0] || "",
