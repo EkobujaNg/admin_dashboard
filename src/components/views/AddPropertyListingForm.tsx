@@ -25,6 +25,12 @@ import {
   type ValuationFormState,
   type ValuationResult,
 } from "@/lib/property/valuation";
+import {
+  formatZodErrors,
+  propertyListingStep1Schema,
+  propertyListingStep2Schema,
+  propertyListingStep4Schema,
+} from "@/lib/property/validation";
 
 const STEPS = [
   { id: 1, label: "Basics" },
@@ -202,32 +208,31 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
   const isSubmitting = createPropertyMutation.isPending || updatePropertyMutation.isPending;
 
   const validateStep1 = () => {
-    if (!details.propertyType) {
-      toast.error("Please select a property type.");
-      return false;
-    }
-    if (!details.name.trim()) {
-      toast.error("Please enter a property name.");
-      return false;
-    }
-    if (!details.description.trim()) {
-      toast.error("Please enter a description.");
-      return false;
-    }
-    if (!details.aboutProperty.some((item) => item.trim())) {
-      toast.error("Please add at least one about-property highlight.");
+    const validation = propertyListingStep1Schema.safeParse({
+      propertyType: details.propertyType,
+      name: details.name,
+      description: details.description,
+      aboutProperty: details.aboutProperty,
+    });
+    if (!validation.success) {
+      const errors = formatZodErrors(validation.error);
+      toast.error(Object.values(errors)[0] || "Please complete the basics step.");
       return false;
     }
     return true;
   };
 
   const validateStep2 = () => {
-    if (!details.media.length) {
-      toast.error("Please upload at least one property image.");
-      return false;
-    }
-    if (!details.propertyAddress.trim() || !details.city.trim() || !details.state.trim() || !details.zip.trim()) {
-      toast.error("Please complete all location fields.");
+    const validation = propertyListingStep2Schema.safeParse({
+      media: details.media,
+      propertyAddress: details.propertyAddress,
+      city: details.city,
+      state: details.state,
+      zip: details.zip,
+    });
+    if (!validation.success) {
+      const errors = formatZodErrors(validation.error);
+      toast.error(Object.values(errors)[0] || "Please complete the media & location step.");
       return false;
     }
     return true;
@@ -256,13 +261,13 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
     // Shares and presale are create-only; the API rejects them on update.
     if (isEditMode) return true;
 
-    const totalShares = Number(details.numberOfShares);
-    if (!totalShares || totalShares < 1) {
-      toast.error("Please enter a valid number of shares.");
-      return false;
-    }
-    if (details.presale === "" || Number(details.presale) < 0 || Number.isNaN(Number(details.presale))) {
-      toast.error("Please enter a valid presale amount (0 or more).");
+    const validation = propertyListingStep4Schema.safeParse({
+      numberOfShares: details.numberOfShares,
+      presale: details.presale,
+    });
+    if (!validation.success) {
+      const errors = formatZodErrors(validation.error);
+      toast.error(Object.values(errors)[0] || "Please complete the shares & presale step.");
       return false;
     }
     return true;

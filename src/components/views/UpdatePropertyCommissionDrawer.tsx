@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { toast } from "sonner";
 import { useDrawerModal } from "@/context/DrawerModalContext";
 import usePropertyAPI from "@/services/usePropertyAPI";
+import { formatZodErrors, updatePropertyCommissionSchema } from "@/lib/property/validation";
 
 type UpdatePropertyCommissionDrawerProps = {
   propertyId: string;
@@ -24,13 +25,14 @@ export default function UpdatePropertyCommissionDrawer({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const commission = Number(value);
-    if (value.trim() === "" || Number.isNaN(commission) || commission < 0.1 || commission > 100) {
-      toast.error("Commission must be between 0.1% and 100%.");
+    const validation = updatePropertyCommissionSchema.safeParse({ commission: value });
+    if (!validation.success) {
+      const errors = formatZodErrors(validation.error);
+      toast.error(errors.commission || Object.values(errors)[0] || "Invalid commission.");
       return;
     }
 
-    updatePropertyCommission(propertyId, commission, {
+    updatePropertyCommission(propertyId, validation.data.commission, {
       onSuccess: () => closeModal(),
     });
   };

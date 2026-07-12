@@ -8,6 +8,8 @@ import {
   getAffectPropertyDirectionLabel,
   getTaskCreatedByLabel,
 } from "@/lib/property-tasks/types";
+import { formatZodErrors, propertyTaskAffectRemarkSchema } from "@/lib/property-tasks/validation";
+import { toast } from "sonner";
 
 type AdminPropertyTaskDrawerProps = {
   taskId: string;
@@ -175,8 +177,13 @@ export default function AdminPropertyTaskDrawer({ taskId, propertyId }: AdminPro
         isOpen={confirmOpen}
         onClose={closeConfirm}
         onConfirm={() => {
-          if (!affectRemark.trim()) return;
-          setAffectProperty(task.id, nextAffectProperty, affectRemark, {
+          const validation = propertyTaskAffectRemarkSchema.safeParse({ remark: affectRemark });
+          if (!validation.success) {
+            const errors = formatZodErrors(validation.error);
+            toast.error(errors.remark || Object.values(errors)[0] || "Enter a valid remark.");
+            return;
+          }
+          setAffectProperty(task.id, nextAffectProperty, validation.data.remark, {
             onSuccess: closeConfirm,
             onError: closeConfirm,
           });

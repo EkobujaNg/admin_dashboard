@@ -19,7 +19,7 @@ const Login = () => {
   const searchParams = useSearchParams();
   const dispatch = useDispatch();
 
-  const [formData, setFormData] = useState({ email: "charlesayom@gmail.com", password: "Password@123" });
+  const [formData, setFormData] = useState({ email: "charlesayom@gmail.com", password: "Password@1234" });
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({ email: "", password: "" });

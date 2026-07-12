@@ -4,7 +4,10 @@ import React from "react";
 import Image from "next/image";
 import { avatar } from "../../../../public/assets/images";
 import { useRouter, usePathname } from "next/navigation";
-import { UserRound, ChevronRight, FileText, CreditCard, Lock, Bell, Shield } from "lucide-react";
+import { ChevronRight, FileText, Lock, Bell, SlidersHorizontal } from "lucide-react";
+import useAdminProfileAPI from "@/services/useAdminProfileAPI";
+import { getAdminProfileDisplayName } from "@/lib/admin-profile/mappers";
+import { formatAdminRoles } from "@/lib/admins/types";
 
 const settingsLinks = [
   {
@@ -21,52 +24,53 @@ const settingsLinks = [
   },
   {
     id: 3,
-    name: "Log in Details",
-    icon: <Shield className="text-primary-20 w-5 h-5" />,
-    path: "/settings/log-in-details",
+    name: "Platform Settings",
+    icon: <SlidersHorizontal className="text-primary-20 w-5 h-5" />,
+    path: "/settings/platform",
   },
   {
     id: 4,
-    name: "Payments",
-    icon: <CreditCard className="text-primary-20 w-5 h-5" />,
-    path: "/settings/payments",
-  },
-
-  {
-    id: 5,
     name: "Notifications & Alerts",
     icon: <Bell className="text-primary-20 w-5 h-5" />,
     path: "/settings/notifications-and-alerts",
-  },
-  {
-    id: 6,
-    name: "Account Sharing",
-    icon: <UserRound className="text-primary-20 w-5 h-5" />,
-    path: "/settings/account-sharing",
   },
 ];
 
 const SettingsLayout = () => {
   const router = useRouter();
   const pathname = usePathname();
+  const { profile, isLoadingProfile } = useAdminProfileAPI({ enableProfile: true });
+
+  const displayName = isLoadingProfile
+    ? "Loading..."
+    : getAdminProfileDisplayName(profile);
+  const email = profile?.email || "—";
+  const rolesLabel = formatAdminRoles(profile?.roles || []);
+
   return (
     <section className="flex flex-col items-start gap-4">
       <div className="flex flex-col gap-1 items-start">
         <h2 className="text-primary-10 font-Raleway font-bold leading-normal text-[28px]">My account</h2>
       </div>
       <div className="flex items-start gap-8 w-full">
-        {/* Left container */}
         <div className="flex flex-col items-start gap-4 w-full h-full sticky top-30">
           <div className="flex items-center gap-4">
-            {/* image */}
             <Image src={avatar} alt="User Avatar" width={56} height={56} className="rounded-full object-cover" />
-            <div className="flex flex-col items-start">
-              <h3 className="text-primary-10 text-xl font-bold font-Raleway leading-normal">Administrator</h3>
-              <p className="text-primary-10 text-sm font-medium font-Raleway leading-normal">admin@ekobuja.com</p>
+            <div className="flex flex-col items-start min-w-0">
+              <h3 className="text-primary-10 text-xl font-bold font-Raleway leading-normal truncate">
+                {displayName}
+              </h3>
+              <p className="text-primary-10 text-sm font-medium font-Raleway leading-normal truncate">
+                {email}
+              </p>
+              {rolesLabel !== "—" && (
+                <p className="text-opacityClr-60 text-xs font-medium font-Raleway leading-normal mt-0.5">
+                  {rolesLabel}
+                </p>
+              )}
             </div>
           </div>
 
-          {/* Setting links */}
           <div className="flex flex-col items-start gap-2 w-full">
             {settingsLinks.map((link) => {
               return (

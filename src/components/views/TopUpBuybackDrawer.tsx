@@ -2,9 +2,10 @@
 
 import React, { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import CurrencyAmountInput from "@/components/ui/CurrencyAmountInput";
-import { parseAmountToNumber } from "@/lib/currency/format";
 import useBuybackAPI from "@/services/useBuybackAPI";
+import { formatZodErrors, topUpBuybackSchema } from "@/lib/buyback/validation";
 
 type TopUpBuybackDrawerProps = {
   closeModal?: () => void;
@@ -15,14 +16,18 @@ const TopUpBuybackDrawer = ({ closeModal, currentBalance = 0 }: TopUpBuybackDraw
   const [amount, setAmount] = useState("");
   const { topUpBuyback, isToppingUpBuyback } = useBuybackAPI();
 
-  const parsedAmount = parseAmountToNumber(amount);
-  const isValid = parsedAmount > 0;
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isValid || isToppingUpBuyback) return;
+    if (isToppingUpBuyback) return;
 
-    topUpBuyback(parsedAmount, {
+    const validation = topUpBuybackSchema.safeParse({ amount });
+    if (!validation.success) {
+      const errors = formatZodErrors(validation.error);
+      toast.error(errors.amount || Object.values(errors)[0] || "Enter a valid amount.");
+      return;
+    }
+
+    topUpBuyback(validation.data.amount, {
       onSuccess: () => {
         setAmount("");
         closeModal?.();
@@ -65,7 +70,7 @@ const TopUpBuybackDrawer = ({ closeModal, currentBalance = 0 }: TopUpBuybackDraw
 
       <button
         type="submit"
-        disabled={!isValid || isToppingUpBuyback}
+        disabled={isToppingUpBuyback}
         className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-primary-10 text-white text-sm font-semibold font-Raleway hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isToppingUpBuyback ? (

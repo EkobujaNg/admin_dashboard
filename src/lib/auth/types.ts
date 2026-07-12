@@ -2,6 +2,7 @@ export type LoginPayload = {
   email: string;
   password: string;
   portal: string;
+  deviceType: string;
 };
 
 export type LoginResponse = {
@@ -33,5 +34,10 @@ export type ForgotPasswordPayload = {
 export type ForgotPasswordResetPayload = {
   email: string;
   code: string;
+  newPassword: string;
+};
+
+export type ChangePasswordPayload = {
+  oldPassword: string;
   newPassword: string;
 };

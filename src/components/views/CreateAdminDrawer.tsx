@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { ChevronDown, Copy, Info } from "lucide-react";
 import useAdminsAPI from "@/services/useAdminsAPI";
+import { createAdminSchema, formatZodErrors } from "@/lib/admins/validation";
 import { facilityManagerPasswordSchema } from "@/lib/facility-manager/validation";
 import {
   ADMIN_ROLE_OPTIONS,
@@ -66,6 +67,7 @@ export default function CreateAdminDrawer({ closeModal }: CreateAdminDrawerProps
   const { createAdminAccount, isCreatingAdmin } = useAdminsAPI();
   const rolesDropdownRef = useRef<HTMLDivElement>(null);
   const [formData, setFormData] = useState<FormState>(createInitialFormState);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [showPasswordInfo, setShowPasswordInfo] = useState(false);
   const [rolesOpen, setRolesOpen] = useState(false);
 
@@ -82,6 +84,15 @@ export default function CreateAdminDrawer({ closeModal }: CreateAdminDrawerProps
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => {
+      if (!prev[name] && !(name === "phone" && prev.phoneNumber) && !(name === "phoneCode" && prev.phoneCode)) {
+        return prev;
+      }
+      const next = { ...prev };
+      delete next[name];
+      if (name === "phone") delete next.phoneNumber;
+      return next;
+    });
   };
 
   const toggleRole = (role: AdminRole) => {
@@ -89,6 +100,12 @@ export default function CreateAdminDrawer({ closeModal }: CreateAdminDrawerProps
       const exists = prev.roles.includes(role);
       const roles = exists ? prev.roles.filter((item) => item !== role) : [...prev.roles, role];
       return { ...prev, roles };
+    });
+    setErrors((prev) => {
+      if (!prev.roles) return prev;
+      const next = { ...prev };
+      delete next.roles;
+      return next;
     });
   };
 
@@ -108,37 +125,35 @@ export default function CreateAdminDrawer({ closeModal }: CreateAdminDrawerProps
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.firstName.trim() || !formData.lastName.trim()) {
-      toast.error("Enter first and last name.");
-      return;
-    }
-    if (!formData.email.trim()) {
-      toast.error("Enter a valid email.");
-      return;
-    }
-    if (!facilityManagerPasswordSchema.safeParse(formData.password).success) {
-      toast.error("Password must meet the security requirements.");
-      return;
-    }
-    if (!formData.phone.trim()) {
-      toast.error("Enter a phone number.");
-      return;
-    }
-    if (formData.roles.length === 0) {
-      toast.error("Select at least one role.");
+    const validation = createAdminSchema.safeParse({
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      password: formData.password,
+      phoneCode: formData.phoneCode,
+      phoneNumber: formData.phone,
+      roles: formData.roles,
+    });
+
+    if (!validation.success) {
+      const formattedErrors = formatZodErrors(validation.error);
+      setErrors(formattedErrors);
+      toast.error(Object.values(formattedErrors)[0] || "Please fix the errors in the form.");
       return;
     }
 
+    setErrors({});
+
     const payload: CreateAdminPayload = {
-      firstName: formData.firstName.trim(),
-      lastName: formData.lastName.trim(),
-      email: formData.email.trim(),
-      password: formData.password,
+      firstName: validation.data.firstName,
+      lastName: validation.data.lastName,
+      email: validation.data.email,
+      password: validation.data.password,
       phoneNumber: {
-        code: formData.phoneCode.trim() || "+234",
-        number: formData.phone.trim(),
+        code: validation.data.phoneCode,
+        number: validation.data.phoneNumber,
       },
-      roles: formData.roles,
+      roles: validation.data.roles,
     };
 
     createAdminAccount(payload, {
@@ -161,6 +176,7 @@ export default function CreateAdminDrawer({ closeModal }: CreateAdminDrawerProps
             placeholder="Enter first name"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-10 focus:border-transparent outline-none"
           />
+          {errors.firstName && <p className="text-xs text-red-600">{errors.firstName}</p>}
         </div>
         <div className="flex flex-col gap-2">
           <label className="text-sm font-medium text-gray-700">Last name *</label>
@@ -171,6 +187,7 @@ export default function CreateAdminDrawer({ closeModal }: CreateAdminDrawerProps
             placeholder="Enter last name"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-10 focus:border-transparent outline-none"
           />
+          {errors.lastName && <p className="text-xs text-red-600">{errors.lastName}</p>}
         </div>
       </div>
 
@@ -184,6 +201,7 @@ export default function CreateAdminDrawer({ closeModal }: CreateAdminDrawerProps
           placeholder="Enter email address"
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-10 focus:border-transparent outline-none"
         />
+        {errors.email && <p className="text-xs text-red-600">{errors.email}</p>}
       </div>
 
       <div className="flex flex-col gap-2">
@@ -232,6 +250,7 @@ export default function CreateAdminDrawer({ closeModal }: CreateAdminDrawerProps
             </button>
           </div>
         </div>
+        {errors.password && <p className="text-xs text-red-600">{errors.password}</p>}
       </div>
 
       <div className="flex flex-col gap-2">
@@ -256,6 +275,9 @@ export default function CreateAdminDrawer({ closeModal }: CreateAdminDrawerProps
             className="flex-1 px-4 py-3 border border-l-0 border-gray-300 rounded-r-lg focus:ring-2 focus:ring-primary-10 focus:border-transparent outline-none"
           />
         </div>
+        {(errors.phoneNumber || errors.phoneCode) && (
+          <p className="text-xs text-red-600">{errors.phoneNumber || errors.phoneCode}</p>
+        )}
       </div>
 
       <div className="flex flex-col gap-2" ref={rolesDropdownRef}>
@@ -312,6 +334,7 @@ export default function CreateAdminDrawer({ closeModal }: CreateAdminDrawerProps
             })}
           </div>
         )}
+        {errors.roles && <p className="text-xs text-red-600">{errors.roles}</p>}
       </div>
 
       <div className="mt-auto pt-4 border-t border-opacityClr-20">

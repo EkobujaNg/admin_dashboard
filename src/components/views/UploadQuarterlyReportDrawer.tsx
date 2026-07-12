@@ -11,6 +11,7 @@ import {
   type QuarterlyReport,
   type QuarterlyReportQuarter,
 } from "@/lib/quarterly-reports/types";
+import { formatZodErrors, uploadQuarterlyReportSchema } from "@/lib/quarterly-reports/validation";
 
 type UploadQuarterlyReportDrawerProps = {
   propertyId: string;
@@ -45,14 +46,17 @@ export default function UploadQuarterlyReportDrawer({
       toast.error("The replace window for this report has expired.");
       return;
     }
-    if (!file) {
-      toast.error("Please select a PDF report to upload.");
+
+    const validation = uploadQuarterlyReportSchema.safeParse({ file });
+    if (!validation.success) {
+      const errors = formatZodErrors(validation.error);
+      toast.error(errors.file || Object.values(errors)[0] || "Please select a PDF report to upload.");
       return;
     }
 
     try {
       setIsUploadingFile(true);
-      const uploaded = await uploadQuarterlyReportDocument(file);
+      const uploaded = await uploadQuarterlyReportDocument(validation.data.file);
 
       if (isReplace && existingReport) {
         updateReport(

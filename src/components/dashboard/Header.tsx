@@ -7,6 +7,7 @@ import Drawer from "../ui/Drawer";
 import { useDrawerModal } from "@/context/DrawerModalContext";
 import type { AuthUser } from "@/lib/auth/types";
 import { formatAdminRole } from "@/lib/admins/types";
+import useAdminProfileAPI from "@/services/useAdminProfileAPI";
 
 function displayNameFromUser(user: AuthUser | null | undefined) {
   if (!user) return "Admin";
@@ -25,6 +26,7 @@ function roleLabelFromUser(user: AuthUser | null | undefined) {
 const Header = memo(({ toggleSidebar }: { toggleSidebar: any }) => {
   const { openModal } = useDrawerModal();
   const user = useSelector((state: { auth: { user: AuthUser | null } }) => state.auth.user);
+  useAdminProfileAPI({ enableProfile: true });
   const [greeting, setGreeting] = useState("Hello");
   const [mounted, setMounted] = useState(false);
 

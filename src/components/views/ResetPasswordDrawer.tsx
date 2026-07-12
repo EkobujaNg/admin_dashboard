@@ -1,132 +1,118 @@
 "use client";
-import React, { useState, useEffect } from "react";
+
+import React, { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { toast } from "sonner";
+import { useMutation } from "@tanstack/react-query";
+import { useDrawerModal } from "@/context/DrawerModalContext";
+import PasswordRequirementsChecklist from "@/components/ui/PasswordRequirementsChecklist";
+import { changePassword } from "@/lib/auth/api";
+import { changePasswordSchema, formatZodErrors } from "@/lib/validation/auth";
+
+function getChangePasswordErrorMessage(error: any) {
+  const message = error?.response?.data?.message;
+  if (Array.isArray(message)) return message.join(", ");
+  return (
+    error?.response?.data?.responseDescription ||
+    error?.response?.data?.responseMessage ||
+    message ||
+    error?.message ||
+    "Failed to change password."
+  );
+}
 
 const ResetPasswordDrawer = () => {
-  const [formData, setFormData] = useState<{ otp: string; newPassword: string; confirmPassword: string }>({
-    otp: "",
+  const { closeModal } = useDrawerModal();
+  const [formData, setFormData] = useState({
+    oldPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
-
-  const [errors, setErrors] = useState<{ otp: string; newPassword: string; confirmPassword: string }>({
-    otp: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
-
-  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [oldPasswordVisible, setOldPasswordVisible] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
-  const [countdown, setCountdown] = useState(60);
-  const [canResend, setCanResend] = useState(false);
 
-  useEffect(() => {
-    let timer;
-    if (countdown > 0) {
-      timer = setInterval(() => {
-        setCountdown((prev) => prev - 1);
-      }, 1000);
-    } else {
-      setCanResend(true);
-    }
-    return () => clearInterval(timer);
-  }, [countdown]);
+  const changePasswordMutation = useMutation({
+    mutationFn: changePassword,
+    onSuccess: () => {
+      toast.success("Password changed successfully.");
+      closeModal?.();
+    },
+    onError: (error) => {
+      toast.error(getChangePasswordErrorMessage(error));
+    },
+  });
 
-  const validateForm = () => {
-    const passwordRequirements = {
-      minLength: 8,
-      uppercase: /[A-Z]/,
-      number: /[0-9]/,
-      specialCharacter: /[!@#$%^&*(),.?":{}|<>]/,
-    };
-
-    let validationErrors: { otp?: string; newPassword?: string; confirmPassword?: string } = {};
-    if (!/^[0-9]{6}$/.test(formData.otp)) {
-      validationErrors.otp = "OTP must be a 6-digit number.";
-    }
-    if (!passwordRequirements.specialCharacter.test(formData.newPassword)) {
-      validationErrors.newPassword = "Password must contain at least one special character.";
-    }
-
-    if (!passwordRequirements.number.test(formData.newPassword)) {
-      validationErrors.newPassword = "Password must contain at least one number.";
-    }
-    if (!passwordRequirements.uppercase.test(formData.newPassword)) {
-      validationErrors.newPassword = "Password must contain at least one uppercase letter.";
-    }
-    if (formData.newPassword.length < passwordRequirements.minLength) {
-      validationErrors.newPassword = "Password must be at least 8 characters long.";
-    }
-    if (formData.newPassword !== formData.confirmPassword) {
-      validationErrors.confirmPassword = "Passwords do not match.";
-    }
-
-    setErrors(validationErrors as { otp: string; newPassword: string; confirmPassword: string });
-
-    return Object.keys(validationErrors).length === 0;
-  };
-
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-    setErrors({ ...errors, [name]: "" });
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => {
+      if (!prev[name]) return prev;
+      const next = { ...prev };
+      delete next[name];
+      return next;
+    });
   };
 
-  const handleResendOTP = () => {
-    // Add your resend OTP API call here
-    setCountdown(60);
-    setCanResend(false);
-  };
-
-  const handleSave = async (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
 
-    try {
-      if (validateForm()) {
-        // Replace this with your actual API call
-        // await resetPasswordAPI(formData);
-      }
-    } catch (error) {
-      console.error("Error resetting password:", error);
-    } finally {
-      setIsLoading(false);
+    const result = changePasswordSchema.safeParse(formData);
+    if (!result.success) {
+      setErrors(formatZodErrors(result.error));
+      return;
     }
+
+    changePasswordMutation.mutate({
+      oldPassword: result.data.oldPassword,
+      newPassword: result.data.newPassword,
+    });
   };
+
+  const isLoading = changePasswordMutation.isPending;
 
   return (
-    <div className="flex flex-col items-start gap-6 p-6 relative h-full">
+    <div className="flex flex-col items-start gap-6 relative h-full">
       <p className="font-Raleway font-normal text-opacityClr-100 text-base leading-[150%]">
-        An OTP has been sent to your email address. Enter OTP and new password below to change your password.
+        Enter your current password and choose a new password below.
       </p>
 
-      <form onSubmit={handleSave} autoComplete="off" className="flex flex-col gap-6 w-full overflow-y-auto pb-24">
-        {/* OTP */}
+      <form onSubmit={handleSubmit} autoComplete="off" className="flex flex-col gap-6 w-full overflow-y-auto pb-24">
         <div className="flex flex-col gap-2 items-start w-full">
-          <label htmlFor="otp" className="text-base font-Raleway font-semibold leading-[150%] text-opacityClr-100">
-            OTP
+          <label htmlFor="oldPassword" className="text-base font-Raleway font-semibold leading-[150%] text-opacityClr-100">
+            Current Password
           </label>
           <div className="relative w-full">
             <input
-              type="text"
-              id="otp"
-              name="otp"
-              value={formData.otp}
+              type={oldPasswordVisible ? "text" : "password"}
+              id="oldPassword"
+              name="oldPassword"
+              value={formData.oldPassword}
               onChange={handleChange}
-              placeholder="6-digits code"
+              placeholder="Enter current password"
               className={`w-full flex items-center gap-2 p-4 rounded-lg border ${
-                errors.otp ? "border-red-500" : "border-opacityClr-50"
-              } text-opacityClr-100 outline-none focus:border focus:border-opacityClr-100  placeholder:text-opacityClr-50 placeholder:font-normal placeholder:font-Raleway transition-all duration-300 ease-in-out`}
+                errors.oldPassword ? "border-red-500" : "border-opacityClr-50"
+              } text-opacityClr-100 outline-none focus:border focus:border-opacityClr-100 placeholder:text-opacityClr-50 placeholder:font-normal placeholder:font-Raleway transition-all duration-300 ease-in-out`}
             />
+            <button
+              type="button"
+              className="absolute right-4 top-4 cursor-pointer"
+              onClick={() => setOldPasswordVisible((prev) => !prev)}
+            >
+              {oldPasswordVisible ? (
+                <Eye className={`w-6 h-6 ${formData.oldPassword ? "text-opacityClr-100" : "text-[#BBC3C3]"}`} />
+              ) : (
+                <EyeOff className={`w-6 h-6 ${formData.oldPassword ? "text-opacityClr-100" : "text-[#BBC3C3]"}`} />
+              )}
+            </button>
           </div>
-          {errors.otp && <p className="text-red-500 text-sm">{errors.otp}</p>}
+          {errors.oldPassword && <p className="text-red-500 text-sm">{errors.oldPassword}</p>}
         </div>
 
-        {/* Password */}
         <div className="flex flex-col gap-2 items-start w-full">
           <label htmlFor="newPassword" className="text-base font-Raleway font-semibold leading-[150%] text-opacityClr-100">
-            Password
+            New Password
           </label>
           <div className="relative w-full">
             <input
@@ -135,12 +121,16 @@ const ResetPasswordDrawer = () => {
               name="newPassword"
               value={formData.newPassword}
               onChange={handleChange}
-              placeholder="Enter your password"
+              placeholder="Enter new password"
               className={`w-full flex items-center gap-2 p-4 rounded-lg border ${
                 errors.newPassword ? "border-red-500" : "border-opacityClr-50"
-              } text-opacityClr-100 outline-none focus:border focus:border-opacityClr-100  placeholder:text-opacityClr-50 placeholder:font-normal placeholder:font-Raleway transition-all duration-300 ease-in-out`}
+              } text-opacityClr-100 outline-none focus:border focus:border-opacityClr-100 placeholder:text-opacityClr-50 placeholder:font-normal placeholder:font-Raleway transition-all duration-300 ease-in-out`}
             />
-            <button type="button" className="absolute right-4 top-4 cursor-pointer" onClick={() => setPasswordVisible(!passwordVisible)}>
+            <button
+              type="button"
+              className="absolute right-4 top-4 cursor-pointer"
+              onClick={() => setPasswordVisible((prev) => !prev)}
+            >
               {passwordVisible ? (
                 <Eye className={`w-6 h-6 ${formData.newPassword ? "text-opacityClr-100" : "text-[#BBC3C3]"}`} />
               ) : (
@@ -148,11 +138,10 @@ const ResetPasswordDrawer = () => {
               )}
             </button>
           </div>
-          <p className="text-opacityClr-50 text-sm font-Raleway font-normal leading-normal">Must be at least 8 characters</p>
+          <PasswordRequirementsChecklist password={formData.newPassword} />
           {errors.newPassword && <p className="text-red-500 text-sm">{errors.newPassword}</p>}
         </div>
 
-        {/* Confirm Password */}
         <div className="flex flex-col gap-2 items-start w-full">
           <label htmlFor="confirmPassword" className="text-base font-Raleway font-semibold leading-[150%] text-opacityClr-100">
             Confirm Password
@@ -164,7 +153,7 @@ const ResetPasswordDrawer = () => {
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleChange}
-              placeholder="Confirm your password"
+              placeholder="Confirm new password"
               className={`w-full flex items-center gap-2 p-4 rounded-lg border ${
                 errors.confirmPassword ? "border-red-500" : "border-opacityClr-50"
               } text-opacityClr-100 outline-none focus:border focus:border-opacityClr-100 placeholder:text-opacityClr-50 placeholder:font-normal placeholder:font-Raleway transition-all duration-300 ease-in-out`}
@@ -172,7 +161,7 @@ const ResetPasswordDrawer = () => {
             <button
               type="button"
               className="absolute right-4 top-4 cursor-pointer"
-              onClick={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
+              onClick={() => setConfirmPasswordVisible((prev) => !prev)}
             >
               {confirmPasswordVisible ? (
                 <Eye className={`w-6 h-6 ${formData.confirmPassword ? "text-opacityClr-100" : "text-[#BBC3C3]"}`} />
@@ -181,46 +170,29 @@ const ResetPasswordDrawer = () => {
               )}
             </button>
           </div>
-          <p className="text-opacityClr-50 text-sm font-Raleway font-normal leading-normal">Must match the password above.</p>
-          {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword}</p>}
-        </div>
-
-        <div className="flex items-center justify-center gap-2">
-          <p className="text-primary-10 text-center font-Raleway text-sm md:text-base font-medium leading-[150%]">
-            Haven't received OTP yet?
+          <p className="text-opacityClr-50 text-sm font-Raleway font-normal leading-normal">
+            Must match the password above.
           </p>
-          <button
-            type="button"
-            className={`text-primary-10 text-center font-Raleway text-sm md:text-base font-bold leading-[150%] tracking-[-0.16px] cursor-pointer ${
-              !canResend ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-            onClick={handleResendOTP}
-            disabled={!canResend}
-          >
-            {canResend ? "Resend OTP" : `Resend OTP code in ${countdown}s`}
-          </button>
+          {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword}</p>}
         </div>
       </form>
 
-      {/* Fixed buttons at the bottom */}
-      <div className="absolute bottom-0 left-0 right-0 bg-white py-3 px-6 border-t border-opacityClr-20">
-        <div className="flex items-center gap-4 w-full">
-          <button
-            type="button"
-            className="flex items-center justify-center w-full rounded-md border border-transparent py-3 px-5 bg-opacityClr-100 text-base text-white font-semibold leading-[150%] transition-all duration-300 ease-in-out hover:bg-opacityClr-80 cursor-pointer"
-            onClick={handleSave}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <div className="flex items-center">
-                <span className="spinner mr-2"></span>
-                Processing...
-              </div>
-            ) : (
-              "Save Changes"
-            )}
-          </button>
-        </div>
+      <div className="absolute bottom-0 left-0 right-0 bg-white py-3 border-t border-opacityClr-20">
+        <button
+          type="button"
+          className="flex items-center justify-center w-full rounded-md border border-transparent py-3 px-5 bg-opacityClr-100 text-base text-white font-semibold leading-[150%] transition-all duration-300 ease-in-out hover:bg-opacityClr-80 cursor-pointer disabled:opacity-50"
+          onClick={handleSubmit}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <div className="flex items-center">
+              <span className="spinner mr-2" />
+              Updating...
+            </div>
+          ) : (
+            "Change Password"
+          )}
+        </button>
       </div>
     </div>
   );

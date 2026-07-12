@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import useWithdrawalsAPI from "@/services/useWithdrawalsAPI";
+import { formatZodErrors, withdrawalRejectReasonSchema } from "@/lib/withdrawals/validation";
+import { toast } from "sonner";
 
 type ViewWithdrawalDetailDrawerProps = {
   requestId: string;
@@ -114,11 +116,15 @@ const ViewWithdrawalDetailDrawer = ({ requestId, closeModal }: ViewWithdrawalDet
     }
 
     if (confirmAction === "reject") {
-      const reason = rejectReason.trim();
-      if (!reason) return;
+      const validation = withdrawalRejectReasonSchema.safeParse({ reason: rejectReason });
+      if (!validation.success) {
+        const errors = formatZodErrors(validation.error);
+        toast.error(errors.reason || Object.values(errors)[0] || "Enter a rejection reason.");
+        return;
+      }
       rejectRequest(
         requestId,
-        { reason },
+        { reason: validation.data.reason },
         {
           onSuccess: () => {
             handleCancelAction();

@@ -57,7 +57,7 @@ const TwoFactorAuthDrawer = () => {
   };
 
   return (
-    <div className="flex flex-col items-start gap-6 p-6 relative h-full ">
+    <div className="flex flex-col items-start gap-6 relative h-full ">
       <p className="font-Raleway font-normal text-opacityClr-100 text-base leading-[150%] mt-6">
         The ability for users to sign in with an additional authentication factor, in addition to using their username and password (e.g. a
         verification code).

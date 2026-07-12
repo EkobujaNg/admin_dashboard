@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { toast } from "sonner";
 import { useDrawerModal } from "@/context/DrawerModalContext";
 import usePropertyAPI from "@/services/usePropertyAPI";
+import { formatZodErrors, updatePropertyBuybackSchema } from "@/lib/property/validation";
 
 type UpdatePropertyBuybackDrawerProps = {
   propertyId: string;
@@ -22,18 +23,14 @@ export default function UpdatePropertyBuybackDrawer({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const ekobujaBuyBack = Number(value);
-    if (
-      value.trim() === "" ||
-      Number.isNaN(ekobujaBuyBack) ||
-      ekobujaBuyBack < 0.1 ||
-      ekobujaBuyBack > 100
-    ) {
-      toast.error("Ekobuja buyback must be between 0.1% and 100%.");
+    const validation = updatePropertyBuybackSchema.safeParse({ ekobujaBuyBack: value });
+    if (!validation.success) {
+      const errors = formatZodErrors(validation.error);
+      toast.error(errors.ekobujaBuyBack || Object.values(errors)[0] || "Invalid buyback percent.");
       return;
     }
 
-    updatePropertyEkobujaBuyback(propertyId, ekobujaBuyBack, {
+    updatePropertyEkobujaBuyback(propertyId, validation.data.ekobujaBuyBack, {
       onSuccess: () => closeModal(),
     });
   };

@@ -1,151 +1,99 @@
 "use client";
+
 import React, { useState } from "react";
-import { Laptop, MinusCircle, Smartphone } from "lucide-react";
+import { Laptop, Smartphone } from "lucide-react";
+import useLoginHistoryAPI from "@/services/useLoginHistoryAPI";
+import {
+  formatLoginHistoryDate,
+  formatLoginHistoryDeviceLabel,
+  isMobileLoginDevice,
+  type LoginHistoryEntry,
+} from "@/lib/auth/login-history";
 
-const LoginHistoryDrawer = () => {
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleSave = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    try {
-    } catch (error) {
-    } finally {
-      setIsLoading(false);
-    }
-  };
+function HistoryRow({ entry }: { entry: LoginHistoryEntry }) {
+  const Icon = isMobileLoginDevice(entry.deviceType) ? Smartphone : Laptop;
 
   return (
-    <div className="flex flex-col items-start gap-6 p-6 relative h-full">
-      <p className="font-Raleway font-normal text-opacityClr-100 text-base leading-[150%]">
-        Get a report showing when users logged in to your account.
-      </p>
+    <div className="flex flex-col items-start gap-4 border-t border-[#E8EBEB] py-4 w-full">
+      <span className="flex p-2.5 items-center justify-center border border-opacityClr-10 rounded">
+        <Icon className="w-8 h-8 text-primary-10" />
+      </span>
 
-      <div className="flex flex-col gap-6 w-full overflow-y-auto pb-24">
-        <div className="flex flex-col items-start gap-4 border-t border-[#E8EBEB] py-4 w-full">
-          <div className="flex items-center justify-between w-full">
-            <span className="flex p-2.5 items-center justify-center gap-2.5 border border-opacityClr-10 rounded">
-              <Laptop className="w-8 h-8" />
-            </span>
-
-            <div className="flex flex-col items-end gap-2">
-              <p className="font-Raleway font-semibold text-base text-primary-10 leading-normal ">Current session</p>
-              <div className="flex items-center justify-center gap-2">
-                <button type="button" className="outline-none bg-transparent">
-                  <MinusCircle className="w-5 h-5" />
-                </button>
-                <span className="font-Raleway font-medium text-sm text-opacityClr-40 leading-normal">Remove device</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col items-start gap-2">
-            <span className="font-Raleway font-medium text-sm text-opacityClr-40 leading-normal">
-              Lagos, Nigeria Feb 02, 2024 at 11:44am
-            </span>
-            <p className="font-Raleway font-semibold text-base text-primary-10 leading-normal ">Windows 10 Chrome</p>
-          </div>
-
-          <div className="flex flex-col items-start gap-2">
-            <span className="font-Raleway font-medium text-sm text-opacityClr-40 leading-normal">Login succeeded </span>
-            <p className="font-Raleway font-semibold text-base text-primary-10 leading-normal ">Yes</p>
-          </div>
-
-          <div className="flex flex-col items-start gap-2">
-            <span className="font-Raleway font-medium text-sm text-opacityClr-40 leading-normal">IP address</span>
-            <p className="font-Raleway font-semibold text-base text-primary-10 leading-normal ">105.235.194.62</p>
-          </div>
-        </div>
-
-        <div className="flex flex-col items-start gap-4 border-t  border-[#E8EBEB] py-4 w-full">
-          <div className="flex items-center justify-between w-full">
-            <span className="flex p-2.5 items-center justify-center gap-2.5 border border-opacityClr-10 rounded">
-              <Smartphone className="w-8 h-8" />
-            </span>
-
-            <div className="flex flex-col items-end gap-2">
-              <div className="flex items-center justify-center gap-2">
-                <button type="button" className="outline-none bg-transparent cursor-pointer">
-                  <MinusCircle className="w-5 h-5" />
-                </button>
-                <span className="font-Raleway font-medium text-sm text-opacityClr-40 leading-normal">Remove device</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col items-start gap-2">
-            <span className="font-Raleway font-medium text-sm text-opacityClr-40 leading-normal">
-              Lagos, Nigeria Feb 02, 2024 at 2:14pm
-            </span>
-            <p className="font-Raleway font-semibold text-base text-primary-10 leading-normal ">Android 10 Chrome</p>
-          </div>
-
-          <div className="flex flex-col items-start gap-2">
-            <span className="font-Raleway font-medium text-sm text-opacityClr-40 leading-normal">Login succeeded </span>
-            <p className="font-Raleway font-semibold text-base text-primary-10 leading-normal ">Yes</p>
-          </div>
-
-          <div className="flex flex-col items-start gap-2">
-            <span className="font-Raleway font-medium text-sm text-opacityClr-40 leading-normal">IP address</span>
-            <p className="font-Raleway font-semibold text-base text-primary-10 leading-normal ">105.68.10.112</p>
-          </div>
-        </div>
-
-        <div className="flex flex-col items-start gap-4 border-t  border-[#E8EBEB] py-4 w-full">
-          <div className="flex items-center justify-between w-full">
-            <span className="flex p-2.5 items-center justify-center gap-2.5 border border-opacityClr-10 rounded">
-              <Smartphone className="w-8 h-8" />
-            </span>
-
-            <div className="flex flex-col items-end gap-2">
-              <div className="flex items-center justify-center gap-2">
-                <button type="button" className="outline-none bg-transparent cursor-pointer">
-                  <MinusCircle className="w-5 h-5" />
-                </button>
-                <span className="font-Raleway font-medium text-sm text-opacityClr-40 leading-normal">Remove device</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col items-start gap-2">
-            <span className="font-Raleway font-medium text-sm text-opacityClr-40 leading-normal">
-              Lagos, Nigeria Feb 02, 2024 at 2:14pm
-            </span>
-            <p className="font-Raleway font-semibold text-base text-primary-10 leading-normal ">IOS 10 Safari</p>
-          </div>
-
-          <div className="flex flex-col items-start gap-2">
-            <span className="font-Raleway font-medium text-sm text-opacityClr-40 leading-normal">Login succeeded </span>
-            <p className="font-Raleway font-semibold text-base text-primary-10 leading-normal ">Yes</p>
-          </div>
-
-          <div className="flex flex-col items-start gap-2">
-            <span className="font-Raleway font-medium text-sm text-opacityClr-40 leading-normal">IP address</span>
-            <p className="font-Raleway font-semibold text-base text-primary-10 leading-normal ">105.68.10.112</p>
-          </div>
-        </div>
+      <div className="flex flex-col items-start gap-2">
+        <span className="font-Raleway font-medium text-sm text-opacityClr-40 leading-normal">Device</span>
+        <p className="font-Raleway font-semibold text-base text-primary-10 leading-normal">
+          {formatLoginHistoryDeviceLabel(entry.deviceType)}
+        </p>
       </div>
 
-      {/* Fixed buttons at the bottom */}
-      <div className="absolute bottom-0 left-0 right-0 bg-white py-3 px-6 border-t border-opacityClr-20">
-        <div className="flex items-center gap-4 w-full">
-          <button
-            type="button"
-            className="flex items-center justify-center w-full rounded-md border border-transparent py-3 px-5 bg-opacityClr-100 text-base text-white font-semibold leading-[150%] transition-all duration-300 ease-in-out hover:bg-opacityClr-80 cursor-pointer"
-            onClick={handleSave}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <div className="flex items-center">
-                <span className="spinner mr-2"></span>
-                Processing...
-              </div>
-            ) : (
-              "Save Changes"
-            )}
-          </button>
-        </div>
+      <div className="flex flex-col items-start gap-2">
+        <span className="font-Raleway font-medium text-sm text-opacityClr-40 leading-normal">Logged in at</span>
+        <p className="font-Raleway font-semibold text-base text-primary-10 leading-normal">
+          {formatLoginHistoryDate(entry.loggedInAt)}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+const LoginHistoryDrawer = () => {
+  const [page, setPage] = useState(1);
+  const { items, isLoading, error, hasMore, totalPages, refetch } = useLoginHistoryAPI({
+    page,
+    limit: 10,
+  });
+
+  return (
+    <div className="flex flex-col items-start gap-6 relative h-full">
+      <p className="font-Raleway font-normal text-opacityClr-100 text-base leading-[150%]">
+        Get a report showing when you logged in to your account.
+      </p>
+
+      <div className="flex flex-col gap-2 w-full overflow-y-auto pb-8">
+        {isLoading ? (
+          Array.from({ length: 3 }).map((_, index) => (
+            <div key={index} className="h-28 w-full rounded-lg bg-opacityClr-10 animate-pulse" />
+          ))
+        ) : error ? (
+          <div className="flex flex-col gap-3 py-6">
+            <p className="font-Raleway text-sm text-opacityClr-80">Could not load login history.</p>
+            <button
+              type="button"
+              onClick={() => refetch()}
+              className="self-start px-4 py-2 rounded-md bg-neutral-lightGreen text-primary-10 font-semibold text-sm cursor-pointer"
+            >
+              Try again
+            </button>
+          </div>
+        ) : items.length === 0 ? (
+          <p className="font-Raleway text-sm text-opacityClr-80 py-6">No login history yet.</p>
+        ) : (
+          items.map((entry) => <HistoryRow key={entry.id} entry={entry} />)
+        )}
+
+        {!isLoading && !error && totalPages > 1 ? (
+          <div className="flex items-center justify-between gap-3 pt-2 w-full">
+            <button
+              type="button"
+              disabled={page <= 1}
+              onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+              className="px-4 py-2 rounded-md border border-opacityClr-20 text-sm font-semibold disabled:opacity-40 cursor-pointer"
+            >
+              Previous
+            </button>
+            <span className="text-sm font-Raleway text-opacityClr-60">
+              Page {page} of {totalPages}
+            </span>
+            <button
+              type="button"
+              disabled={!hasMore}
+              onClick={() => setPage((prev) => prev + 1)}
+              className="px-4 py-2 rounded-md border border-opacityClr-20 text-sm font-semibold disabled:opacity-40 cursor-pointer"
+            >
+              Next
+            </button>
+          </div>
+        ) : null}
       </div>
     </div>
   );
