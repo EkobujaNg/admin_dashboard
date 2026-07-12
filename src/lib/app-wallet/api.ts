@@ -10,7 +10,7 @@ function unwrapData<T>(data: T | { data: T }): T {
   return data as T;
 }
 
-export function normalizeAppWalletBalance(raw: Record<string, unknown>): AppWalletBalance {
+function normalizeAppWalletBalance(raw: Record<string, unknown>): AppWalletBalance {
   return {
     balance: Number(raw.balance ?? 0),
     buyBackBalance: Number(raw.buyBackBalance ?? 0),

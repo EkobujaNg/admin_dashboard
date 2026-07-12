@@ -137,11 +137,11 @@ export function getAnnualRentForUnit(unit: RentalUnit): number {
   return unit.numberOfUnits * unit.monthlyRentPerUnit * 12;
 }
 
-export function getGrossRent(rentalUnits: RentalUnit[]): number {
+function getGrossRent(rentalUnits: RentalUnit[]): number {
   return rentalUnits.reduce((total, unit) => total + getAnnualRentForUnit(unit), 0);
 }
 
-export function getBaseCapRate(propertyTier: number, propertyClassification: PropertyClassification): number {
+function getBaseCapRate(propertyTier: number, propertyClassification: PropertyClassification): number {
   return CAP_RATE_TABLE[propertyClassification][propertyTier] ?? CAP_RATE_TABLE.standard[propertyTier];
 }
 

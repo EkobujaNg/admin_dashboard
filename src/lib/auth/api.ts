@@ -6,7 +6,7 @@ import type {
   LoginResponse,
 } from "./types";
 
-export const ADMIN_PORTAL = "admin";
+const ADMIN_PORTAL = "admin";
 
 function unwrapData<T>(data: T | { data: T }): T {
   if (data && typeof data === "object" && "data" in data && (data as { data: T }).data) {

@@ -4,15 +4,12 @@ import Image from "next/image";
 import { ArrowUpRight, Search, X } from "lucide-react";
 import Link from "next/link";
 import PropertyCard from "@/components/views/PropertyCard";
-import TradeMarketList from "@/components/views/TradeMarketList";
 import StatsCard from "@/components/ui/StatsCard";
-import TabButton from "@/components/ui/TabButton";
 import { usePropertyAPI } from "@/services/usePropertyAPI";
 import { useDebounce } from "use-debounce";
 import { emptyAssets } from "../../../../public/assets/images";
 
 const PropertiesPage = () => {
-  const [activeTab, setActiveTab] = useState("allProperties");
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
 
@@ -23,7 +20,7 @@ const PropertiesPage = () => {
     page: 1,
     limit: 20,
     searchTerm,
-    enableProperties: activeTab === "allProperties",
+    enableProperties: true,
     enableStatistics: true,
   });
 
@@ -95,68 +92,50 @@ const PropertiesPage = () => {
         />
       </div>
 
-      <div className="flex flex-col gap-4 w-full">
-        <div className="flex items-center justify-center gap-2 w-full bg-[#ECECEC] rounded-[100px]">
-          <TabButton label="All Properties" isActive={activeTab === "allProperties"} onClick={() => setActiveTab("allProperties")} />
-          <TabButton label="Trade Market" isActive={activeTab === "tradeMarket"} onClick={() => setActiveTab("tradeMarket")} />
-        </div>
-
-        <div className="flex items-center gap-2 px-6 py-[14px] bg-[#ECECEC] rounded-[100px] w-full">
-          {searchQuery ? (
-            <X className="text-[#8C9394] cursor-pointer font-normal" onClick={handleClearSearch} />
-          ) : (
-            <Search className="text-[#8C9394]" />
-          )}
-          <input
-            type="text"
-            className="bg-transparent w-full outline-none focus:bg-transparent focus:border-none focus:text-primary-10 placeholder:text-[#8C9394] placeholder:text-sm placeholder:font-normal"
-            placeholder={`Search for ${activeTab === "allProperties" ? "property..." : "trade property..."}`}
-            value={searchQuery}
-            onChange={handleInputChange}
-          />
-        </div>
+      <div className="flex items-center gap-2 px-6 py-[14px] bg-[#ECECEC] rounded-[100px] w-full">
+        {searchQuery ? (
+          <X className="text-[#8C9394] cursor-pointer font-normal" onClick={handleClearSearch} />
+        ) : (
+          <Search className="text-[#8C9394]" />
+        )}
+        <input
+          type="text"
+          className="bg-transparent w-full outline-none focus:bg-transparent focus:border-none focus:text-primary-10 placeholder:text-[#8C9394] placeholder:text-sm placeholder:font-normal"
+          placeholder="Search for property..."
+          value={searchQuery}
+          onChange={handleInputChange}
+        />
       </div>
 
       <div className="flex flex-col gap-4 w-full">
-        {activeTab === "allProperties" ? (
-          <>
-            {isLoadingProperties ? (
-              <div className="flex items-center justify-center w-full h-[250px]">
-                <span className="font-Raleway text-opacityClr-60">Loading properties...</span>
-              </div>
-            ) : displayProperties.length === 0 ? (
-              <div className="flex flex-col items-center justify-center gap-6 mt-10 w-full">
-                <Image src={emptyAssets} alt="empty assets" width={220} height={175} />
-                <p className="text-center text-base text-[#A5AFAF] font-Raleway font-normal leading-normal">
-                  {searchTerm
-                    ? "No properties match your search."
-                    : "You don't have any property listed at the moment."}
-                </p>
-                <Link
-                  href="/properties/add"
-                  className="flex py-3 px-5 items-center justify-center gap-2 rounded-md border border-opacityClr-100 bg-transparent cursor-pointer w-fit"
-                >
-                  <span className="font-Geist font-semibold text-base text-primary-10 leading-[150%] tracking-[-0.16px]">
-                    Add Property
-                  </span>
-                  <ArrowUpRight className="text-primary-10 text-base w-5 h-5" />
-                </Link>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 w-full">
-                {displayProperties.map((property) => (
-                  <PropertyCard key={property.propertyId} property={property} />
-                ))}
-              </div>
-            )}
-          </>
-        ) : (
-          <>
-            <p className="text-base text-primary-10 font-Raleway">
-              Sell, invest into property-stocks in minutes. Click on available property to view stocks sold by other users.
+        {isLoadingProperties ? (
+          <div className="flex items-center justify-center w-full h-[250px]">
+            <span className="font-Raleway text-opacityClr-60">Loading properties...</span>
+          </div>
+        ) : displayProperties.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-6 mt-10 w-full">
+            <Image src={emptyAssets} alt="empty assets" width={220} height={175} />
+            <p className="text-center text-base text-[#A5AFAF] font-Raleway font-normal leading-normal">
+              {searchTerm
+                ? "No properties match your search."
+                : "You don't have any property listed at the moment."}
             </p>
-            <TradeMarketList />
-          </>
+            <Link
+              href="/properties/add"
+              className="flex py-3 px-5 items-center justify-center gap-2 rounded-md border border-opacityClr-100 bg-transparent cursor-pointer w-fit"
+            >
+              <span className="font-Geist font-semibold text-base text-primary-10 leading-[150%] tracking-[-0.16px]">
+                Add Property
+              </span>
+              <ArrowUpRight className="text-primary-10 text-base w-5 h-5" />
+            </Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 w-full">
+            {displayProperties.map((property) => (
+              <PropertyCard key={property.propertyId} property={property} />
+            ))}
+          </div>
         )}
       </div>
     </section>

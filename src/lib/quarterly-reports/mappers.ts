@@ -27,7 +27,7 @@ function defaultQuarterLabel(quarter: QuarterlyReportQuarter): string {
   return labels[quarter];
 }
 
-export function normalizeQuarterlyReport(
+function normalizeQuarterlyReport(
   raw: Record<string, unknown>,
   defaults?: { propertyId?: string; year?: number }
 ): QuarterlyReport {

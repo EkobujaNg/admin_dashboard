@@ -1,6 +1,6 @@
 export type AdminUserFilter = "all" | "pending_utility_bill" | "blocked" | "kyc_complete";
 
-export type AdminUserPhoneNumber = {
+type AdminUserPhoneNumber = {
   code: string;
   number: string;
 };

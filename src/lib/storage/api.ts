@@ -10,7 +10,7 @@ function unwrapData<T>(data: T | { data: T }): T {
   return data as T;
 }
 
-export async function getPresignedUploadUrl(payload: PresignUploadPayload): Promise<PresignUploadResponse> {
+async function getPresignedUploadUrl(payload: PresignUploadPayload): Promise<PresignUploadResponse> {
   const { data } = await http.post<PresignUploadResponse | { data: PresignUploadResponse }>(
     "/storage/presign",
     payload
@@ -18,7 +18,7 @@ export async function getPresignedUploadUrl(payload: PresignUploadPayload): Prom
   return unwrapData(data);
 }
 
-export async function uploadFileToPresignedUrl(uploadUrl: string, file: File): Promise<void> {
+async function uploadFileToPresignedUrl(uploadUrl: string, file: File): Promise<void> {
   const response = await fetch(uploadUrl, {
     method: "PUT",
     headers: {

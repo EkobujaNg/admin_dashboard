@@ -8,7 +8,7 @@ import type {
   WalletTransaction,
 } from "./types";
 
-export function normalizeWalletTransaction(raw: Record<string, unknown>): WalletTransaction {
+function normalizeWalletTransaction(raw: Record<string, unknown>): WalletTransaction {
   const metadata =
     raw.metadata && typeof raw.metadata === "object" ? (raw.metadata as Record<string, unknown>) : {};
 
@@ -35,7 +35,7 @@ export function normalizeWalletTransaction(raw: Record<string, unknown>): Wallet
   };
 }
 
-export function normalizeCommissionRecord(raw: Record<string, unknown>): CommissionRecord {
+function normalizeCommissionRecord(raw: Record<string, unknown>): CommissionRecord {
   return {
     id: String(raw.id ?? ""),
     userId: String(raw.userId ?? ""),
@@ -51,7 +51,7 @@ export function normalizeCommissionRecord(raw: Record<string, unknown>): Commiss
   };
 }
 
-export function normalizePropertyMarketTransaction(
+function normalizePropertyMarketTransaction(
   raw: Record<string, unknown>,
   market: PropertyMarketType
 ): PropertyMarketTransaction {

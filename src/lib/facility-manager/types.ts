@@ -1,4 +1,4 @@
-export type PhoneNumberPayload = {
+type PhoneNumberPayload = {
   code: string;
   number: string;
 };
@@ -43,10 +43,6 @@ export type CreateFacilityManagerResponse = {
   responseDescription?: string;
   responseMessage?: string;
   [key: string]: unknown;
-};
-
-export type AssignPropertyToFacilityManagerPayload = {
-  propertyId: string;
 };
 
 export type AssignPropertyToFacilityManagerResponse = {

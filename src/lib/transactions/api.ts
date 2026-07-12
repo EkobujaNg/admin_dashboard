@@ -22,16 +22,6 @@ function unwrapData<T>(data: T | { data: T }): T {
   return data as T;
 }
 
-export function getTransactionsErrorMessage(error: any, fallback: string) {
-  return (
-    error?.response?.data?.responseDescription ||
-    error?.response?.data?.responseMessage ||
-    error?.response?.data?.message ||
-    error?.message ||
-    fallback
-  );
-}
-
 export async function getWalletTransactions(
   params: GetWalletTransactionsParams = {}
 ): Promise<PaginatedWalletTransactions> {

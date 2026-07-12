@@ -1,4 +1,4 @@
-export type WalletTransactionStatus = string;
+type WalletTransactionStatus = string;
 
 export type WalletTransaction = {
   id: string;

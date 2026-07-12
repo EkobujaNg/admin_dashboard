@@ -11,18 +11,6 @@ function unwrapData<T>(data: T | { data: T }): T {
   return data as T;
 }
 
-export function getDashboardErrorMessage(error: any, fallback: string) {
-  const message = error?.response?.data?.message;
-  if (Array.isArray(message)) return message.join(", ");
-  return (
-    error?.response?.data?.responseDescription ||
-    error?.response?.data?.responseMessage ||
-    message ||
-    error?.message ||
-    fallback
-  );
-}
-
 export async function getAdminDashboard(): Promise<AdminDashboard> {
   const { data } = await http.get<Record<string, unknown> | { data: Record<string, unknown> }>(
     ADMIN_DASHBOARD_BASE

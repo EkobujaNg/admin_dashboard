@@ -24,5 +24,3 @@ export const createFacilityManagerSchema = z.object({
     .max(15, "Phone number is too long.")
     .regex(/^\d+$/, "Phone number should contain digits only."),
 });
-
-export type CreateFacilityManagerFormData = z.infer<typeof createFacilityManagerSchema>;

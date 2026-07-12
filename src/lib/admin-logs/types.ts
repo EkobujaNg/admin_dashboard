@@ -1,4 +1,4 @@
-export type AdminLogAction =
+type AdminLogAction =
   | "withdrawal_completed"
   | "withdrawal_rejected"
   | "buyback_approved"
@@ -27,7 +27,7 @@ export type AdminLogAction =
   | "property_quarterly_report_updated"
   | string;
 
-export type AdminLogResourceType =
+type AdminLogResourceType =
   | "withdrawal_request"
   | "buyback_request"
   | "user"

@@ -7,7 +7,7 @@ export const ADMIN_ROLE_OPTIONS: Array<{ value: AdminRole; label: string }> = [
   { value: "finance", label: "Finance" },
 ];
 
-export type PhoneNumberPayload = {
+type PhoneNumberPayload = {
   code: string;
   number: string;
 };

@@ -1,4 +1,4 @@
-export type StorageKind = "profile" | "properties";
+type StorageKind = "profile" | "properties";
 
 export type PresignUploadPayload = {
   kind: StorageKind;

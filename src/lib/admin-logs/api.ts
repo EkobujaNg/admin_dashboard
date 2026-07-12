@@ -20,18 +20,6 @@ function unwrapData<T>(data: T | { data: T }): T {
   return data as T;
 }
 
-export function getAdminLogsErrorMessage(error: any, fallback: string) {
-  const message = error?.response?.data?.message;
-  if (Array.isArray(message)) return message.join(", ");
-  return (
-    error?.response?.data?.responseDescription ||
-    error?.response?.data?.responseMessage ||
-    message ||
-    error?.message ||
-    fallback
-  );
-}
-
 export async function getAdminLogs(params: GetAdminLogsParams = {}): Promise<PaginatedAdminLogs> {
   const page = params.page ?? 1;
   const limit = params.limit ?? 10;

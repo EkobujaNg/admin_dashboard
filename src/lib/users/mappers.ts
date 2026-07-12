@@ -93,7 +93,7 @@ function normalizeNextOfKin(raw: unknown): AdminUserNextOfKin {
   };
 }
 
-export function normalizeAdminUser(raw: Record<string, unknown>): AdminUserRecord {
+function normalizeAdminUser(raw: Record<string, unknown>): AdminUserRecord {
   const id = String(raw.id ?? "");
   const { display, phone } = formatPhone(raw.phoneNumber);
   const profile = raw.profile && typeof raw.profile === "object" ? (raw.profile as Record<string, unknown>) : null;

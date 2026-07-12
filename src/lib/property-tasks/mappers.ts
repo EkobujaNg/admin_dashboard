@@ -31,7 +31,7 @@ function normalizeDirection(raw: unknown): AffectPropertyDirection | null {
   return null;
 }
 
-export function normalizePropertyTask(raw: Record<string, unknown>): PropertyTask {
+function normalizePropertyTask(raw: Record<string, unknown>): PropertyTask {
   const imageUrls = Array.isArray(raw.imageUrls)
     ? raw.imageUrls.map(String)
     : Array.isArray(raw.images)

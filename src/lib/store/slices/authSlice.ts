@@ -45,11 +45,6 @@ const authSlice = createSlice({
       state.user = null;
       state.initiateEmail = null;
     },
-    updateProfileLocally: (state, action) => {
-      if (state.user) {
-        state.user = { ...state.user, ...action.payload };
-      }
-    },
   },
 });
 
@@ -59,7 +54,6 @@ export const {
   logout,
   setForgotPasswordEmail,
   clearForgotPasswordFlow,
-  updateProfileLocally,
 } = authSlice.actions;
 
 export default authSlice.reducer;
