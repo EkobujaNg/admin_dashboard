@@ -47,7 +47,8 @@ export function formatPropertyImpact(
   affectPropertyBy?: number | null,
   direction?: AffectPropertyDirection | null
 ): string {
-  if (!affectProperty || affectPropertyBy == null) return "—";
+  if (affectPropertyBy == null) return "—";
   const sign = direction === "minus" ? "-" : direction === "plus" ? "+" : "";
-  return `${sign}${affectPropertyBy}%`;
+  const value = `${sign}${affectPropertyBy}%`;
+  return affectProperty ? value : `${value} (disabled)`;
 }

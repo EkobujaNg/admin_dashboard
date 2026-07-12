@@ -50,7 +50,7 @@ const Dropdown = ({ label, options, value, onSelect = () => {} }: DropdownProps)
       </button>
 
       {isOpen && (
-        <ul className="absolute top-full left-0 min-w-full mt-1 bg-white rounded-xl shadow-md z-10">
+        <ul className="absolute top-full left-0 min-w-full mt-1 bg-white rounded-xl shadow-md z-10 max-h-72 overflow-y-auto">
           {options.map((option) => {
             const optionValue = getOptionValue(option);
             const optionLabel = getOptionLabel(option);

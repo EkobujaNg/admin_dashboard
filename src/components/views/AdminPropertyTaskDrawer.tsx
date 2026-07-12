@@ -57,8 +57,11 @@ export default function AdminPropertyTaskDrawer({ taskId, propertyId }: AdminPro
     );
   }
 
-  // Only show override when the task currently affects property value.
-  const showAffectButton = task.affectProperty === true;
+  // Disable when impact is on; enable when it was turned off but still has a % contribution.
+  const canDisableImpact = task.affectProperty === true;
+  const canEnableImpact = task.affectProperty === false && task.affectPropertyBy != null;
+  const showAffectButton = canDisableImpact || canEnableImpact;
+  const nextAffectProperty = canDisableImpact ? false : true;
 
   const closeConfirm = () => {
     setConfirmOpen(false);
@@ -85,7 +88,7 @@ export default function AdminPropertyTaskDrawer({ taskId, propertyId }: AdminPro
           </div>
         </div>
 
-        {task.affectProperty && (
+        {task.affectPropertyBy != null && (
           <div className="flex flex-col gap-1.5">
             <label className={labelClass}>Direction</label>
             <div className={valueClass}>{getAffectPropertyDirectionLabel(task.affectPropertyDirection)}</div>
@@ -153,9 +156,17 @@ export default function AdminPropertyTaskDrawer({ taskId, propertyId }: AdminPro
             type="button"
             onClick={() => setConfirmOpen(true)}
             disabled={isUpdatingAffectProperty}
-            className="w-full px-5 py-[14px] rounded-md font-Raleway font-bold text-base bg-[#9F1B1B] text-white hover:bg-[#7f1616] transition-colors disabled:opacity-50"
+            className={`w-full px-5 py-[14px] rounded-md font-Raleway font-bold text-base text-white transition-colors disabled:opacity-50 ${
+              canDisableImpact
+                ? "bg-[#9F1B1B] hover:bg-[#7f1616]"
+                : "bg-[#6D9F1B] hover:bg-[#587f16]"
+            }`}
           >
-            {isUpdatingAffectProperty ? "Updating..." : "Disable property value impact"}
+            {isUpdatingAffectProperty
+              ? "Updating..."
+              : canDisableImpact
+                ? "Disable property value impact"
+                : "Enable property value impact"}
           </button>
         </div>
       )}
@@ -165,21 +176,35 @@ export default function AdminPropertyTaskDrawer({ taskId, propertyId }: AdminPro
         onClose={closeConfirm}
         onConfirm={() => {
           if (!affectRemark.trim()) return;
-          setAffectProperty(task.id, false, affectRemark, {
+          setAffectProperty(task.id, nextAffectProperty, affectRemark, {
             onSuccess: closeConfirm,
             onError: closeConfirm,
           });
         }}
-        message="Disable this task's impact on the property value? Add a remark for the override."
+        message={
+          canDisableImpact
+            ? "Disable this task's impact on the property value? Add a remark for the override."
+            : "Enable this task's impact on the property value? Add a remark for the override."
+        }
         cancelMsg="Cancel"
-        confirmMsg={isUpdatingAffectProperty ? "Updating..." : "Disable"}
-        confirmButtonColor="red"
+        confirmMsg={
+          isUpdatingAffectProperty
+            ? "Updating..."
+            : canDisableImpact
+              ? "Disable"
+              : "Enable"
+        }
+        confirmButtonColor={canDisableImpact ? "red" : "green"}
         confirmDisabled={isUpdatingAffectProperty || !affectRemark.trim()}
       >
         <textarea
           value={affectRemark}
           onChange={(e) => setAffectRemark(e.target.value)}
-          placeholder="Admin override: task should not affect property value."
+          placeholder={
+            canDisableImpact
+              ? "Admin override: task should not affect property value."
+              : "Admin override: re-apply task impact on property value."
+          }
           rows={3}
           className="w-full rounded-xl border border-opacityClr-50 px-3 py-2.5 text-sm font-Raleway text-primary-10 outline-none focus:border-primary-10 resize-none"
         />

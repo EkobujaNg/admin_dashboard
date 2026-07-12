@@ -12,14 +12,13 @@ import {
   Users,
   Building2,
   Banknote,
-  Briefcase,
-  ChartColumn,
   ClipboardList,
   ArrowDownToLine,
   Settings,
   PieChart,
   RefreshCcw,
   Shield,
+  ScrollText,
   type LucideIcon,
 } from "lucide-react";
 
@@ -30,14 +29,13 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen: any; setIsOpen:
     { href: "/overview", label: "Overview", icon: LayoutDashboard },
     { href: "/accounts", label: "Accounts", icon: Users },
     { href: "/properties", label: "Properties", icon: Building2 },
-    { href: "/investments", label: "Investments", icon: Briefcase },
     { href: "/earnings", label: "Earnings", icon: Banknote },
     { href: "/profit-sharing", label: "Profit Sharing", icon: PieChart },
     { href: "/withdrawals", label: "Withdrawals", icon: ArrowDownToLine },
     { href: "/buyback", label: "Buyback", icon: RefreshCcw },
     { href: "/admins", label: "Admins", icon: Shield },
+    { href: "/admin-logs", label: "Admin Logs", icon: ScrollText },
     { href: "/facility-admin", label: "FM Manager", icon: ClipboardList },
-    { href: "/analytics-metrics", label: "Reports Analytics", icon: ChartColumn },
   ];
 
   const handleLinkClick = () => {
