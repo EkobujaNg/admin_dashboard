@@ -27,6 +27,7 @@ import {
 } from "@/lib/property/valuation";
 import {
   formatZodErrors,
+  PROPERTY_DESCRIPTION_MAX_LENGTH,
   propertyListingStep1Schema,
   propertyListingStep2Schema,
   propertyListingStep4Schema,
@@ -321,6 +322,10 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
     4: isEditMode ? "Review your changes before saving the listing." : "Review everything before creating the listing.",
   }[step];
 
+  const descriptionRemaining = PROPERTY_DESCRIPTION_MAX_LENGTH - details.description.length;
+  const isDescriptionOverLimit = descriptionRemaining < 0;
+  const isDescriptionNearLimit = descriptionRemaining <= 20 && descriptionRemaining >= 0;
+
   if (!isInitialized) {
     return (
       <div className="flex items-center justify-center min-h-[320px] w-full">
@@ -391,8 +396,31 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
                 placeholder="A premium residential block in Lekki with strong rental demand."
                 rows={4}
                 required
-                className={`${inputClassName} resize-none`}
+                aria-invalid={isDescriptionOverLimit}
+                className={`${inputClassName} resize-none ${
+                  isDescriptionOverLimit ? "border-red-500 focus:border-red-500" : ""
+                }`}
               />
+              <div className="flex items-center justify-between gap-3">
+                {isDescriptionOverLimit ? (
+                  <p className="text-xs font-Raleway text-red-600">
+                    Description must be {PROPERTY_DESCRIPTION_MAX_LENGTH} characters or fewer.
+                  </p>
+                ) : (
+                  <span />
+                )}
+                <p
+                  className={`text-xs font-Raleway font-semibold tabular-nums ${
+                    isDescriptionOverLimit
+                      ? "text-red-600"
+                      : isDescriptionNearLimit
+                        ? "text-amber-600"
+                        : "text-opacityClr-60"
+                  }`}
+                >
+                  {details.description.length}/{PROPERTY_DESCRIPTION_MAX_LENGTH}
+                </p>
+              </div>
             </Field>
 
             <div className="flex flex-col gap-3 w-full">

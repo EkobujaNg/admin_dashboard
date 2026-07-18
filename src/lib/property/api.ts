@@ -97,14 +97,3 @@ export async function updatePropertyCommission(
   );
   return unwrapData(data);
 }
-
-export async function updatePropertyEkobujaBuyback(
-  id: string,
-  ekobujaBuyBack: number
-): Promise<CreatePropertyResponse> {
-  const { data } = await http.patch<CreatePropertyResponse | { data: CreatePropertyResponse }>(
-    `/properties/${id}/ekobuja-buyback`,
-    { ekobujaBuyBack }
-  );
-  return unwrapData(data);
-}

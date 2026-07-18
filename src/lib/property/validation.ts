@@ -14,18 +14,23 @@ function percentFromInput(label: string) {
     .refine((value) => value >= 0.1 && value <= 100, `${label} must be between 0.1% and 100%.`);
 }
 
+export const PROPERTY_DESCRIPTION_MAX_LENGTH = 300;
+
 export const updatePropertyCommissionSchema = z.object({
   commission: percentFromInput("Commission"),
-});
-
-export const updatePropertyBuybackSchema = z.object({
-  ekobujaBuyBack: percentFromInput("Ekobuja buyback"),
 });
 
 export const propertyListingStep1Schema = z.object({
   propertyType: z.string().trim().min(1, "Please select a property type."),
   name: z.string().trim().min(1, "Please enter a property name."),
-  description: z.string().trim().min(1, "Please enter a description."),
+  description: z
+    .string()
+    .trim()
+    .min(1, "Please enter a description.")
+    .max(
+      PROPERTY_DESCRIPTION_MAX_LENGTH,
+      `Description must be ${PROPERTY_DESCRIPTION_MAX_LENGTH} characters or fewer.`
+    ),
   aboutProperty: z
     .array(z.string())
     .refine((items) => items.some((item) => item.trim().length > 0), {

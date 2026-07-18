@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import MediaImage from "@/components/ui/MediaImage";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Eye, EyeOff, MapPin, ArrowUpRight, Pencil, Percent, RefreshCw } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, MapPin, ArrowUpRight, Pencil, Percent } from "lucide-react";
 import TabButton from "@/components/ui/TabButton";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import ActionDropdown from "@/components/ui/ActionDropdown";
@@ -11,7 +11,6 @@ import PropertyTasksTab from "@/components/views/PropertyTasksTab";
 import PropertyTransactionsTab from "@/components/views/PropertyTransactionsTab";
 import PropertyReportsTab from "@/components/views/PropertyReportsTab";
 import UpdatePropertyCommissionDrawer from "@/components/views/UpdatePropertyCommissionDrawer";
-import UpdatePropertyBuybackDrawer from "@/components/views/UpdatePropertyBuybackDrawer";
 import { useDrawerModal } from "@/context/DrawerModalContext";
 import { formatNaira, formatPercent } from "@/lib/property/valuation";
 import { PROPERTY_LISTING_TYPE_OPTIONS, type PropertyRecord } from "@/lib/property/types";
@@ -91,18 +90,6 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
           ),
       },
       {
-        label: "Update Ekobuja Buyback",
-        icon: RefreshCw,
-        onClick: () =>
-          openModal(
-            "Update Ekobuja Buyback",
-            <UpdatePropertyBuybackDrawer
-              propertyId={property.propertyId}
-              currentBuyback={property.ekobujaBuyBack}
-            />
-          ),
-      },
-      {
         label: isHidden ? "Show Property" : "Hide Property",
         icon: isHidden ? Eye : EyeOff,
         variant: isHidden ? ("success" as const) : ("warning" as const),
@@ -115,7 +102,6 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
       isUpdatingPropertyVisibility,
       openModal,
       property.commission,
-      property.ekobujaBuyBack,
       property.propertyId,
       router,
     ]
@@ -291,10 +277,6 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
               <DetailRow
                 label="Commission"
                 value={property.commission != null ? `${Number(property.commission)}%` : "—"}
-              />
-              <DetailRow
-                label="Ekobuja Buyback"
-                value={property.ekobujaBuyBack != null ? `${Number(property.ekobujaBuyBack)}%` : "—"}
               />
               <DetailRow label="Visibility" value={isHidden ? "Hidden" : "Visible"} />
               <DetailRow label="Created" value={formatDate(property.createdAt)} />

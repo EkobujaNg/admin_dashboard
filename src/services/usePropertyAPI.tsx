@@ -9,7 +9,6 @@ import {
   updateProperty as updatePropertyRequest,
   setPropertyVisibility as setPropertyVisibilityRequest,
   updatePropertyCommission as updatePropertyCommissionRequest,
-  updatePropertyEkobujaBuyback as updatePropertyEkobujaBuybackRequest,
 } from "@/lib/property/api";
 import type { CreatePropertyPayload } from "@/lib/property/types";
 
@@ -83,15 +82,6 @@ export const usePropertyAPI = ({
   const updateCommissionMutation = useMutation({
     mutationFn: ({ id, commission }: { id: string; commission: number }) =>
       updatePropertyCommissionRequest(id, commission),
-    onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["properties"] });
-      queryClient.invalidateQueries({ queryKey: ["property", variables.id] });
-    },
-  });
-
-  const updateEkobujaBuybackMutation = useMutation({
-    mutationFn: ({ id, ekobujaBuyBack }: { id: string; ekobujaBuyBack: number }) =>
-      updatePropertyEkobujaBuybackRequest(id, ekobujaBuyBack),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["properties"] });
       queryClient.invalidateQueries({ queryKey: ["property", variables.id] });
@@ -193,31 +183,6 @@ export const usePropertyAPI = ({
     );
   };
 
-  const updatePropertyEkobujaBuyback = (
-    id: string,
-    ekobujaBuyBack: number,
-    options?: { onSuccess?: (data?: any) => void; onError?: (error?: any) => void }
-  ) => {
-    updateEkobujaBuybackMutation.mutate(
-      { id, ekobujaBuyBack },
-      {
-        onSuccess: (data) => {
-          toast.success(
-            data?.responseDescription ||
-              data?.responseMessage ||
-              data?.message ||
-              "Ekobuja buyback updated."
-          );
-          options?.onSuccess?.(data);
-        },
-        onError: (error) => {
-          toast.error(getPropertyErrorMessage(error, "Failed to update Ekobuja buyback."));
-          options?.onError?.(error);
-        },
-      }
-    );
-  };
-
   const deleteProperty = async (_id: string, options?: { onSuccess?: () => void }) => {
     toast.success("Property deleted successfully");
     queryClient.invalidateQueries({ queryKey: ["properties"] });
@@ -250,13 +215,11 @@ export const usePropertyAPI = ({
     updateProperty,
     setPropertyVisibility,
     updatePropertyCommission,
-    updatePropertyEkobujaBuyback,
     deleteProperty,
     isAddingProperty: addPropertyMutation.isPending,
     isUpdatingProperty: updatePropertyMutation.isPending,
     isUpdatingPropertyVisibility: setPropertyVisibilityMutation.isPending,
     isUpdatingCommission: updateCommissionMutation.isPending,
-    isUpdatingEkobujaBuyback: updateEkobujaBuybackMutation.isPending,
     isDeletingProperty: false,
   };
 };
