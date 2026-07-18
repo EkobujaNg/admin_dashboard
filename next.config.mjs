@@ -38,6 +38,12 @@ const nextConfig = {
         port: "",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "ekobujamedia.com.ng",
+        port: "",
+        pathname: "/**",
+      },
     ],
   },
 };

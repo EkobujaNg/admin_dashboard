@@ -19,6 +19,7 @@ import {
   RefreshCcw,
   Shield,
   ScrollText,
+  ArrowLeftRight,
   type LucideIcon,
 } from "lucide-react";
 
@@ -30,6 +31,7 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen: any; setIsOpen:
     { href: "/accounts", label: "Accounts", icon: Users },
     { href: "/properties", label: "Properties", icon: Building2 },
     { href: "/earnings", label: "Earnings", icon: Banknote },
+    { href: "/user-transactions", label: "User Transactions", icon: ArrowLeftRight },
     { href: "/profit-sharing", label: "Profit Sharing", icon: PieChart },
     { href: "/withdrawals", label: "Withdrawals", icon: ArrowDownToLine },
     { href: "/buyback", label: "Buyback", icon: RefreshCcw },

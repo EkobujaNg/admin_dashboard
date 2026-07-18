@@ -8,6 +8,8 @@ import { useDrawerModal } from "@/context/DrawerModalContext";
 import type { AuthUser } from "@/lib/auth/types";
 import { formatAdminRole } from "@/lib/admins/types";
 import useAdminProfileAPI from "@/services/useAdminProfileAPI";
+import useNotificationsAPI from "@/services/useNotificationsAPI";
+import NotificationDrawer from "@/components/views/NotificationDrawer";
 
 function displayNameFromUser(user: AuthUser | null | undefined) {
   if (!user) return "Admin";
@@ -27,6 +29,7 @@ const Header = memo(({ toggleSidebar }: { toggleSidebar: any }) => {
   const { openModal } = useDrawerModal();
   const user = useSelector((state: { auth: { user: AuthUser | null } }) => state.auth.user);
   useAdminProfileAPI({ enableProfile: true });
+  const { unreadCount } = useNotificationsAPI({ enableUnreadCount: true });
   const [greeting, setGreeting] = useState("Hello");
   const [mounted, setMounted] = useState(false);
 
@@ -69,9 +72,14 @@ const Header = memo(({ toggleSidebar }: { toggleSidebar: any }) => {
         </div>
 
         <div className="flex items-center gap-4 shrink-0">
-          <div className="relative cursor-pointer" onClick={() => openModal("Notifications Main", <p>Notification drawer...</p>)}>
+          <div
+            className="relative cursor-pointer"
+            onClick={() => openModal("Notifications Main", <NotificationDrawer />)}
+          >
             <Bell className="w-5 h-5 md:w-6 md:h-6 text-gray-600 hover:text-black" />
-            <span className="absolute top-0 right-0 w-2 h-2 bg-orange-500 rounded-full"></span>
+            {mounted && unreadCount > 0 ? (
+              <span className="absolute top-0 right-0 w-2 h-2 bg-orange-500 rounded-full" />
+            ) : null}
           </div>
         </div>
       </header>

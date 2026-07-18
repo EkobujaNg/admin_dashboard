@@ -7,7 +7,6 @@ import type {
 } from "./types";
 
 const ADMIN_BUYBACK_BASE = "/admin/buyback/requests";
-const ADMIN_BUYBACK_TOP_UP = "/admin/buyback/top-up";
 
 function unwrapData<T>(data: T | { data: T }): T {
   if (data && typeof data === "object" && "data" in data && (data as { data: T }).data) {
@@ -24,11 +23,6 @@ export function getBuybackErrorMessage(error: any, fallback: string) {
     error?.message ||
     fallback
   );
-}
-
-export async function topUpBuybackBalance(amount: number): Promise<{ message?: string }> {
-  const { data } = await http.post(ADMIN_BUYBACK_TOP_UP, { amount });
-  return unwrapData(data) as { message?: string };
 }
 
 export async function getBuybackRequests(

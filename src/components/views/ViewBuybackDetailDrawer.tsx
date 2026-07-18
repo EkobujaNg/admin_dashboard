@@ -173,7 +173,7 @@ const ViewBuybackDetailDrawer = ({ requestId, closeModal }: ViewBuybackDetailDra
           </p>
           {hasInsufficientBalance && (
             <p className="text-xs text-[#9F471B] font-Raleway mt-2">
-              Insufficient buyback balance for this request. Top up from Earnings before approving.
+              Insufficient buyback balance for this request.
             </p>
           )}
         </div>

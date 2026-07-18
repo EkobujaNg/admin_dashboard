@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import Image from "next/image";
+import MediaImage from "@/components/ui/MediaImage";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Eye, EyeOff, MapPin, ArrowUpRight, Pencil, Percent, RefreshCw } from "lucide-react";
 import TabButton from "@/components/ui/TabButton";
@@ -175,7 +175,7 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
 
       <div className="flex flex-col md:flex-row gap-6 p-6 rounded-2xl bg-primary-10 w-full">
         <div className="w-full md:w-[30%] h-[150px] md:h-[200px] rounded-2xl overflow-hidden relative">
-          <Image
+          <MediaImage
             src={primaryImage}
             alt={property.name}
             fill
@@ -234,7 +234,7 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
                 selectedImageIndex === index ? "border-primary-10" : "border-transparent"
               }`}
             >
-              <Image src={image} alt={`${property.name} ${index + 1}`} fill className="object-cover" sizes="112px" />
+              <MediaImage src={image} alt={`${property.name} ${index + 1}`} fill className="object-cover" sizes="112px" />
             </button>
           ))}
         </div>

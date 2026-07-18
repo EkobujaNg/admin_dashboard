@@ -8,13 +8,13 @@ import TabButton from "@/components/ui/TabButton";
 import { emptyWallet } from "../../../../public/assets/images";
 import TableHeadAndBody from "@/components/ui/TableHeadAndBody";
 import { useDrawerModal } from "@/context/DrawerModalContext";
-import ViewWalletTransactionDrawer from "@/components/views/ViewWalletTransactionDrawer";
 import ViewCommissionDrawer from "@/components/views/ViewCommissionDrawer";
-import TopUpBuybackDrawer from "@/components/views/TopUpBuybackDrawer";
 import useAppWalletAPI from "@/services/useAppWalletAPI";
 import useTransactionsAPI from "@/services/useTransactionsAPI";
-import type { CommissionRecord, WalletTransaction } from "@/lib/transactions/types";
-import { Eye, Plus } from "lucide-react";
+import useProfitSharingAPI from "@/services/useProfitSharingAPI";
+import type { CommissionRecord } from "@/lib/transactions/types";
+import type { UnownedProfitHistoryEntry } from "@/lib/profit-sharing/types";
+import { Eye } from "lucide-react";
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -23,10 +23,10 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-type EarningsTab = "transactions" | "commissions";
+type EarningsTab = "commissions" | "unowned-history";
 
-const walletColumnHelper = createColumnHelper<WalletTransaction>();
 const commissionColumnHelper = createColumnHelper<CommissionRecord>();
+const unownedColumnHelper = createColumnHelper<UnownedProfitHistoryEntry>();
 
 function formatMoney(amount?: number, currency = "NGN") {
   const value = Number(amount || 0).toLocaleString(undefined, {
@@ -49,133 +49,46 @@ function formatDate(value?: string | null) {
   });
 }
 
-function statusStyles(status: string) {
-  const normalized = status.toLowerCase();
-  if (normalized === "completed" || normalized === "success") {
-    return { badge: "bg-[#CEDDB7] text-[#6D9F1B]", dot: "bg-[#6D9F1B]" };
-  }
-  if (normalized === "failed" || normalized === "rejected") {
-    return { badge: "bg-[#DBC8C0] text-[#9F471B]", dot: "bg-[#9F471B]" };
-  }
-  return { badge: "bg-[#E3DAC1] text-[#C39830]", dot: "bg-[#C39830]" };
-}
-
 const EarningsPage = () => {
-  const { openModal, closeModal } = useDrawerModal();
+  const { openModal } = useDrawerModal();
   const [activeTab, setActiveTab] = useState<EarningsTab>("commissions");
   const [page, setPage] = useState(1);
+  const [propertySearch, setPropertySearch] = useState("");
+  const [debouncedPropertySearch, setDebouncedPropertySearch] = useState("");
   const pageSize = 10;
 
   useEffect(() => {
     setPage(1);
-  }, [activeTab]);
+  }, [activeTab, debouncedPropertySearch]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedPropertySearch(propertySearch.trim());
+    }, 350);
+    return () => window.clearTimeout(timer);
+  }, [propertySearch]);
 
   const { balance, isLoadingBalance } = useAppWalletAPI({ enableBalance: true });
 
-  const {
-    walletTransactions,
-    walletMeta,
-    isLoadingWalletTransactions,
-    walletTransactionsError,
-    commissions,
-    commissionsMeta,
-    isLoadingCommissions,
-    commissionsError,
-  } = useTransactionsAPI({
+  const { commissions, commissionsMeta, isLoadingCommissions, commissionsError } = useTransactionsAPI({
     page,
     limit: pageSize,
-    enableWalletTransactions: activeTab === "transactions",
     enableCommissions: activeTab === "commissions",
   });
 
-  const handleTopUpBuyback = useCallback(() => {
-    openModal(
-      "Top Up Buyback",
-      <TopUpBuybackDrawer closeModal={closeModal} currentBalance={balance?.buyBackBalance} />
-    );
-  }, [openModal, closeModal, balance?.buyBackBalance]);
-
-  const handleViewTransaction = useCallback(
-    (transaction: WalletTransaction) => {
-      openModal("Transaction Details", <ViewWalletTransactionDrawer transaction={transaction} />);
-    },
-    [openModal]
-  );
+  const { unownedHistory, unownedHistoryMeta, isLoadingUnownedHistory, unownedHistoryError } =
+    useProfitSharingAPI({
+      page,
+      limit: pageSize,
+      propertyName: debouncedPropertySearch,
+      enableUnownedHistory: activeTab === "unowned-history",
+    });
 
   const handleViewCommission = useCallback(
     (commission: CommissionRecord) => {
       openModal("Commission Details", <ViewCommissionDrawer commission={commission} />);
     },
     [openModal]
-  );
-
-  const walletColumns = useMemo(
-    () => [
-      walletColumnHelper.display({
-        id: "user",
-        header: "User",
-        cell: (info) => (
-          <div className="flex flex-col">
-            <span className="font-medium text-primary-10">{info.row.original.userName || "—"}</span>
-            <span className="text-xs text-gray-500">{info.row.original.userEmail || "—"}</span>
-          </div>
-        ),
-      }),
-      walletColumnHelper.display({
-        id: "title",
-        header: "Transaction",
-        cell: (info) => (
-          <div className="flex flex-col">
-            <span className="font-medium text-primary-10">{info.row.original.title || "—"}</span>
-            <span className="text-xs text-gray-500">{info.row.original.description || "—"}</span>
-          </div>
-        ),
-      }),
-      walletColumnHelper.accessor("amount", {
-        header: "Amount",
-        cell: (info) => (
-          <span className="font-semibold text-primary-10">
-            {formatMoney(info.getValue(), info.row.original.currency)}
-          </span>
-        ),
-      }),
-      walletColumnHelper.accessor("action", {
-        header: "Action",
-        cell: (info) => <span className="capitalize text-gray-600">{info.getValue() || "—"}</span>,
-      }),
-      walletColumnHelper.accessor("status", {
-        header: "Status",
-        cell: (info) => {
-          const status = String(info.getValue() || "—");
-          const styles = statusStyles(status);
-          return (
-            <span className={`inline-flex items-center gap-2 px-2 py-[6px] text-sm leading-5 rounded-lg capitalize ${styles.badge}`}>
-              <span className={`w-2 h-2 rounded-full ${styles.dot}`} />
-              {status}
-            </span>
-          );
-        },
-      }),
-      walletColumnHelper.accessor("createdAt", {
-        header: "Date",
-        cell: (info) => <span className="text-gray-600">{formatDate(info.getValue())}</span>,
-      }),
-      walletColumnHelper.display({
-        id: "actions",
-        header: "Actions",
-        cell: (info) => (
-          <button
-            type="button"
-            onClick={() => handleViewTransaction(info.row.original)}
-            className="inline-flex items-center justify-center p-2 rounded-md text-primary-10 hover:bg-neutral-100 transition-colors cursor-pointer"
-            aria-label="View transaction"
-          >
-            <Eye className="w-4 h-4" />
-          </button>
-        ),
-      }),
-    ],
-    [handleViewTransaction]
   );
 
   const commissionColumns = useMemo(
@@ -220,15 +133,43 @@ const EarningsPage = () => {
     [handleViewCommission]
   );
 
-  const walletTable = useReactTable({
-    data: walletTransactions,
-    columns: walletColumns,
-    getSortedRowModel: getSortedRowModel(),
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    manualPagination: true,
-    pageCount: walletMeta.totalPages,
-  });
+  const unownedColumns = useMemo(
+    () => [
+      unownedColumnHelper.accessor("propertyName", {
+        header: "Property",
+        cell: (info) => <span className="font-medium text-primary-10">{info.getValue() || "—"}</span>,
+      }),
+      unownedColumnHelper.accessor("section", {
+        header: "Section",
+        cell: (info) => <span className="text-gray-600">{info.getValue() ?? "—"}</span>,
+      }),
+      unownedColumnHelper.accessor("year", {
+        header: "Year",
+        cell: (info) => <span className="text-gray-600">{info.getValue() ?? "—"}</span>,
+      }),
+      unownedColumnHelper.accessor("loadedAmount", {
+        header: "Loaded amount",
+        cell: (info) => (
+          <span className="font-semibold text-primary-10">
+            {formatMoney(info.getValue(), info.row.original.currency)}
+          </span>
+        ),
+      }),
+      unownedColumnHelper.accessor("amountToProfitBalance", {
+        header: "To profit balance",
+        cell: (info) => (
+          <span className="font-semibold text-primary-10">
+            {formatMoney(info.getValue(), info.row.original.currency)}
+          </span>
+        ),
+      }),
+      unownedColumnHelper.accessor("distributedAt", {
+        header: "Distributed at",
+        cell: (info) => <span className="text-gray-600">{formatDate(info.getValue())}</span>,
+      }),
+    ],
+    []
+  );
 
   const commissionsTable = useReactTable({
     data: commissions,
@@ -240,12 +181,22 @@ const EarningsPage = () => {
     pageCount: commissionsMeta.totalPages,
   });
 
-  const isTransactionsTab = activeTab === "transactions";
-  const activeTable = isTransactionsTab ? walletTable : commissionsTable;
-  const activeMeta = isTransactionsTab ? walletMeta : commissionsMeta;
-  const isLoading = isTransactionsTab ? isLoadingWalletTransactions : isLoadingCommissions;
-  const hasError = isTransactionsTab ? walletTransactionsError : commissionsError;
-  const hasData = isTransactionsTab ? walletTransactions.length > 0 : commissions.length > 0;
+  const unownedTable = useReactTable({
+    data: unownedHistory,
+    columns: unownedColumns,
+    getSortedRowModel: getSortedRowModel(),
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    manualPagination: true,
+    pageCount: unownedHistoryMeta.totalPages,
+  });
+
+  const isCommissionsTab = activeTab === "commissions";
+  const activeTable = isCommissionsTab ? commissionsTable : unownedTable;
+  const activeMeta = isCommissionsTab ? commissionsMeta : unownedHistoryMeta;
+  const isLoading = isCommissionsTab ? isLoadingCommissions : isLoadingUnownedHistory;
+  const hasError = isCommissionsTab ? commissionsError : unownedHistoryError;
+  const hasData = isCommissionsTab ? commissions.length > 0 : unownedHistory.length > 0;
 
   return (
     <section className="flex flex-col gap-6 pb-5">
@@ -258,16 +209,6 @@ const EarningsPage = () => {
             Manage all earnings, revenue and cost of maintenance here.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={handleTopUpBuyback}
-          className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-primary-10 rounded-lg border border-transparent transition hover:bg-transparent hover:border-primary-10 group cursor-pointer"
-        >
-          <Plus className="w-4 h-4 text-white group-hover:text-primary-10" />
-          <span className="text-white font-Raleway font-semibold text-sm group-hover:text-primary-10">
-            Top Up Buyback
-          </span>
-        </button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
@@ -281,52 +222,56 @@ const EarningsPage = () => {
           footerText="App wallet balance"
         />
         <StatsCard
-          title="Buyback Balance"
-          count={isLoadingBalance ? "..." : formatMoney(balance?.buyBackBalance, balance?.currency)}
+          title="Profit Balance"
+          count={isLoadingBalance ? "..." : formatMoney(balance?.profitBalance, balance?.currency)}
           textColor="#1d3638"
           bodyBg="#EFF1F1"
           footerBg="#E1E7E7"
-          footerText="Available buyback funds"
+          footerText="Unowned profit balance"
         />
       </div>
 
       <div className="flex items-center justify-center gap-2 w-full bg-[#ECECEC] rounded-[100px]">
         <TabButton
           label="Commissions"
-          isActive={!isTransactionsTab}
+          isActive={isCommissionsTab}
           onClick={() => setActiveTab("commissions")}
         />
         <TabButton
-          label="Wallet Transaction"
-          isActive={isTransactionsTab}
-          onClick={() => setActiveTab("transactions")}
+          label="Profit Balance Unowned History"
+          isActive={!isCommissionsTab}
+          onClick={() => setActiveTab("unowned-history")}
         />
       </div>
 
       <div className="flex flex-col items-start justify-center rounded-2xl border border-opacityClr-30 bg-white">
         <TableHeader
           title={
-            isTransactionsTab
-              ? `Wallet Transactions (${activeMeta.totalRecords})`
-              : `Commissions (${activeMeta.totalRecords})`
+            isCommissionsTab
+              ? `Commissions (${activeMeta.totalRecords})`
+              : `Profit Balance Unowned History (${activeMeta.totalRecords})`
           }
           isLoading={isLoading}
           table={activeTable}
           showExport={false}
-          showSearch={false}
           showFilter={false}
+          showSearch={!isCommissionsTab}
+          searchQuery={propertySearch}
+          handleInputChange={(e) => setPropertySearch(e.target.value)}
+          handleClear={() => setPropertySearch("")}
+          searchPlaceholder="Filter by property name..."
         />
         <TableHeadAndBody
           table={activeTable}
           isLoading={isLoading}
           emptyState={{
             image: emptyWallet,
-            alt: isTransactionsTab ? "No Wallet Transactions" : "No Commissions",
+            alt: isCommissionsTab ? "No Commissions" : "No Unowned Profit History",
             message: hasError
-              ? `Failed to load ${isTransactionsTab ? "wallet transactions" : "commissions"}. Please try again.`
-              : isTransactionsTab
-                ? "No wallet transactions found"
-                : "No commission records found",
+              ? `Failed to load ${isCommissionsTab ? "commissions" : "unowned profit history"}. Please try again.`
+              : isCommissionsTab
+                ? "No commission records found"
+                : "No unowned profit history found",
           }}
         />
         {hasData && (

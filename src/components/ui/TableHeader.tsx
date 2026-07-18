@@ -20,6 +20,7 @@ type TableHeaderProps = {
   showFilter?: boolean;
   showSearch?: boolean;
   searchPlaceholder?: string;
+  headerActions?: React.ReactNode;
 };
 
 function TableHeader({
@@ -37,13 +38,14 @@ function TableHeader({
   showFilter = true,
   showSearch = true,
   searchPlaceholder = "Search...",
+  headerActions,
 }: TableHeaderProps) {
   const hasData = (table?.getRowModel()?.rows?.length ?? 0) > 0;
   const hasCustomFilter = Boolean(onFilterChange);
+  const keepVisible = hasCustomFilter || showSearch || Boolean(headerActions);
 
-  // Keep search/filter controls visible when a custom filter is wired.
-  // Otherwise keep the original hide-on-empty behavior for other pages.
-  if (table && !hasCustomFilter && (isLoading || !hasData)) return null;
+  // Keep search/filter controls visible when wired; otherwise hide on empty/loading.
+  if (table && !keepVisible && (isLoading || !hasData)) return null;
 
   return (
     <div className="flex items-center justify-between gap-8 p-6 w-full">
@@ -68,6 +70,8 @@ function TableHeader({
             />
           </div>
         )}
+
+        {headerActions}
 
         {showFilter && (
           <Dropdown

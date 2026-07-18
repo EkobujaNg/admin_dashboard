@@ -11,8 +11,10 @@ function unwrapData<T>(data: T | { data: T }): T {
 }
 
 function normalizeAppWalletBalance(raw: Record<string, unknown>): AppWalletBalance {
+  const profitBalance = Number(raw.profitBalance ?? 0);
   return {
     balance: Number(raw.balance ?? 0),
+    profitBalance,
     buyBackBalance: Number(raw.buyBackBalance ?? 0),
     currency: String(raw.currency ?? "NGN"),
   };

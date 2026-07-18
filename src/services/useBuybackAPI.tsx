@@ -6,7 +6,6 @@ import {
   getBuybackErrorMessage,
   getBuybackRequestById,
   getBuybackRequests,
-  topUpBuybackBalance,
 } from "@/lib/buyback/api";
 import type { BuybackStatusFilter } from "@/lib/buyback/types";
 
@@ -65,13 +64,6 @@ export const useBuybackAPI = ({
     onSuccess: (_data, id) => invalidateRequests(id),
   });
 
-  const topUpMutation = useMutation({
-    mutationFn: topUpBuybackBalance,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-app-wallet-balance"] });
-    },
-  });
-
   const approveRequest = (
     id: string,
     options?: { onSuccess?: (data?: unknown) => void; onError?: (error?: unknown) => void }
@@ -104,22 +96,6 @@ export const useBuybackAPI = ({
     });
   };
 
-  const topUpBuyback = (
-    amount: number,
-    options?: { onSuccess?: (data?: unknown) => void; onError?: (error?: unknown) => void }
-  ) => {
-    topUpMutation.mutate(amount, {
-      onSuccess: (data) => {
-        toast.success("Buyback balance topped up successfully.");
-        options?.onSuccess?.(data);
-      },
-      onError: (error) => {
-        toast.error(getBuybackErrorMessage(error, "Failed to top up buyback balance."));
-        options?.onError?.(error);
-      },
-    });
-  };
-
   const paginated = requestsQuery.data;
 
   return {
@@ -140,10 +116,8 @@ export const useBuybackAPI = ({
 
     approveRequest,
     declineRequest,
-    topUpBuyback,
     isApprovingRequest: approveMutation.isPending,
     isDecliningRequest: declineMutation.isPending,
-    isToppingUpBuyback: topUpMutation.isPending,
   };
 };
 
