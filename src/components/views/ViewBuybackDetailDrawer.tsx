@@ -4,7 +4,6 @@ import React, { useCallback, useState } from "react";
 import { Building2, Check, Loader2, Percent, User, Wallet, X } from "lucide-react";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import useBuybackAPI from "@/services/useBuybackAPI";
-import useAppWalletAPI from "@/services/useAppWalletAPI";
 
 type ViewBuybackDetailDrawerProps = {
   requestId: string;
@@ -87,8 +86,6 @@ const ViewBuybackDetailDrawer = ({ requestId, closeModal }: ViewBuybackDetailDra
     enableDetail: true,
   });
 
-  const { balance, isLoadingBalance } = useAppWalletAPI({ enableBalance: true });
-
   const handleCancelAction = useCallback(() => {
     setShowConfirmModal(false);
     setConfirmAction("");
@@ -138,8 +135,6 @@ const ViewBuybackDetailDrawer = ({ requestId, closeModal }: ViewBuybackDetailDra
   const isPending = status.toLowerCase() === "pending";
   const isConfirmPending = isApprovingRequest || isDecliningRequest;
   const isDeclineFlow = confirmAction === "decline";
-  const buybackBalance = balance?.buyBackBalance ?? 0;
-  const hasInsufficientBalance = isPending && requestDetail.totalAmount > buybackBalance;
 
   return (
     <div className="flex flex-col min-h-full">
@@ -158,24 +153,6 @@ const ViewBuybackDetailDrawer = ({ requestId, closeModal }: ViewBuybackDetailDra
           >
             {status}
           </span>
-        </div>
-
-        <div
-          className={`rounded-xl border p-4 ${
-            hasInsufficientBalance
-              ? "border-[#DBC8C0] bg-[#F8F1EE]"
-              : "border-opacityClr-30 bg-primary-10/5"
-          }`}
-        >
-          <p className="text-xs font-medium text-gray-500 font-Raleway">Buyback wallet balance</p>
-          <p className="text-lg font-bold text-primary-10 font-Raleway mt-1">
-            {isLoadingBalance ? "..." : formatMoney(buybackBalance)}
-          </p>
-          {hasInsufficientBalance && (
-            <p className="text-xs text-[#9F471B] font-Raleway mt-2">
-              Insufficient buyback balance for this request.
-            </p>
-          )}
         </div>
 
         <Section title="Buyback Summary" icon={Wallet}>

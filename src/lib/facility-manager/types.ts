@@ -11,6 +11,8 @@ export type FacilityManagerRecord = {
   email: string;
   phoneNumber: PhoneNumberPayload;
   idCard: string;
+  isBlocked: boolean;
+  blockedAt: string | null;
   createdAt: string;
 };
 
@@ -50,4 +52,16 @@ export type AssignPropertyToFacilityManagerResponse = {
   responseDescription?: string;
   responseMessage?: string;
   [key: string]: unknown;
+};
+
+export type FacilityManagerAssistant = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: PhoneNumberPayload;
+  assignedPropertyCount: number;
+  isBlocked: boolean;
+  status: string;
+  createdAt: string | null;
 };

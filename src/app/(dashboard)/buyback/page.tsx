@@ -17,7 +17,6 @@ import { emptyWallet } from "../../../../public/assets/images";
 import { useDrawerModal } from "@/context/DrawerModalContext";
 import ViewBuybackDetailDrawer from "@/components/views/ViewBuybackDetailDrawer";
 import useBuybackAPI from "@/services/useBuybackAPI";
-import useAppWalletAPI from "@/services/useAppWalletAPI";
 import type { BuybackRequest, BuybackStatusFilter } from "@/lib/buyback/types";
 
 const columnHelper = createColumnHelper<BuybackRequest>();
@@ -70,8 +69,6 @@ const BuybackPage = () => {
     limit: pageSize,
     status,
   });
-
-  const { balance, isLoadingBalance } = useAppWalletAPI({ enableBalance: true });
 
   const handleViewRequest = useCallback(
     (id: string) => {
@@ -164,16 +161,7 @@ const BuybackPage = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full">
-        <StatsCard
-          title="Buyback Balance"
-          count={isLoadingBalance ? "..." : formatMoney(balance?.buyBackBalance ?? 0)}
-          textColor="#E8EBEB"
-          FTextColor="#1d3638"
-          bodyBg="#4E6E6E"
-          footerBg="#E1E7E7"
-          footerText="Available buyback funds"
-        />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
         <StatsCard
           title="Total Requests"
           count={isLoadingRequests ? "..." : requestsMeta.totalRecords}

@@ -3,17 +3,28 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { Calendar, Mail, Phone, User, ExternalLink, Loader2 } from "lucide-react";
+import {
+  Calendar,
+  Mail,
+  Phone,
+  ShieldCheck,
+  User,
+  UserX,
+  ExternalLink,
+  Loader2,
+} from "lucide-react";
 import Breadcrumb from "@/components/ui/Breadcrumb";
+import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import useFacilityManagerAPI from "@/services/useFacilityManagerAPI";
 import AssignPropertySection from "@/components/views/AssignPropertySection";
+import FacilityManagerAssistantsSection from "@/components/views/FacilityManagerAssistantsSection";
 
 function formatPhoneNumber(phoneNumber?: { code?: string; number?: string }) {
   if (!phoneNumber?.number) return "—";
   return `${phoneNumber.code || ""} ${phoneNumber.number}`.trim();
 }
 
-function formatDate(value?: string) {
+function formatDate(value?: string | null) {
   if (!value) return "—";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "—";
@@ -53,8 +64,17 @@ const FacilityManagerDetailPage = () => {
   const params = useParams();
   const managerId = String(params.id || "");
   const [idImageError, setIdImageError] = useState(false);
+  const [confirmType, setConfirmType] = useState<"block" | "unblock" | "">("");
 
-  const { facilityManager, isLoadingFacilityManager, facilityManagerError } = useFacilityManagerAPI({
+  const {
+    facilityManager,
+    isLoadingFacilityManager,
+    facilityManagerError,
+    blockManager,
+    unblockManager,
+    isBlockingManager,
+    isUnblockingManager,
+  } = useFacilityManagerAPI({
     managerId,
     enableDetail: true,
   });
@@ -79,7 +99,10 @@ const FacilityManagerDetailPage = () => {
     );
   }
 
-  const fullName = [facilityManager.firstName, facilityManager.lastName].filter(Boolean).join(" ") || "Facility Manager";
+  const fullName =
+    [facilityManager.firstName, facilityManager.lastName].filter(Boolean).join(" ") || "Facility Manager";
+  const isBlocked = facilityManager.isBlocked;
+  const isConfirmPending = isBlockingManager || isUnblockingManager;
 
   return (
     <section className="flex flex-col gap-6">
@@ -92,10 +115,36 @@ const FacilityManagerDetailPage = () => {
       />
 
       <div className="flex flex-wrap items-center justify-between w-full gap-4">
-        <div>
-          <h2 className="text-[28px] font-Raleway font-bold text-primary-10">{fullName}</h2>
-          <p className="text-sm font-Raleway font-medium text-gray-600 mt-1">Facility manager profile and details</p>
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-wrap items-center gap-3">
+            <h2 className="text-[28px] font-Raleway font-bold text-primary-10">{fullName}</h2>
+            <span
+              className={`inline-flex items-center gap-2 px-2.5 py-1 text-sm leading-5 rounded-lg ${
+                isBlocked ? "bg-[#DBC8C0] text-[#9F471B]" : "bg-[#CEDDB7] text-[#6D9F1B]"
+              }`}
+            >
+              <span className={`w-2 h-2 rounded-full ${isBlocked ? "bg-[#9F471B]" : "bg-[#6D9F1B]"}`} />
+              {isBlocked ? "Blocked" : "Active"}
+            </span>
+          </div>
+          <p className="text-sm font-Raleway font-medium text-gray-600">
+            Facility manager profile and details
+          </p>
         </div>
+
+        <button
+          type="button"
+          onClick={() => setConfirmType(isBlocked ? "unblock" : "block")}
+          disabled={isConfirmPending}
+          className={`inline-flex items-center gap-2 px-5 py-3 rounded-lg border font-Raleway font-semibold text-sm transition-colors disabled:opacity-50 ${
+            isBlocked
+              ? "border-[#6D9F1B] text-[#6D9F1B] hover:bg-[#CEDDB7]/40"
+              : "border-[#9F1B1B] text-[#9F1B1B] hover:bg-[#DBC8C0]/40"
+          }`}
+        >
+          {isBlocked ? <ShieldCheck className="w-4 h-4" /> : <UserX className="w-4 h-4" />}
+          {isBlocked ? "Unblock manager" : "Block manager"}
+        </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -112,6 +161,9 @@ const FacilityManagerDetailPage = () => {
               icon={Phone}
             />
             <DetailField label="Date Added" value={formatDate(facilityManager.createdAt)} icon={Calendar} />
+            {facilityManager.blockedAt && (
+              <DetailField label="Blocked At" value={formatDate(facilityManager.blockedAt)} icon={Calendar} />
+            )}
           </div>
         </div>
 
@@ -161,6 +213,34 @@ const FacilityManagerDetailPage = () => {
       </div>
 
       <AssignPropertySection managerId={managerId} />
+      <FacilityManagerAssistantsSection managerId={managerId} />
+
+      <ConfirmationModal
+        isOpen={Boolean(confirmType)}
+        onClose={() => setConfirmType("")}
+        onConfirm={() => {
+          if (confirmType === "unblock") {
+            unblockManager(managerId, {
+              onSuccess: () => setConfirmType(""),
+              onError: () => setConfirmType(""),
+            });
+            return;
+          }
+          blockManager(managerId, {
+            onSuccess: () => setConfirmType(""),
+            onError: () => setConfirmType(""),
+          });
+        }}
+        message={
+          confirmType === "unblock"
+            ? `Unblock ${facilityManager.firstName || "this facility manager"}?`
+            : `Block ${facilityManager.firstName || "this facility manager"}?`
+        }
+        cancelMsg="Cancel"
+        confirmMsg={isConfirmPending ? "Updating..." : confirmType === "unblock" ? "Unblock" : "Block"}
+        confirmButtonColor={confirmType === "unblock" ? "green" : "red"}
+        confirmDisabled={isConfirmPending}
+      />
     </section>
   );
 };

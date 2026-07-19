@@ -2,12 +2,15 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   assignPropertyToFacilityManager,
+  blockFacilityManager,
   createFacilityManager,
+  getFacilityManagerAssistants,
   getFacilityManagerById,
   getFacilityManagerProperties,
   getFacilityManagers,
   getFacilityManagerErrorMessage,
   removePropertyFromFacilityManager,
+  unblockFacilityManager,
 } from "@/lib/facility-manager/api";
 import type { CreateFacilityManagerPayload } from "@/lib/facility-manager/types";
 
@@ -19,6 +22,7 @@ type UseFacilityManagerAPIOptions = {
   enableList?: boolean;
   enableDetail?: boolean;
   enableAssignedProperties?: boolean;
+  enableAssistants?: boolean;
 };
 
 export default function useFacilityManagerAPI({
@@ -29,6 +33,7 @@ export default function useFacilityManagerAPI({
   enableList = false,
   enableDetail = false,
   enableAssignedProperties = false,
+  enableAssistants = false,
 }: UseFacilityManagerAPIOptions = {}) {
   const queryClient = useQueryClient();
   const trimmedSearch = search.trim();
@@ -56,6 +61,12 @@ export default function useFacilityManagerAPI({
     enabled: enableAssignedProperties && Boolean(managerId),
   });
 
+  const assistantsQuery = useQuery({
+    queryKey: ["facility-manager-assistants", managerId],
+    queryFn: () => getFacilityManagerAssistants(managerId),
+    enabled: enableAssistants && Boolean(managerId),
+  });
+
   const createFacilityManagerMutation = useMutation({
     mutationFn: createFacilityManager,
     onSuccess: () => {
@@ -76,6 +87,22 @@ export default function useFacilityManagerAPI({
       removePropertyFromFacilityManager(managerId, propertyId),
     onSuccess: (_data, variables) => {
       invalidateManagerProperties(variables.managerId);
+    },
+  });
+
+  const blockMutation = useMutation({
+    mutationFn: blockFacilityManager,
+    onSuccess: (_data, id) => {
+      queryClient.invalidateQueries({ queryKey: ["facility-managers"] });
+      queryClient.invalidateQueries({ queryKey: ["facility-manager", id] });
+    },
+  });
+
+  const unblockMutation = useMutation({
+    mutationFn: unblockFacilityManager,
+    onSuccess: (_data, id) => {
+      queryClient.invalidateQueries({ queryKey: ["facility-managers"] });
+      queryClient.invalidateQueries({ queryKey: ["facility-manager", id] });
     },
   });
 
@@ -150,6 +177,48 @@ export default function useFacilityManagerAPI({
     );
   };
 
+  const blockManager = (
+    id: string,
+    options?: { onSuccess?: (data?: unknown) => void; onError?: (error?: unknown) => void }
+  ) => {
+    blockMutation.mutate(id, {
+      onSuccess: (data) => {
+        toast.success(
+          data?.responseDescription ||
+            data?.responseMessage ||
+            data?.message ||
+            "Facility manager blocked."
+        );
+        options?.onSuccess?.(data);
+      },
+      onError: (error) => {
+        toast.error(getFacilityManagerErrorMessage(error, "Failed to block facility manager."));
+        options?.onError?.(error);
+      },
+    });
+  };
+
+  const unblockManager = (
+    id: string,
+    options?: { onSuccess?: (data?: unknown) => void; onError?: (error?: unknown) => void }
+  ) => {
+    unblockMutation.mutate(id, {
+      onSuccess: (data) => {
+        toast.success(
+          data?.responseDescription ||
+            data?.responseMessage ||
+            data?.message ||
+            "Facility manager unblocked."
+        );
+        options?.onSuccess?.(data);
+      },
+      onError: (error) => {
+        toast.error(getFacilityManagerErrorMessage(error, "Failed to unblock facility manager."));
+        options?.onError?.(error);
+      },
+    });
+  };
+
   const paginated = facilityManagersQuery.data;
 
   return {
@@ -161,6 +230,12 @@ export default function useFacilityManagerAPI({
 
     removeProperty,
     isRemovingProperty: removePropertyMutation.isPending,
+
+    blockManager,
+    isBlockingManager: blockMutation.isPending,
+
+    unblockManager,
+    isUnblockingManager: unblockMutation.isPending,
 
     facilityManagers: paginated?.pageItems ?? [],
     facilityManagersMeta: {
@@ -183,5 +258,10 @@ export default function useFacilityManagerAPI({
     isLoadingAssignedProperties: assignedPropertiesQuery.isLoading,
     assignedPropertiesError: assignedPropertiesQuery.error,
     refetchAssignedProperties: assignedPropertiesQuery.refetch,
+
+    assistants: assistantsQuery.data ?? [],
+    isLoadingAssistants: assistantsQuery.isLoading,
+    assistantsError: assistantsQuery.error,
+    refetchAssistants: assistantsQuery.refetch,
   };
 }

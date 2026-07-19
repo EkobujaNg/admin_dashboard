@@ -1,11 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import Link from "next/link";
+import React, { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Eye, ShieldCheck, UserX } from "lucide-react";
 import StatsCard from "@/components/ui/StatsCard";
 import Pagination from "@/components/ui/Pagination";
 import TableHeader from "@/components/ui/TableHeader";
 import TableHeadAndBody from "@/components/ui/TableHeadAndBody";
+import ActionDropdown from "@/components/ui/ActionDropdown";
+import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import { emptyWallet } from "../../../../public/assets/images";
 import { useDrawerModal } from "@/context/DrawerModalContext";
 import CreateFacilityManagerDrawer from "@/components/views/CreateFacilityManagerDrawer";
@@ -40,10 +43,15 @@ function formatDate(value?: string) {
 }
 
 const FacilityAdminPage = () => {
+  const router = useRouter();
   const { openModal, closeModal } = useDrawerModal();
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery] = useDebounce(searchQuery, 400);
   const [page, setPage] = useState(1);
+  const [confirmAction, setConfirmAction] = useState<{
+    type: "block" | "unblock" | "";
+    manager: FacilityManagerRecord | null;
+  }>({ type: "", manager: null });
   const pageSize = 10;
 
   useEffect(() => {
@@ -55,6 +63,10 @@ const FacilityAdminPage = () => {
     facilityManagersMeta,
     isLoadingFacilityManagers,
     facilityManagersError,
+    blockManager,
+    unblockManager,
+    isBlockingManager,
+    isUnblockingManager,
   } = useFacilityManagerAPI({
     page,
     limit: pageSize,
@@ -62,41 +74,86 @@ const FacilityAdminPage = () => {
     enableList: true,
   });
 
-  const columns = [
-    columnHelper.display({
-      id: "name",
-      header: "Name",
-      cell: (info) => (
-        <span className="font-semibold font-Raleway text-primary-10">
-          {[info.row.original.firstName, info.row.original.lastName].filter(Boolean).join(" ") || "—"}
-        </span>
-      ),
-    }),
-    columnHelper.accessor("email", {
-      header: "Email",
-      cell: (info) => <span className="text-primary-10 font-Raleway">{info.getValue() || "—"}</span>,
-    }),
-    columnHelper.accessor("phoneNumber", {
-      header: "Phone Number",
-      cell: (info) => <span className="text-primary-10 font-Raleway">{formatPhoneNumber(info.getValue())}</span>,
-    }),
-    columnHelper.accessor("createdAt", {
-      header: "Date Added",
-      cell: (info) => <span className="text-primary-10 font-Raleway">{formatDate(info.getValue())}</span>,
-    }),
-    columnHelper.display({
-      id: "actions",
-      header: "Actions",
-      cell: (info) => (
-        <Link
-          href={`/facility-admin/${info.row.original.id}`}
-          className="border border-opacityClr-100 rounded px-4 py-1.5 font-Raleway font-normal text-opacityClr-100 text-sm cursor-pointer hover:bg-opacityClr-10 transition-colors"
-        >
-          View
-        </Link>
-      ),
-    }),
-  ];
+  const blockedCount = useMemo(
+    () => facilityManagers.filter((manager) => manager.isBlocked).length,
+    [facilityManagers]
+  );
+
+  const columns = useMemo(
+    () => [
+      columnHelper.display({
+        id: "name",
+        header: "Name",
+        cell: (info) => (
+          <span className="font-semibold font-Raleway text-primary-10">
+            {[info.row.original.firstName, info.row.original.lastName].filter(Boolean).join(" ") || "—"}
+          </span>
+        ),
+      }),
+      columnHelper.accessor("email", {
+        header: "Email",
+        cell: (info) => <span className="text-primary-10 font-Raleway">{info.getValue() || "—"}</span>,
+      }),
+      columnHelper.accessor("phoneNumber", {
+        header: "Phone Number",
+        cell: (info) => (
+          <span className="text-primary-10 font-Raleway">{formatPhoneNumber(info.getValue())}</span>
+        ),
+      }),
+      columnHelper.display({
+        id: "status",
+        header: "Status",
+        cell: (info) => {
+          const blocked = info.row.original.isBlocked;
+          return (
+            <span
+              className={`inline-flex items-center gap-2 px-2 py-[6px] text-sm leading-5 rounded-lg ${
+                blocked ? "bg-[#DBC8C0] text-[#9F471B]" : "bg-[#CEDDB7] text-[#6D9F1B]"
+              }`}
+            >
+              <span className={`w-2 h-2 rounded-full ${blocked ? "bg-[#9F471B]" : "bg-[#6D9F1B]"}`} />
+              {blocked ? "Blocked" : "Active"}
+            </span>
+          );
+        },
+      }),
+      columnHelper.accessor("createdAt", {
+        header: "Date Added",
+        cell: (info) => (
+          <span className="text-primary-10 font-Raleway">{formatDate(info.getValue())}</span>
+        ),
+      }),
+      columnHelper.display({
+        id: "actions",
+        header: "Actions",
+        cell: (info) => {
+          const manager = info.row.original;
+          return (
+            <ActionDropdown
+              actions={[
+                {
+                  label: "View details",
+                  icon: Eye,
+                  onClick: () => router.push(`/facility-admin/${manager.id}`),
+                },
+                {
+                  label: manager.isBlocked ? "Unblock manager" : "Block manager",
+                  icon: manager.isBlocked ? ShieldCheck : UserX,
+                  variant: (manager.isBlocked ? "success" : "danger") as "success" | "danger",
+                  onClick: () =>
+                    setConfirmAction({
+                      type: manager.isBlocked ? "unblock" : "block",
+                      manager,
+                    }),
+                },
+              ]}
+            />
+          );
+        },
+      }),
+    ],
+    [router]
+  );
 
   const table = useReactTable({
     data: facilityManagers,
@@ -109,6 +166,7 @@ const FacilityAdminPage = () => {
   });
 
   const hasData = facilityManagers.length > 0;
+  const isConfirmPending = isBlockingManager || isUnblockingManager;
 
   return (
     <section className="flex flex-col gap-6">
@@ -142,23 +200,23 @@ const FacilityAdminPage = () => {
           footerText="All registered facility managers"
         />
         <StatsCard
-          title="Approved Reports"
-          count={0}
+          title="Active Managers"
+          count={isLoadingFacilityManagers ? "..." : Math.max(facilityManagers.length - blockedCount, 0)}
           textColor="#1d3638"
           bodyBg="#EFF1F1"
           footerBg="#E1E7E7"
-          footerText="Starts from 06 Jan 2025"
+          footerText="On this page"
+        />
+        <StatsCard
+          title="Blocked Managers"
+          count={isLoadingFacilityManagers ? "..." : blockedCount}
+          textColor="#1d3638"
+          bodyBg="#EFF1F1"
+          footerBg="#E1E7E7"
+          footerText="On this page"
         />
         <StatsCard
           title="Pending Approval Reports"
-          count={0}
-          textColor="#1d3638"
-          bodyBg="#EFF1F1"
-          footerBg="#E1E7E7"
-          footerText="Starts from 06 Jan 2025"
-        />
-        <StatsCard
-          title="Rejected Reports"
           count={0}
           textColor="#1d3638"
           bodyBg="#EFF1F1"
@@ -201,6 +259,36 @@ const FacilityAdminPage = () => {
           />
         )}
       </div>
+
+      <ConfirmationModal
+        isOpen={Boolean(confirmAction.manager)}
+        onClose={() => setConfirmAction({ type: "", manager: null })}
+        onConfirm={() => {
+          if (!confirmAction.manager) return;
+          if (confirmAction.type === "unblock") {
+            unblockManager(confirmAction.manager.id, {
+              onSuccess: () => setConfirmAction({ type: "", manager: null }),
+              onError: () => setConfirmAction({ type: "", manager: null }),
+            });
+            return;
+          }
+          blockManager(confirmAction.manager.id, {
+            onSuccess: () => setConfirmAction({ type: "", manager: null }),
+            onError: () => setConfirmAction({ type: "", manager: null }),
+          });
+        }}
+        message={
+          confirmAction.type === "unblock"
+            ? `Unblock ${confirmAction.manager?.firstName || "this facility manager"}?`
+            : `Block ${confirmAction.manager?.firstName || "this facility manager"}?`
+        }
+        cancelMsg="Cancel"
+        confirmMsg={
+          isConfirmPending ? "Updating..." : confirmAction.type === "unblock" ? "Unblock" : "Block"
+        }
+        confirmButtonColor={confirmAction.type === "unblock" ? "green" : "red"}
+        confirmDisabled={isConfirmPending}
+      />
     </section>
   );
 };

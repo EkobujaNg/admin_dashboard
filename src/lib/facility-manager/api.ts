@@ -1,11 +1,17 @@
 import http from "@/lib/http";
 import { normalizeProperty } from "@/lib/property/mappers";
 import type { PropertyRecord } from "@/lib/property/types";
-import { normalizeFacilityManager, normalizePaginatedFacilityManagers } from "./mappers";
+import {
+  normalizeFacilityManager,
+  normalizeFacilityManagerAssistant,
+  normalizeFacilityManagerAssistants,
+  normalizePaginatedFacilityManagers,
+} from "./mappers";
 import type {
   AssignPropertyToFacilityManagerResponse,
   CreateFacilityManagerPayload,
   CreateFacilityManagerResponse,
+  FacilityManagerAssistant,
   FacilityManagerRecord,
   GetFacilityManagersParams,
   PaginatedFacilityManagers,
@@ -102,4 +108,42 @@ export async function removePropertyFromFacilityManager(
     AssignPropertyToFacilityManagerResponse | { data: AssignPropertyToFacilityManagerResponse }
   >(`${ADMIN_FACILITY_MANAGER_BASE}/${managerId}/properties/${propertyId}`);
   return unwrapData(data);
+}
+
+export async function blockFacilityManager(
+  id: string
+): Promise<AssignPropertyToFacilityManagerResponse> {
+  const { data } = await http.post<
+    AssignPropertyToFacilityManagerResponse | { data: AssignPropertyToFacilityManagerResponse }
+  >(`${ADMIN_FACILITY_MANAGER_BASE}/${id}/block`);
+  return unwrapData(data);
+}
+
+export async function unblockFacilityManager(
+  id: string
+): Promise<AssignPropertyToFacilityManagerResponse> {
+  const { data } = await http.post<
+    AssignPropertyToFacilityManagerResponse | { data: AssignPropertyToFacilityManagerResponse }
+  >(`${ADMIN_FACILITY_MANAGER_BASE}/${id}/unblock`);
+  return unwrapData(data);
+}
+
+export async function getFacilityManagerAssistants(
+  managerId: string
+): Promise<FacilityManagerAssistant[]> {
+  const { data } = await http.get<Record<string, unknown> | unknown[] | { data: Record<string, unknown> | unknown[] }>(
+    `${ADMIN_FACILITY_MANAGER_BASE}/${managerId}/assistants`
+  );
+  return normalizeFacilityManagerAssistants(
+    unwrapData(data) as Record<string, unknown> | unknown[]
+  );
+}
+
+export async function getAssistantFacilityManagerById(
+  id: string
+): Promise<FacilityManagerAssistant> {
+  const { data } = await http.get<Record<string, unknown> | { data: Record<string, unknown> }>(
+    `/admin/assistant-facility-manager/${id}`
+  );
+  return normalizeFacilityManagerAssistant(unwrapData(data) as Record<string, unknown>);
 }
