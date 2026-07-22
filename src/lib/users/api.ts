@@ -69,3 +69,8 @@ export async function unblockAdminUser(id: string): Promise<{ message?: string }
   const { data } = await http.post(`${ADMIN_USERS_BASE}/${id}/unblock`);
   return unwrapData(data) as { message?: string };
 }
+
+export async function verifyUtilityBill(userId: string): Promise<{ message?: string }> {
+  const { data } = await http.post(`/admin/kyc/utility-bills/${userId}/verify`);
+  return unwrapData(data) as { message?: string };
+}

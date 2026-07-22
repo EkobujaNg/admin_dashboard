@@ -42,9 +42,9 @@ function formatDate(value?: string | null) {
 }
 
 function getKycLabel(user: AdminUserRecord) {
-  const { nin, bvn, utilityBill } = user.kyc;
-  if (nin && bvn && utilityBill) return "Complete";
-  if (nin || bvn || utilityBill) return "Partial";
+  const { nin, utilityBill } = user.kyc;
+  if (nin && utilityBill) return "Complete";
+  if (nin || utilityBill) return "Partial";
   return "Pending";
 }
 

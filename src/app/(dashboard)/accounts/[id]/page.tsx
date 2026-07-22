@@ -14,8 +14,10 @@ import {
   Loader2,
   ExternalLink,
   MapPin,
+  Check,
 } from "lucide-react";
 import Breadcrumb from "@/components/ui/Breadcrumb";
+import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import useUserAPI from "@/services/useUsersAPI";
 
 function formatDate(value?: string | null, withTime = true) {
@@ -76,7 +78,7 @@ function DetailField({
           <Icon className="w-5 h-5 text-primary-10" />
         </div>
       )}
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <p className="text-xs font-medium text-gray-500 font-Raleway">{label}</p>
         <div className="text-sm font-semibold text-primary-10 font-Raleway break-words">{value || "—"}</div>
       </div>
@@ -130,8 +132,15 @@ function ProfileAvatar({
 const UserDetailPage = () => {
   const params = useParams();
   const userId = String(params.id || "");
+  const [confirmVerify, setConfirmVerify] = useState(false);
 
-  const { userDetail, isLoadingUserDetail, userDetailError } = useUserAPI({
+  const {
+    userDetail,
+    isLoadingUserDetail,
+    userDetailError,
+    approveUtilityBill,
+    isApprovingUtilityBill,
+  } = useUserAPI({
     userId,
     enableUserDetail: true,
     enableStats: false,
@@ -165,6 +174,7 @@ const UserDetailPage = () => {
     profile.address.state,
     profile.address.country,
   ].filter(Boolean);
+  const utilityBillVerified = Boolean(profile.kyc.utilityBill);
 
   return (
     <section className="flex flex-col gap-6">
@@ -239,8 +249,30 @@ const UserDetailPage = () => {
           <h3 className="text-lg font-Raleway font-bold text-primary-10">KYC</h3>
           <div className="flex flex-col gap-5">
             <DetailField label="NIN" value={kycBadge(profile.kyc.nin)} icon={Shield} />
-            <DetailField label="BVN" value={kycBadge(profile.kyc.bvn)} icon={Shield} />
-            <DetailField label="Utility Bill" value={kycBadge(profile.kyc.utilityBill)} icon={Shield} />
+
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-lg bg-primary-10/10 flex items-center justify-center shrink-0">
+                <Shield className="w-5 h-5 text-primary-10" />
+              </div>
+              <div className="min-w-0 flex-1 flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-medium text-gray-500 font-Raleway">Utility Bill</p>
+                  <div className="mt-0.5">{kycBadge(utilityBillVerified)}</div>
+                </div>
+                {!utilityBillVerified && (
+                  <button
+                    type="button"
+                    onClick={() => setConfirmVerify(true)}
+                    disabled={isApprovingUtilityBill}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#6D9F1B] text-white text-xs font-Raleway font-semibold hover:opacity-90 disabled:opacity-50 shrink-0"
+                  >
+                    <Check className="w-3.5 h-3.5" />
+                    Verify
+                  </button>
+                )}
+              </div>
+            </div>
+
             {profile.utilityBillUrl && (
               <DetailField
                 label="Utility Bill Document"
@@ -297,6 +329,22 @@ const UserDetailPage = () => {
       </div>
 
       <p className="text-xs text-gray-400 font-Raleway">User ID: {userDetail.id}</p>
+
+      <ConfirmationModal
+        isOpen={confirmVerify}
+        onClose={() => setConfirmVerify(false)}
+        onConfirm={() => {
+          approveUtilityBill(userId, {
+            onSuccess: () => setConfirmVerify(false),
+            onError: () => setConfirmVerify(false),
+          });
+        }}
+        message="Verify this utility bill submission?"
+        cancelMsg="Cancel"
+        confirmMsg={isApprovingUtilityBill ? "Verifying..." : "Verify"}
+        confirmButtonColor="green"
+        confirmDisabled={isApprovingUtilityBill}
+      />
     </section>
   );
 };

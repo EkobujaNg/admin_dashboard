@@ -7,6 +7,7 @@ import {
   getAdminUsers,
   getAdminUserStats,
   unblockAdminUser,
+  verifyUtilityBill,
 } from "@/lib/users/api";
 import type { AdminUserFilter } from "@/lib/users/types";
 
@@ -71,6 +72,11 @@ export const useUserAPI = ({
     onSuccess: (_data, id) => invalidateUsers(id),
   });
 
+  const verifyUtilityBillMutation = useMutation({
+    mutationFn: verifyUtilityBill,
+    onSuccess: (_data, id) => invalidateUsers(id),
+  });
+
   const blockUser = (
     id: string,
     options?: { onSuccess?: (data?: unknown) => void; onError?: (error?: unknown) => void }
@@ -98,6 +104,24 @@ export const useUserAPI = ({
       },
       onError: (error) => {
         toast.error(getAdminUserErrorMessage(error, "Failed to unblock user."));
+        options?.onError?.(error);
+      },
+    });
+  };
+
+  const approveUtilityBill = (
+    id: string,
+    options?: { onSuccess?: (data?: unknown) => void; onError?: (error?: unknown) => void }
+  ) => {
+    verifyUtilityBillMutation.mutate(id, {
+      onSuccess: (data) => {
+        toast.success(
+          (data as { message?: string })?.message || "Utility bill verified successfully."
+        );
+        options?.onSuccess?.(data);
+      },
+      onError: (error) => {
+        toast.error(getAdminUserErrorMessage(error, "Failed to verify utility bill."));
         options?.onError?.(error);
       },
     });
@@ -132,6 +156,9 @@ export const useUserAPI = ({
     unblockUser,
     isBlockingUser: blockUserMutation.isPending,
     isUnblockingUser: unblockUserMutation.isPending,
+
+    approveUtilityBill,
+    isApprovingUtilityBill: verifyUtilityBillMutation.isPending,
   };
 };
 
