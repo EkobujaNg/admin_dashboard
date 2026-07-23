@@ -4,7 +4,7 @@ import React from "react";
 import Image from "next/image";
 import { avatar } from "../../../../public/assets/images";
 import { useRouter, usePathname } from "next/navigation";
-import { ChevronRight, FileText, Lock, Bell, SlidersHorizontal } from "lucide-react";
+import { ChevronRight, FileText, Lock, Bell, SlidersHorizontal, MessageCircle } from "lucide-react";
 import useAdminProfileAPI from "@/services/useAdminProfileAPI";
 import { getAdminProfileDisplayName } from "@/lib/admin-profile/mappers";
 import { formatAdminRoles } from "@/lib/admins/types";
@@ -33,6 +33,12 @@ const settingsLinks = [
     name: "Notifications & Alerts",
     icon: <Bell className="text-primary-20 w-5 h-5" />,
     path: "/settings/notifications-and-alerts",
+  },
+  {
+    id: 5,
+    name: "Support",
+    icon: <MessageCircle className="text-primary-20 w-5 h-5" />,
+    path: "/settings/support",
   },
 ];
 
