@@ -97,3 +97,11 @@ export async function updatePropertyCommission(
   );
   return unwrapData(data);
 }
+
+export async function addFeaturedProperty(propertyId: string): Promise<CreatePropertyResponse> {
+  const { data } = await http.post<CreatePropertyResponse | { data: CreatePropertyResponse }>(
+    "/properties/featured",
+    { propertyId }
+  );
+  return unwrapData(data);
+}

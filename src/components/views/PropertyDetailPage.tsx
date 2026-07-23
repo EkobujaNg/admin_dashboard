@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import MediaImage from "@/components/ui/MediaImage";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Eye, EyeOff, MapPin, ArrowUpRight, Pencil, Percent } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, MapPin, ArrowUpRight, Pencil, Percent, Star } from "lucide-react";
 import TabButton from "@/components/ui/TabButton";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import ActionDropdown from "@/components/ui/ActionDropdown";
@@ -61,8 +61,14 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isHidden, setIsHidden] = useState(Boolean(property?.isHidden));
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isFeatureConfirmOpen, setIsFeatureConfirmOpen] = useState(false);
 
-  const { setPropertyVisibility, isUpdatingPropertyVisibility } = usePropertyAPI({
+  const {
+    setPropertyVisibility,
+    isUpdatingPropertyVisibility,
+    addFeaturedProperty,
+    isAddingFeaturedProperty,
+  } = usePropertyAPI({
     propertyId: property?.propertyId,
   });
 
@@ -90,6 +96,12 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
           ),
       },
       {
+        label: "Feature Property",
+        icon: Star,
+        disabled: isAddingFeaturedProperty,
+        onClick: () => setIsFeatureConfirmOpen(true),
+      },
+      {
         label: isHidden ? "Show Property" : "Hide Property",
         icon: isHidden ? Eye : EyeOff,
         variant: isHidden ? ("success" as const) : ("warning" as const),
@@ -98,6 +110,7 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
       },
     ],
     [
+      isAddingFeaturedProperty,
       isHidden,
       isUpdatingPropertyVisibility,
       openModal,
@@ -117,6 +130,13 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
         setIsConfirmOpen(false);
       },
       onError: () => setIsConfirmOpen(false),
+    });
+  };
+
+  const handleFeatureConfirm = () => {
+    addFeaturedProperty(property.propertyId, {
+      onSuccess: () => setIsFeatureConfirmOpen(false),
+      onError: () => setIsFeatureConfirmOpen(false),
     });
   };
 
@@ -388,6 +408,16 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
               ? "Show Property"
               : "Hide Property"
         }
+        confirmButtonColor="green"
+      />
+
+      <ConfirmationModal
+        isOpen={isFeatureConfirmOpen}
+        onClose={() => setIsFeatureConfirmOpen(false)}
+        onConfirm={handleFeatureConfirm}
+        message={`Add "${property.name}" to the featured list? If the list is full, the oldest featured property will be removed.`}
+        cancelMsg="Cancel"
+        confirmMsg={isAddingFeaturedProperty ? "Featuring..." : "Feature Property"}
         confirmButtonColor="green"
       />
     </div>

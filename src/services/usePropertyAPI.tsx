@@ -9,6 +9,7 @@ import {
   updateProperty as updatePropertyRequest,
   setPropertyVisibility as setPropertyVisibilityRequest,
   updatePropertyCommission as updatePropertyCommissionRequest,
+  addFeaturedProperty as addFeaturedPropertyRequest,
 } from "@/lib/property/api";
 import type { CreatePropertyPayload } from "@/lib/property/types";
 
@@ -85,6 +86,15 @@ export const usePropertyAPI = ({
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["properties"] });
       queryClient.invalidateQueries({ queryKey: ["property", variables.id] });
+    },
+  });
+
+  const addFeaturedPropertyMutation = useMutation({
+    mutationFn: (propertyId: string) => addFeaturedPropertyRequest(propertyId),
+    onSuccess: (_data, propertyId) => {
+      queryClient.invalidateQueries({ queryKey: ["properties"] });
+      queryClient.invalidateQueries({ queryKey: ["properties", "featured"] });
+      queryClient.invalidateQueries({ queryKey: ["property", propertyId] });
     },
   });
 
@@ -183,6 +193,27 @@ export const usePropertyAPI = ({
     );
   };
 
+  const addFeaturedProperty = (
+    propertyId: string,
+    options?: { onSuccess?: (data?: any) => void; onError?: (error?: any) => void }
+  ) => {
+    addFeaturedPropertyMutation.mutate(propertyId, {
+      onSuccess: (data) => {
+        toast.success(
+          data?.responseDescription ||
+            data?.responseMessage ||
+            data?.message ||
+            "Property added to featured list."
+        );
+        options?.onSuccess?.(data);
+      },
+      onError: (error) => {
+        toast.error(getPropertyErrorMessage(error, "Failed to feature property."));
+        options?.onError?.(error);
+      },
+    });
+  };
+
   const deleteProperty = async (_id: string, options?: { onSuccess?: () => void }) => {
     toast.success("Property deleted successfully");
     queryClient.invalidateQueries({ queryKey: ["properties"] });
@@ -215,11 +246,13 @@ export const usePropertyAPI = ({
     updateProperty,
     setPropertyVisibility,
     updatePropertyCommission,
+    addFeaturedProperty,
     deleteProperty,
     isAddingProperty: addPropertyMutation.isPending,
     isUpdatingProperty: updatePropertyMutation.isPending,
     isUpdatingPropertyVisibility: setPropertyVisibilityMutation.isPending,
     isUpdatingCommission: updateCommissionMutation.isPending,
+    isAddingFeaturedProperty: addFeaturedPropertyMutation.isPending,
     isDeletingProperty: false,
   };
 };
