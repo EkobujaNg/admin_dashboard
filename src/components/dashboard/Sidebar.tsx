@@ -20,6 +20,7 @@ import {
   Shield,
   ScrollText,
   ArrowLeftRight,
+  MessageCircle,
   type LucideIcon,
 } from "lucide-react";
 
@@ -38,6 +39,11 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen: any; setIsOpen:
     { href: "/admins", label: "Admins", icon: Shield },
     { href: "/admin-logs", label: "Admin Logs", icon: ScrollText },
     { href: "/facility-admin", label: "FM Manager", icon: ClipboardList },
+  ];
+
+  const bottomLinks: Array<{ href: string; label: string; icon: LucideIcon }> = [
+    { href: "/support", label: "Help & Support", icon: MessageCircle },
+    { href: "/settings", label: "Settings", icon: Settings },
   ];
 
   const handleLinkClick = () => {
@@ -64,6 +70,8 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen: any; setIsOpen:
     }`;
 
   const isSettingsActive = pathname === "/settings" || pathname.startsWith("/settings/");
+
+  const isLinkActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
   return (
     <>
@@ -108,15 +116,20 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen: any; setIsOpen:
 
         <div className="shrink-0 pt-4 pb-8 mt-auto border-t border-[#D2D7D7]">
           <ul className="flex flex-col gap-2 items-start w-full">
-            <li className="w-full">
-              <Link href="/settings" onClick={handleLinkClick} className={linkClass(isSettingsActive)}>
-                <Settings
-                  className={iconClass(isSettingsActive)}
-                  strokeWidth={isSettingsActive ? 2.25 : 1.75}
-                />
-                <span className={labelClass(isSettingsActive)}>Settings</span>
-              </Link>
-            </li>
+            {bottomLinks.map((link) => {
+              const isActive = link.href === "/settings" ? isSettingsActive : isLinkActive(link.href);
+              const Icon = link.icon;
+
+              return (
+                <li key={link.href} className="w-full">
+                  <Link href={link.href} onClick={handleLinkClick} className={linkClass(isActive)}>
+                    <Icon className={iconClass(isActive)} strokeWidth={isActive ? 2.25 : 1.75} />
+                    <span className={labelClass(isActive)}>{link.label}</span>
+                  </Link>
+                </li>
+              );
+            })}
+
             <li className="w-full">
               <LogoutAction variant="sidebar" />
             </li>
