@@ -657,7 +657,7 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
               />
             </Field>
 
-            <Field label="Presale Amount (₦)" required={!isEditMode}>
+            <Field label="Presale Amount (₦)">
               <input
                 type="number"
                 name="presale"
@@ -665,8 +665,7 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
                 step="any"
                 value={details.presale}
                 onChange={handleDetailsChange}
-                placeholder="5000"
-                required={!isEditMode}
+                placeholder="Optional"
                 disabled={isEditMode}
                 readOnly={isEditMode}
                 className={`${inputClassName} ${isEditMode ? "bg-opacityClr-10 cursor-not-allowed opacity-70" : ""}`}

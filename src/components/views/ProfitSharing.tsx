@@ -37,7 +37,7 @@ const ProfitSharing = () => {
   const [page, setPage] = useState(1);
   const [nameSearch, setNameSearch] = useState("");
   const [debouncedName, setDebouncedName] = useState("");
-  const pageSize = 10;
+  const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setDebouncedName(nameSearch.trim()), 350);
@@ -46,7 +46,7 @@ const ProfitSharing = () => {
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedName]);
+  }, [debouncedName, pageSize]);
 
   const { statuses, statusesMeta, isLoadingStatuses, statusesError } = useProfitSharingAPI({
     page,
@@ -131,7 +131,6 @@ const ProfitSharing = () => {
           title={`Properties (${statusesMeta.totalRecords})`}
           isLoading={isLoadingStatuses}
           table={table}
-          showExport={false}
           showFilter={false}
           showSearch
           searchQuery={nameSearch}
@@ -154,6 +153,11 @@ const ProfitSharing = () => {
             totalPages={statusesMeta.totalPages}
             onPageChange={setPage}
             totalRecords={statusesMeta.totalRecords}
+            pageSize={pageSize}
+            onPageSizeChange={(size) => {
+              setPageSize(size);
+              setPage(1);
+            }}
           />
         )}
       </div>

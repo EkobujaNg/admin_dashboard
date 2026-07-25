@@ -57,11 +57,11 @@ const BuybackPage = () => {
   const { openModal, closeModal } = useDrawerModal();
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState<BuybackStatusFilter>("all");
-  const pageSize = 10;
+  const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
     setPage(1);
-  }, [status]);
+  }, [status, pageSize]);
 
   const { requests, requestsMeta, isLoadingRequests, requestsError } = useBuybackAPI({
     enableList: true,
@@ -185,7 +185,6 @@ const BuybackPage = () => {
           title={`Buyback Requests (${requestsMeta.totalRecords})`}
           isLoading={isLoadingRequests}
           table={table}
-          showExport={false}
           showSearch={false}
           filterLabel="All"
           filterOptions={STATUS_FILTER_OPTIONS}
@@ -209,6 +208,11 @@ const BuybackPage = () => {
             totalPages={requestsMeta.totalPages}
             onPageChange={setPage}
             totalRecords={requestsMeta.totalRecords}
+            pageSize={pageSize}
+            onPageSizeChange={(size) => {
+              setPageSize(size);
+              setPage(1);
+            }}
           />
         )}
       </div>

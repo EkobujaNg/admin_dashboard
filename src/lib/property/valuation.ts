@@ -16,15 +16,17 @@ export type PropertyClassification = "standard" | "premium" | "budget";
 
 export type AdminAdjustWith = "plus" | "minus";
 
+export type ExpenseInput = number | "";
+
 export type ValuationFormState = {
   rentalUnits: RentalUnit[];
   vacancy: SelectOption<number>;
-  securityCost: number;
-  maintenanceCost: number;
-  repairsCost: number;
-  utilitiesCost: number;
-  managementCost: number;
-  taxCost: number;
+  securityCost: ExpenseInput;
+  maintenanceCost: ExpenseInput;
+  repairsCost: ExpenseInput;
+  utilitiesCost: ExpenseInput;
+  managementCost: ExpenseInput;
+  taxCost: ExpenseInput;
   propertyTier: number;
   propertyClassification: PropertyClassification;
   titleAdjustment: SelectOption<number>;
@@ -34,6 +36,12 @@ export type ValuationFormState = {
   adminAdjustment: number;
   adminAdjustWith: AdminAdjustWith;
 };
+
+function toExpenseNumber(value: ExpenseInput): number {
+  if (value === "" || value == null) return 0;
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? numeric : 0;
+}
 
 export type ValuationResult = {
   grossRent: number;
@@ -149,12 +157,12 @@ export function calculatePropertyValuation(state: ValuationFormState): Valuation
   const grossRent = getGrossRent(state.rentalUnits);
 
   const totalOperatingExpenses =
-    state.securityCost +
-    state.maintenanceCost +
-    state.repairsCost +
-    state.utilitiesCost +
-    state.managementCost +
-    state.taxCost;
+    toExpenseNumber(state.securityCost) +
+    toExpenseNumber(state.maintenanceCost) +
+    toExpenseNumber(state.repairsCost) +
+    toExpenseNumber(state.utilitiesCost) +
+    toExpenseNumber(state.managementCost) +
+    toExpenseNumber(state.taxCost);
 
   const capRate =
     getBaseCapRate(state.propertyTier, state.propertyClassification) +
@@ -188,12 +196,12 @@ export function calculatePropertyValuation(state: ValuationFormState): Valuation
 export function buildValuationPayload(state: ValuationFormState): ValuationPayload {
   return {
     vacancy: state.vacancy,
-    securityCost: state.securityCost,
-    maintenanceCost: state.maintenanceCost,
-    repairsCost: state.repairsCost,
-    utilitiesCost: state.utilitiesCost,
-    managementCost: state.managementCost,
-    taxCost: state.taxCost,
+    securityCost: toExpenseNumber(state.securityCost),
+    maintenanceCost: toExpenseNumber(state.maintenanceCost),
+    repairsCost: toExpenseNumber(state.repairsCost),
+    utilitiesCost: toExpenseNumber(state.utilitiesCost),
+    managementCost: toExpenseNumber(state.managementCost),
+    taxCost: toExpenseNumber(state.taxCost),
     propertyTier: state.propertyTier,
     propertyClassification: state.propertyClassification,
     titleAdjustment: state.titleAdjustment,
@@ -214,12 +222,12 @@ export function createInitialValuationState(): ValuationFormState {
   return {
     rentalUnits: [createEmptyRentalUnit()],
     vacancy: VACANCY_OPTIONS[0],
-    securityCost: 0,
-    maintenanceCost: 0,
-    repairsCost: 0,
-    utilitiesCost: 0,
-    managementCost: 0,
-    taxCost: 0,
+    securityCost: "",
+    maintenanceCost: "",
+    repairsCost: "",
+    utilitiesCost: "",
+    managementCost: "",
+    taxCost: "",
     propertyTier: 3,
     propertyClassification: "standard",
     titleAdjustment: TITLE_ADJUSTMENT_OPTIONS[0],
@@ -268,7 +276,9 @@ export function buildCreatePropertyPayload(
     state: details.state.trim(),
     zip: details.zip.trim(),
     numberOfShares: Number(details.numberOfShares) || 0,
-    presale: Number(details.presale) || 0,
+    ...(details.presale === "" || details.presale == null
+      ? {}
+      : { presale: Number(details.presale) || 0 }),
     valuation: buildValuationPayload(valuationState),
   };
 }

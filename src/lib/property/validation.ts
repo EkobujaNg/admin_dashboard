@@ -57,10 +57,14 @@ export const propertyListingStep4Schema = z.object({
   presale: z
     .string()
     .trim()
-    .min(1, "Please enter a valid presale amount (0 or more).")
-    .refine((value) => !Number.isNaN(Number(value)), "Please enter a valid presale amount (0 or more).")
-    .transform((value) => Number(value))
-    .refine((value) => value >= 0, "Please enter a valid presale amount (0 or more)."),
+    .refine(
+      (value) => value === "" || !Number.isNaN(Number(value)),
+      "Please enter a valid presale amount (0 or more)."
+    )
+    .refine(
+      (value) => value === "" || Number(value) >= 0,
+      "Please enter a valid presale amount (0 or more)."
+    ),
 });
 
 export function isResidentialPropertyType(propertyType: PropertyListingType | string): boolean {

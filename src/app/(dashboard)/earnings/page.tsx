@@ -55,11 +55,11 @@ const EarningsPage = () => {
   const [page, setPage] = useState(1);
   const [propertySearch, setPropertySearch] = useState("");
   const [debouncedPropertySearch, setDebouncedPropertySearch] = useState("");
-  const pageSize = 10;
+  const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
     setPage(1);
-  }, [activeTab, debouncedPropertySearch]);
+  }, [activeTab, debouncedPropertySearch, pageSize]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -253,7 +253,6 @@ const EarningsPage = () => {
           }
           isLoading={isLoading}
           table={activeTable}
-          showExport={false}
           showFilter={false}
           showSearch={!isCommissionsTab}
           searchQuery={propertySearch}
@@ -280,6 +279,11 @@ const EarningsPage = () => {
             totalPages={activeMeta.totalPages}
             onPageChange={setPage}
             totalRecords={activeMeta.totalRecords}
+            pageSize={pageSize}
+            onPageSizeChange={(size) => {
+              setPageSize(size);
+              setPage(1);
+            }}
           />
         )}
       </div>

@@ -58,11 +58,11 @@ export default function AdminsManagementPage() {
     type: "block" | "unblock" | "";
     admin: AdminAccount | null;
   }>({ type: "", admin: null });
-  const pageSize = 10;
+  const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearchQuery]);
+  }, [debouncedSearchQuery, pageSize]);
 
   const {
     admins,
@@ -248,7 +248,6 @@ export default function AdminsManagementPage() {
           searchQuery={searchQuery}
           handleInputChange={(e) => setSearchQuery(e.target.value)}
           handleClear={() => setSearchQuery("")}
-          showExport={false}
           showFilter={false}
           table={table}
           isLoading={isLoadingAdmins}
@@ -272,6 +271,11 @@ export default function AdminsManagementPage() {
             totalPages={adminsMeta.totalPages}
             onPageChange={setPage}
             totalRecords={adminsMeta.totalRecords}
+            pageSize={pageSize}
+            onPageSizeChange={(size) => {
+              setPageSize(size);
+              setPage(1);
+            }}
           />
         )}
       </div>

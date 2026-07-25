@@ -162,7 +162,6 @@ export default function PropertyTasksTab({ propertyId }: PropertyTasksTabProps) 
           title={`Tasks (${filteredTasks.length})`}
           isLoading={isLoadingTasks}
           table={table}
-          showExport={false}
           showSearch={false}
           filterLabel={statusLabel}
           filterOptions={STATUS_FILTER_OPTIONS}
@@ -185,9 +184,14 @@ export default function PropertyTasksTab({ propertyId }: PropertyTasksTabProps) 
         {hasData && (
           <Pagination
             currentPage={table.getState().pagination.pageIndex + 1}
-            totalPages={table.getPageCount()}
+            totalPages={Math.max(table.getPageCount(), 1)}
             onPageChange={(page: number) => table.setPageIndex(page - 1)}
             totalRecords={filteredTasks.length}
+            pageSize={table.getState().pagination.pageSize}
+            onPageSizeChange={(size) => {
+              table.setPageSize(size);
+              table.setPageIndex(0);
+            }}
           />
         )}
       </div>

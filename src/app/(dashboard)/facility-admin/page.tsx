@@ -52,11 +52,11 @@ const FacilityAdminPage = () => {
     type: "block" | "unblock" | "";
     manager: FacilityManagerRecord | null;
   }>({ type: "", manager: null });
-  const pageSize = 10;
+  const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearchQuery]);
+  }, [debouncedSearchQuery, pageSize]);
 
   const {
     facilityManagers,
@@ -256,6 +256,11 @@ const FacilityAdminPage = () => {
             totalPages={facilityManagersMeta.totalPages}
             onPageChange={setPage}
             totalRecords={facilityManagersMeta.totalRecords}
+            pageSize={pageSize}
+            onPageSizeChange={(size) => {
+              setPageSize(size);
+              setPage(1);
+            }}
           />
         )}
       </div>

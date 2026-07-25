@@ -126,6 +126,7 @@ const TaskLists = () => {
     getFilteredRowModel: getFilteredRowModel(),
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    initialState: { pagination: { pageSize: 10 } },
   });
 
   return (
@@ -163,10 +164,11 @@ const TaskLists = () => {
 
       <div className="flex flex-col items-start justify-center rounded-2xl border border-opacityClr-30 bg-white">
         <TableHeader
-          title={`Task (${taskTable.getRowModel().rows.length})`}
+          title={`Task (${taskTable.getFilteredRowModel().rows.length})`}
           searchQuery={searchQuery}
           handleInputChange={(e) => setSearchQuery(e.target.value)}
           handleClear={() => setSearchQuery("")}
+          table={taskTable}
         />
         <TableHeadAndBody
           table={taskTable}
@@ -182,9 +184,14 @@ const TaskLists = () => {
         />
         <Pagination
           currentPage={taskTable.getState().pagination.pageIndex + 1}
-          totalPages={taskTable.getPageCount()}
+          totalPages={Math.max(taskTable.getPageCount(), 1)}
           onPageChange={(page: number) => taskTable.setPageIndex(page - 1)}
-          totalRecords={taskTable.getRowCount()}
+          totalRecords={taskTable.getFilteredRowModel().rows.length}
+          pageSize={taskTable.getState().pagination.pageSize}
+          onPageSizeChange={(size) => {
+            taskTable.setPageSize(size);
+            taskTable.setPageIndex(0);
+          }}
         />
       </div>
 

@@ -89,7 +89,7 @@ const PropertyProfitSharingDetail = ({ propertyId }: PropertyProfitSharingDetail
   const [tablePage, setTablePage] = useState(1);
   const [yearFilter, setYearFilter] = useState<number | undefined>(CURRENT_YEAR);
   const [sectionFilter, setSectionFilter] = useState<number | undefined>(undefined);
-  const pageSize = 10;
+  const [pageSize, setPageSize] = useState(10);
 
   const {
     propertyStatus,
@@ -419,7 +419,6 @@ const PropertyProfitSharingDetail = ({ propertyId }: PropertyProfitSharingDetail
           }
           isLoading={isLoadingTable}
           table={activeTable}
-          showExport={false}
           showSearch={false}
           showFilter={false}
           headerActions={
@@ -458,6 +457,11 @@ const PropertyProfitSharingDetail = ({ propertyId }: PropertyProfitSharingDetail
             totalPages={activeMeta.totalPages}
             onPageChange={setTablePage}
             totalRecords={activeMeta.totalRecords}
+            pageSize={pageSize}
+            onPageSizeChange={(size) => {
+              setPageSize(size);
+              setTablePage(1);
+            }}
           />
         )}
       </div>

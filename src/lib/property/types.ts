@@ -27,7 +27,7 @@ export type CreatePropertyPayload = {
   state: string;
   zip: string;
   numberOfShares: number;
-  presale: number;
+  presale?: number;
   valuation: ValuationPayload;
 };
 

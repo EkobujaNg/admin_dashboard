@@ -110,16 +110,22 @@ const ReportManagementPage = () => {
     getFilteredRowModel: getFilteredRowModel(),
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    initialState: { pagination: { pageSize: 10 } },
   });
 
   const renderPagination = (tableInstance: any) => {
-    const hasData = tableInstance.getRowModel().rows.length > 0;
+    const hasData = tableInstance.getFilteredRowModel().rows.length > 0;
     return hasData ? (
       <Pagination
         currentPage={tableInstance.getState().pagination.pageIndex + 1}
-        totalPages={tableInstance.getPageCount()}
+        totalPages={Math.max(tableInstance.getPageCount(), 1)}
         onPageChange={(page: number) => tableInstance.setPageIndex(page - 1)}
-        totalRecords={tableInstance.getRowCount()}
+        totalRecords={tableInstance.getFilteredRowModel().rows.length}
+        pageSize={tableInstance.getState().pagination.pageSize}
+        onPageSizeChange={(size: number) => {
+          tableInstance.setPageSize(size);
+          tableInstance.setPageIndex(0);
+        }}
       />
     ) : null;
   };
@@ -202,10 +208,11 @@ const ReportManagementPage = () => {
       <div className="flex flex-col gap-4 w-full">
         <div className="flex flex-col items-start justify-center rounded-2xl border border-opacityClr-30 bg-white">
           <TableHeader
-            title={`All Inspection Reports (${reportTable.getRowModel().rows.length})`}
+            title={`All Inspection Reports (${reportTable.getFilteredRowModel().rows.length})`}
             searchQuery={searchQuery}
             handleInputChange={(e) => setSearchQuery(e.target.value)}
             handleClear={() => setSearchQuery("")}
+            table={reportTable}
           />
           <TableHeadAndBody
             table={reportTable}

@@ -2,6 +2,7 @@
 
 import { Search, X } from "lucide-react";
 import Dropdown from "../ui/Dropdown";
+import { exportFromTable } from "@/lib/export/table-export";
 
 type FilterOption = string | { value: string; label: string };
 
@@ -21,6 +22,7 @@ type TableHeaderProps = {
   showSearch?: boolean;
   searchPlaceholder?: string;
   headerActions?: React.ReactNode;
+  exportFilename?: string;
 };
 
 function TableHeader({
@@ -39,13 +41,21 @@ function TableHeader({
   showSearch = true,
   searchPlaceholder = "Search...",
   headerActions,
+  exportFilename,
 }: TableHeaderProps) {
   const hasData = (table?.getRowModel()?.rows?.length ?? 0) > 0;
   const hasCustomFilter = Boolean(onFilterChange);
-  const keepVisible = hasCustomFilter || showSearch || Boolean(headerActions);
+  const keepVisible = hasCustomFilter || showSearch || Boolean(headerActions) || showExport;
 
-  // Keep search/filter controls visible when wired; otherwise hide on empty/loading.
+  // Keep search/filter/export controls visible when wired; otherwise hide on empty/loading.
   if (table && !keepVisible && (isLoading || !hasData)) return null;
+
+  const handleExport = (format: string) => {
+    exportFromTable(format, table, {
+      title,
+      filename: exportFilename || title,
+    });
+  };
 
   return (
     <div className="flex items-center justify-between gap-8 p-6 w-full">
@@ -82,7 +92,13 @@ function TableHeader({
           />
         )}
 
-        {showExport && <Dropdown label="Export as" options={["CSV", "PDF", "Excel"]} />}
+        {showExport && (
+          <Dropdown
+            label="Export as"
+            options={["CSV", "PDF", "Excel"]}
+            onSelect={handleExport}
+          />
+        )}
       </div>
     </div>
   );

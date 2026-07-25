@@ -129,6 +129,7 @@ const FacilityManager = () => {
     getFilteredRowModel: getFilteredRowModel(),
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    initialState: { pagination: { pageSize: 10 } },
   });
 
   return (
@@ -166,10 +167,11 @@ const FacilityManager = () => {
 
       <div className="flex flex-col items-start justify-center rounded-2xl border border-opacityClr-30 bg-white">
         <TableHeader
-          title={`Users (${managerTable.getRowModel().rows.length})`}
+          title={`Users (${managerTable.getFilteredRowModel().rows.length})`}
           searchQuery={searchQuery}
           handleInputChange={(e) => setSearchQuery(e.target.value)}
           handleClear={() => setSearchQuery("")}
+          table={managerTable}
         />
         <TableHeadAndBody
           table={managerTable}
@@ -185,9 +187,14 @@ const FacilityManager = () => {
         />
         <Pagination
           currentPage={managerTable.getState().pagination.pageIndex + 1}
-          totalPages={managerTable.getPageCount()}
+          totalPages={Math.max(managerTable.getPageCount(), 1)}
           onPageChange={(page: number) => managerTable.setPageIndex(page - 1)}
-          totalRecords={managerTable.getRowCount()}
+          totalRecords={managerTable.getFilteredRowModel().rows.length}
+          pageSize={managerTable.getState().pagination.pageSize}
+          onPageSizeChange={(size) => {
+            managerTable.setPageSize(size);
+            managerTable.setPageIndex(0);
+          }}
         />
       </div>
 

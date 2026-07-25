@@ -9,7 +9,7 @@ import type {
   PropertyStatistics,
 } from "./types";
 
-const MAX_PROPERTY_PAGE_LIMIT = 50;
+const MAX_PROPERTY_PAGE_LIMIT = 100;
 
 function clampLimit(limit?: number) {
   const value = limit ?? 10;

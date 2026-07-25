@@ -55,7 +55,7 @@ function statusStyles(status: string) {
 const UserTransactionsPage = () => {
   const { openModal } = useDrawerModal();
   const [page, setPage] = useState(1);
-  const pageSize = 10;
+  const [pageSize, setPageSize] = useState(10);
 
   const { walletTransactions, walletMeta, isLoadingWalletTransactions, walletTransactionsError } =
     useTransactionsAPI({
@@ -168,7 +168,6 @@ const UserTransactionsPage = () => {
           title={`User Transactions (${walletMeta.totalRecords})`}
           isLoading={isLoadingWalletTransactions}
           table={table}
-          showExport={false}
           showSearch={false}
           showFilter={false}
         />
@@ -189,6 +188,11 @@ const UserTransactionsPage = () => {
             totalPages={walletMeta.totalPages}
             onPageChange={setPage}
             totalRecords={walletMeta.totalRecords}
+            pageSize={pageSize}
+            onPageSizeChange={(size) => {
+              setPageSize(size);
+              setPage(1);
+            }}
           />
         )}
       </div>

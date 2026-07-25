@@ -65,11 +65,11 @@ export default function PropertyTransactionsTab({ propertyId }: PropertyTransact
   const { openModal } = useDrawerModal();
   const [market, setMarket] = useState<PropertyMarketType>("primary");
   const [page, setPage] = useState(1);
-  const pageSize = 10;
+  const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
     setPage(1);
-  }, [market]);
+  }, [market, pageSize]);
 
   const {
     propertyMarketTransactions,
@@ -182,7 +182,6 @@ export default function PropertyTransactionsTab({ propertyId }: PropertyTransact
           title={`${marketLabel} transactions (${propertyMarketMeta.totalRecords})`}
           isLoading={isLoadingPropertyMarketTransactions}
           table={table}
-          showExport={false}
           showSearch={false}
           showFilter={false}
           onFilterChange={() => undefined}
@@ -204,6 +203,11 @@ export default function PropertyTransactionsTab({ propertyId }: PropertyTransact
             totalPages={propertyMarketMeta.totalPages}
             onPageChange={setPage}
             totalRecords={propertyMarketMeta.totalRecords}
+            pageSize={pageSize}
+            onPageSizeChange={(size) => {
+              setPageSize(size);
+              setPage(1);
+            }}
           />
         )}
       </div>

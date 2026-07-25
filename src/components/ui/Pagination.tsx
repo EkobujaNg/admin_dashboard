@@ -1,7 +1,29 @@
 import React from "react";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 
-const Pagination = ({ currentPage, totalPages, onPageChange, totalRecords }: { currentPage: any; totalPages: any; onPageChange: any; totalRecords: any }) => {
+export const PAGE_SIZE_OPTIONS = [10, 20, 50, 100] as const;
+
+type PaginationProps = {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  totalRecords: number;
+  pageSize?: number;
+  onPageSizeChange?: (pageSize: number) => void;
+  pageSizeOptions?: readonly number[];
+  label?: string;
+};
+
+const Pagination = ({
+  currentPage,
+  totalPages,
+  onPageChange,
+  totalRecords,
+  pageSize,
+  onPageSizeChange,
+  pageSizeOptions = PAGE_SIZE_OPTIONS,
+  label = "records",
+}: PaginationProps) => {
   const getPageNumbers = () => {
     const totalNumbers = 1;
     const maxPages = 3;
@@ -20,18 +42,37 @@ const Pagination = ({ currentPage, totalPages, onPageChange, totalRecords }: { c
   };
 
   const pages = getPageNumbers();
+  const showPageSize = typeof pageSize === "number" && typeof onPageSizeChange === "function";
 
   return (
-    <div className="flex items-center justify-between py-4 px-6 border-t border-gray-200 w-full">
-      {/* Left side - Showing text */}
-      <p className="text-sm text-gray-700 font-semibold">
-        Showing <span className="text-primary-10 font-bold">{currentPage}</span> -{" "}
-        <span className="text-primary-10 font-bold">{totalPages}</span> of {totalRecords || 0} transactions
-      </p>
+    <div className="flex flex-wrap items-center justify-between gap-4 py-4 px-6 border-t border-gray-200 w-full">
+      <div className="flex flex-wrap items-center gap-4">
+        <p className="text-sm text-gray-700 font-semibold">
+          Showing <span className="text-primary-10 font-bold">{currentPage}</span> -{" "}
+          <span className="text-primary-10 font-bold">{totalPages}</span> of {totalRecords || 0} {label}
+        </p>
 
-      {/* Right side - Pagination controls */}
+        {showPageSize && (
+          <label className="flex items-center gap-2 text-sm text-gray-700 font-semibold">
+            <span className="whitespace-nowrap">Rows per page</span>
+            <select
+              value={pageSize}
+              onChange={(event) => onPageSizeChange(Number(event.target.value))}
+              className="h-10 rounded-md border border-gray-300 bg-opacityClr-10 px-3 text-sm text-primary-10 outline-none"
+            >
+              {pageSizeOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+      </div>
+
       <div className="flex items-center space-x-2">
         <button
+          type="button"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
           className="w-10 h-10 rounded-md border border-gray-300 bg-opacityClr-10 text-gray-800 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
@@ -41,6 +82,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange, totalRecords }: { c
 
         {pages.map((page, idx) => (
           <button
+            type="button"
             key={idx}
             onClick={() => typeof page === "number" && onPageChange(page)}
             disabled={page === "..."}
@@ -53,6 +95,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange, totalRecords }: { c
         ))}
 
         <button
+          type="button"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
           className="w-10 h-10 rounded-md border border-gray-300 bg-opacityClr-10 text-gray-800 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"

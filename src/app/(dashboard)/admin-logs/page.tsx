@@ -16,6 +16,7 @@ import { useDrawerModal } from "@/context/DrawerModalContext";
 import { emptyUser } from "../../../../public/assets/images";
 import useAdminLogsAPI from "@/services/useAdminLogsAPI";
 import ViewAdminLogDrawer from "@/components/views/ViewAdminLogDrawer";
+import { exportFromTable } from "@/lib/export/table-export";
 import {
   ADMIN_LOG_ACTION_OPTIONS,
   ADMIN_LOG_RESOURCE_OPTIONS,
@@ -44,11 +45,11 @@ export default function AdminLogsPage() {
   const [page, setPage] = useState(1);
   const [action, setAction] = useState("all");
   const [resourceType, setResourceType] = useState("all");
-  const pageSize = 10;
+  const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
     setPage(1);
-  }, [action, resourceType]);
+  }, [action, resourceType, pageSize]);
 
   const { logs, logsMeta, isLoadingLogs, logsError } = useAdminLogsAPI({
     enableList: true,
@@ -213,6 +214,16 @@ export default function AdminLogsPage() {
               value={resourceType}
               onSelect={setResourceType}
             />
+            <Dropdown
+              label="Export as"
+              options={["CSV", "PDF", "Excel"]}
+              onSelect={(format) =>
+                exportFromTable(format, table, {
+                  title: "Activity logs",
+                  filename: "activity-logs",
+                })
+              }
+            />
           </div>
         </div>
 
@@ -234,6 +245,11 @@ export default function AdminLogsPage() {
             totalPages={logsMeta.totalPages}
             onPageChange={setPage}
             totalRecords={logsMeta.totalRecords}
+            pageSize={pageSize}
+            onPageSizeChange={(size) => {
+              setPageSize(size);
+              setPage(1);
+            }}
           />
         )}
       </div>

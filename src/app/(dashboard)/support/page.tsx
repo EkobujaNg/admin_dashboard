@@ -14,7 +14,6 @@ import type { ContactSubmission, SupportTicket, SupportTicketStatus } from "@/li
 import type { AccountDeletionRequest } from "@/lib/account-deletion/api";
 import { createColumnHelper, getCoreRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
 
-const PAGE_SIZE = 10;
 const contactColumnHelper = createColumnHelper<ContactSubmission>();
 const ticketColumnHelper = createColumnHelper<SupportTicket>();
 
@@ -63,6 +62,7 @@ const SupportSettingsPage = () => {
   const [contactPage, setContactPage] = useState(1);
   const [ticketPage, setTicketPage] = useState(1);
   const [deletionsPage, setDeletionsPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const [selectedDeletionId, setSelectedDeletionId] = useState("");
   const [selectedContactId, setSelectedContactId] = useState("");
@@ -88,7 +88,7 @@ const SupportSettingsPage = () => {
     isReplying,
   } = useSupportAPI({
     page: activeTab === "contact" ? contactPage : ticketPage,
-    limit: PAGE_SIZE,
+    limit: pageSize,
     ticketId: selectedTicketId,
     contactId: selectedContactId,
     enableContacts: activeTab === "contact",
@@ -104,7 +104,7 @@ const SupportSettingsPage = () => {
     refetchDetail,
   } = useAccountDeletionAPI({
     page: deletionsPage,
-    limit: PAGE_SIZE,
+    limit: pageSize,
     enable: activeTab === "deletions",
     requestId: selectedDeletionId,
     enableDetail: activeTab === "deletions" && !!selectedDeletionId,
@@ -317,7 +317,6 @@ const SupportSettingsPage = () => {
             title={`${activeTab === "contact" ? "Contact requests" : "Support tickets"} (${activeMeta?.total ?? 0})`}
             isLoading={isLoading}
             table={activeTable}
-            showExport={false}
             showFilter={false}
             showSearch={false}
           />
@@ -338,6 +337,11 @@ const SupportSettingsPage = () => {
               totalPages={activeMeta?.totalPages ?? 1}
               onPageChange={setActivePage}
               totalRecords={activeMeta?.total ?? 0}
+              pageSize={pageSize}
+              onPageSizeChange={(size) => {
+                setPageSize(size);
+                setActivePage(1);
+              }}
             />
           )}
         </div>
@@ -347,7 +351,6 @@ const SupportSettingsPage = () => {
             title={`Account deletion requests (${deletionMeta?.total ?? 0})`}
             isLoading={isLoadingDeletions}
             table={deletionsTable}
-            showExport={false}
             showFilter={false}
             showSearch={false}
           />
@@ -366,6 +369,11 @@ const SupportSettingsPage = () => {
               totalPages={deletionMeta?.totalPages ?? 1}
               onPageChange={setDeletionsPage}
               totalRecords={deletionMeta?.total ?? 0}
+              pageSize={pageSize}
+              onPageSizeChange={(size) => {
+                setPageSize(size);
+                setDeletionsPage(1);
+              }}
             />
           )}
         </div>

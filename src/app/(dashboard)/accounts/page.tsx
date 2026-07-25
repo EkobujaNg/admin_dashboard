@@ -59,11 +59,11 @@ const AccountPage = () => {
     type: "",
     userId: null,
   });
-  const pageSize = 10;
+  const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearchQuery, filter]);
+  }, [debouncedSearchQuery, filter, pageSize]);
 
   const {
     summaryStats,
@@ -282,7 +282,6 @@ const AccountPage = () => {
           filterOptions={USER_FILTER_OPTIONS}
           filterValue={filter}
           onFilterChange={(value) => setFilter(value as AdminUserFilter)}
-          showExport={false}
           searchPlaceholder="Search by name or email..."
         />
         <TableHeadAndBody
@@ -300,6 +299,11 @@ const AccountPage = () => {
             totalPages={usersMeta.totalPages}
             onPageChange={setPage}
             totalRecords={usersMeta.totalRecords}
+            pageSize={pageSize}
+            onPageSizeChange={(size) => {
+              setPageSize(size);
+              setPage(1);
+            }}
           />
         )}
       </div>

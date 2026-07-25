@@ -132,7 +132,11 @@ export default function PropertyValuationCalculator({
   };
 
   const handleNumberChange = (field: keyof ValuationFormState, value: string) => {
-    updateState({ [field]: Number(value) || 0 } as Partial<ValuationFormState>);
+    if (value === "") {
+      updateState({ [field]: "" } as Partial<ValuationFormState>);
+      return;
+    }
+    updateState({ [field]: Number(value) } as Partial<ValuationFormState>);
   };
 
   const handleSelectOption = <T extends string | number>(
@@ -265,22 +269,22 @@ export default function PropertyValuationCalculator({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
           <Field label="Security Payments (₦)">
-            <input type="number" min="0" value={state.securityCost} onChange={(e) => handleNumberChange("securityCost", e.target.value)} className={inputClassName} />
+            <input type="number" min="0" placeholder="0" value={state.securityCost} onChange={(e) => handleNumberChange("securityCost", e.target.value)} className={inputClassName} />
           </Field>
           <Field label="Maintenance (₦)">
-            <input type="number" min="0" value={state.maintenanceCost} onChange={(e) => handleNumberChange("maintenanceCost", e.target.value)} className={inputClassName} />
+            <input type="number" min="0" placeholder="0" value={state.maintenanceCost} onChange={(e) => handleNumberChange("maintenanceCost", e.target.value)} className={inputClassName} />
           </Field>
           <Field label="Repairs Allowance (₦)">
-            <input type="number" min="0" value={state.repairsCost} onChange={(e) => handleNumberChange("repairsCost", e.target.value)} className={inputClassName} />
+            <input type="number" min="0" placeholder="0" value={state.repairsCost} onChange={(e) => handleNumberChange("repairsCost", e.target.value)} className={inputClassName} />
           </Field>
           <Field label="Utilities / Common Services (₦)">
-            <input type="number" min="0" value={state.utilitiesCost} onChange={(e) => handleNumberChange("utilitiesCost", e.target.value)} className={inputClassName} />
+            <input type="number" min="0" placeholder="0" value={state.utilitiesCost} onChange={(e) => handleNumberChange("utilitiesCost", e.target.value)} className={inputClassName} />
           </Field>
           <Field label="Management Fee (₦)">
-            <input type="number" min="0" value={state.managementCost} onChange={(e) => handleNumberChange("managementCost", e.target.value)} className={inputClassName} />
+            <input type="number" min="0" placeholder="0" value={state.managementCost} onChange={(e) => handleNumberChange("managementCost", e.target.value)} className={inputClassName} />
           </Field>
           <Field label="Land Use Charge / Property Tax (₦)">
-            <input type="number" min="0" value={state.taxCost} onChange={(e) => handleNumberChange("taxCost", e.target.value)} className={inputClassName} />
+            <input type="number" min="0" placeholder="0" value={state.taxCost} onChange={(e) => handleNumberChange("taxCost", e.target.value)} className={inputClassName} />
           </Field>
         </div>
       </section>
