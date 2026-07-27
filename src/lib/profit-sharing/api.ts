@@ -11,6 +11,8 @@ import type {
   GetProfitShareRecordsParams,
   GetProfitSharingStatusesParams,
   GetUnownedProfitHistoryParams,
+  ConfirmDistributeProfitSharePayload,
+  InitiateLoadProfitSharePayload,
   LoadProfitSharePayload,
   PaginatedProfitShareBreakdown,
   PaginatedProfitShareRecords,
@@ -159,6 +161,14 @@ export async function getProfitShareBreakdown(
   );
 }
 
+export async function initiateLoadProfitShare(
+  propertyId: string,
+  payload: InitiateLoadProfitSharePayload
+): Promise<unknown> {
+  const { data } = await http.post(`${PROFIT_SHARING_BASE}/${propertyId}/load/initiate`, payload);
+  return unwrapData(data);
+}
+
 export async function loadProfitShare(
   propertyId: string,
   payload: LoadProfitSharePayload
@@ -167,8 +177,16 @@ export async function loadProfitShare(
   return unwrapData(data);
 }
 
-export async function distributeProfitShare(propertyId: string): Promise<unknown> {
-  const { data } = await http.post(`${PROFIT_SHARING_BASE}/${propertyId}/distribute`);
+export async function initiateDistributeProfitShare(propertyId: string): Promise<unknown> {
+  const { data } = await http.post(`${PROFIT_SHARING_BASE}/${propertyId}/distribute/initiate`);
+  return unwrapData(data);
+}
+
+export async function distributeProfitShare(
+  propertyId: string,
+  payload: ConfirmDistributeProfitSharePayload
+): Promise<unknown> {
+  const { data } = await http.post(`${PROFIT_SHARING_BASE}/${propertyId}/distribute`, payload);
   return unwrapData(data);
 }
 

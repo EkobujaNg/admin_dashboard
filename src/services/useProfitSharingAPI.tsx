@@ -8,10 +8,17 @@ import {
   getProfitSharingStatuses,
   getPropertyProfitSharingStatus,
   getUnownedProfitHistory,
+  initiateDistributeProfitShare,
+  initiateLoadProfitShare,
   loadProfitShare,
   updateProfitSharingRate,
 } from "@/lib/profit-sharing/api";
-import type { LoadProfitSharePayload, UpdateProfitSharingRatePayload } from "@/lib/profit-sharing/types";
+import type {
+  ConfirmDistributeProfitSharePayload,
+  InitiateLoadProfitSharePayload,
+  LoadProfitSharePayload,
+  UpdateProfitSharingRatePayload,
+} from "@/lib/profit-sharing/types";
 
 type UseProfitSharingAPIOptions = {
   page?: number;
@@ -113,15 +120,35 @@ export default function useProfitSharingAPI({
     queryClient.invalidateQueries({ queryKey: ["admin-unowned-profit-history"] });
   };
 
+  const initiateLoadMutation = useMutation({
+    mutationFn: ({
+      propertyId: id,
+      payload,
+    }: {
+      propertyId: string;
+      payload: InitiateLoadProfitSharePayload;
+    }) => initiateLoadProfitShare(id, payload),
+  });
+
   const loadMutation = useMutation({
     mutationFn: ({ propertyId: id, payload }: { propertyId: string; payload: LoadProfitSharePayload }) =>
       loadProfitShare(id, payload),
     onSuccess: (_data, variables) => invalidatePropertyQueries(variables.propertyId),
   });
 
+  const initiateDistributeMutation = useMutation({
+    mutationFn: (id: string) => initiateDistributeProfitShare(id),
+  });
+
   const distributeMutation = useMutation({
-    mutationFn: (id: string) => distributeProfitShare(id),
-    onSuccess: (_data, id) => invalidatePropertyQueries(id),
+    mutationFn: ({
+      propertyId: id,
+      payload,
+    }: {
+      propertyId: string;
+      payload: ConfirmDistributeProfitSharePayload;
+    }) => distributeProfitShare(id, payload),
+    onSuccess: (_data, variables) => invalidatePropertyQueries(variables.propertyId),
   });
 
   const updateRateMutation = useMutation({
@@ -139,6 +166,26 @@ export default function useProfitSharingAPI({
   const unowned = unownedHistoryQuery.data;
   const records = recordsQuery.data;
   const breakdown = breakdownQuery.data;
+
+  const initiateLoad = (
+    id: string,
+    payload: InitiateLoadProfitSharePayload,
+    options?: { onSuccess?: (data?: unknown) => void; onError?: (error?: unknown) => void }
+  ) => {
+    initiateLoadMutation.mutate(
+      { propertyId: id, payload },
+      {
+        onSuccess: (data) => {
+          toast.success("OTP sent to super admin email.");
+          options?.onSuccess?.(data);
+        },
+        onError: (error) => {
+          toast.error(getProfitSharingErrorMessage(error, "Failed to send OTP for profit share load."));
+          options?.onError?.(error);
+        },
+      }
+    );
+  };
 
   const loadAmount = (
     id: string,
@@ -160,20 +207,40 @@ export default function useProfitSharingAPI({
     );
   };
 
-  const distributeShare = (
+  const initiateDistribute = (
     id: string,
     options?: { onSuccess?: (data?: unknown) => void; onError?: (error?: unknown) => void }
   ) => {
-    distributeMutation.mutate(id, {
+    initiateDistributeMutation.mutate(id, {
       onSuccess: (data) => {
-        toast.success("Profit share distributed to holders.");
+        toast.success("OTP sent to super admin email.");
         options?.onSuccess?.(data);
       },
       onError: (error) => {
-        toast.error(getProfitSharingErrorMessage(error, "Failed to distribute profit share."));
+        toast.error(getProfitSharingErrorMessage(error, "Failed to send OTP for profit share distribution."));
         options?.onError?.(error);
       },
     });
+  };
+
+  const distributeShare = (
+    id: string,
+    payload: ConfirmDistributeProfitSharePayload,
+    options?: { onSuccess?: (data?: unknown) => void; onError?: (error?: unknown) => void }
+  ) => {
+    distributeMutation.mutate(
+      { propertyId: id, payload },
+      {
+        onSuccess: (data) => {
+          toast.success("Profit share distributed to holders.");
+          options?.onSuccess?.(data);
+        },
+        onError: (error) => {
+          toast.error(getProfitSharingErrorMessage(error, "Failed to distribute profit share."));
+          options?.onError?.(error);
+        },
+      }
+    );
   };
 
   const updateRate = (
@@ -248,8 +315,12 @@ export default function useProfitSharingAPI({
     isLoadingBreakdown: breakdownQuery.isLoading,
     breakdownError: breakdownQuery.error,
 
+    initiateLoad,
+    isInitiatingLoad: initiateLoadMutation.isPending,
     loadAmount,
     isLoadingAmount: loadMutation.isPending,
+    initiateDistribute,
+    isInitiatingDistribute: initiateDistributeMutation.isPending,
     distributeShare,
     isDistributing: distributeMutation.isPending,
     updateRate,

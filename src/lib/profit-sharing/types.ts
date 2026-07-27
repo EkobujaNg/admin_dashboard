@@ -66,8 +66,17 @@ export type GetProfitSharingStatusesParams = {
   name?: string;
 };
 
+export type InitiateLoadProfitSharePayload = {
+  amount: number;
+};
+
 export type LoadProfitSharePayload = {
   amount: number;
+  code: string;
+};
+
+export type ConfirmDistributeProfitSharePayload = {
+  code: string;
 };
 
 export type UpdateProfitSharingRatePayload = {

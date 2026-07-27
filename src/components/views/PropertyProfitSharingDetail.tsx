@@ -9,7 +9,6 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import TabButton from "@/components/ui/TabButton";
 import TableHeader from "@/components/ui/TableHeader";
 import TableHeadAndBody from "@/components/ui/TableHeadAndBody";
@@ -17,6 +16,7 @@ import Pagination from "@/components/ui/Pagination";
 import Dropdown from "@/components/ui/Dropdown";
 import { useDrawerModal } from "@/context/DrawerModalContext";
 import LoadProfitShareDrawer from "@/components/views/LoadProfitShareDrawer";
+import DistributeProfitShareDrawer from "@/components/views/DistributeProfitShareDrawer";
 import UpdateProfitSharingRateDrawer from "@/components/views/UpdateProfitSharingRateDrawer";
 import useProfitSharingAPI from "@/services/useProfitSharingAPI";
 import type { ProfitShareBreakdownEntry, ProfitShareRecord } from "@/lib/profit-sharing/types";
@@ -84,7 +84,6 @@ function DetailRow({ label, value }: { label: string; value: React.ReactNode }) 
 
 const PropertyProfitSharingDetail = ({ propertyId }: PropertyProfitSharingDetailProps) => {
   const { openModal } = useDrawerModal();
-  const [showDistributeConfirm, setShowDistributeConfirm] = useState(false);
   const [activeTab, setActiveTab] = useState<DetailTab>("records");
   const [tablePage, setTablePage] = useState(1);
   const [yearFilter, setYearFilter] = useState<number | undefined>(CURRENT_YEAR);
@@ -96,7 +95,6 @@ const PropertyProfitSharingDetail = ({ propertyId }: PropertyProfitSharingDetail
     isLoadingPropertyStatus,
     propertyStatusError,
     refetchPropertyStatus,
-    distributeShare,
     isDistributing,
   } = useProfitSharingAPI({
     propertyId,
@@ -158,15 +156,18 @@ const PropertyProfitSharingDetail = ({ propertyId }: PropertyProfitSharingDetail
     );
   };
 
-  const handleDistribute = () => {
+  const handleOpenDistributeDrawer = () => {
     if (!canDistribute || isDistributing) return;
-    distributeShare(propertyId, {
-      onSuccess: () => {
-        setShowDistributeConfirm(false);
-        refetchPropertyStatus();
-      },
-      onError: () => setShowDistributeConfirm(false),
-    });
+    openModal(
+      "Distribute profit share",
+      <DistributeProfitShareDrawer
+        propertyId={propertyId}
+        propertyName={status?.propertyName}
+        amount={pendingShare?.amount}
+        section={pendingShare?.section}
+        onSuccess={() => refetchPropertyStatus()}
+      />
+    );
   };
 
   const recordColumns = useMemo(
@@ -325,7 +326,7 @@ const PropertyProfitSharingDetail = ({ propertyId }: PropertyProfitSharingDetail
           <button
             type="button"
             disabled={isDistributing}
-            onClick={() => setShowDistributeConfirm(true)}
+            onClick={handleOpenDistributeDrawer}
             className="px-6 py-3 rounded-md bg-primary-10 text-white font-semibold text-sm cursor-pointer disabled:opacity-40"
           >
             {isDistributing ? "Distributing..." : "Distribute"}
@@ -465,19 +466,6 @@ const PropertyProfitSharingDetail = ({ propertyId }: PropertyProfitSharingDetail
           />
         )}
       </div>
-
-      <ConfirmationModal
-        isOpen={showDistributeConfirm}
-        onClose={() => !isDistributing && setShowDistributeConfirm(false)}
-        onConfirm={handleDistribute}
-        message={`Distribute ${formatMoney(pendingShare?.amount)} to holders for section ${
-          pendingShare?.section ?? "—"
-        }? Unowned remainder goes to profit balance.`}
-        confirmMsg={isDistributing ? "Distributing..." : "Distribute"}
-        cancelMsg="Cancel"
-        confirmButtonColor="green"
-        confirmDisabled={isDistributing}
-      />
     </div>
   );
 };
