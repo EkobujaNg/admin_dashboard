@@ -8,7 +8,7 @@ import StepProgress from "@/components/ui/StepProgress";
 import PropertyValuationCalculator from "@/components/views/PropertyValuationCalculator";
 import { createProperty, getPropertyErrorMessage, updateProperty } from "@/lib/property/api";
 import { mapPropertyToDetailsState, mapPropertyToValuationState } from "@/lib/property/form";
-import { uploadPropertyMedia } from "@/lib/property/media";
+import { buildPropertyMediaPayload, uploadPropertyMedia } from "@/lib/property/media";
 import {
   createInitialPropertyDetailsState,
   PROPERTY_LISTING_TYPE_OPTIONS,
@@ -103,7 +103,11 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
     const mappedDetails = mapPropertyToDetailsState(property);
     const mappedValuation = mapPropertyToValuationState(property);
 
-    setDetails(mappedDetails);
+    setDetails({
+      ...createInitialPropertyDetailsState(),
+      ...mappedDetails,
+      videoLink: mappedDetails.videoLink ?? "",
+    });
     setValuationState(mappedValuation.state);
     setValuationResult(mappedValuation.result);
     setHasCalculated(Boolean(mappedValuation.result));
@@ -226,6 +230,7 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
   const validateStep2 = () => {
     const validation = propertyListingStep2Schema.safeParse({
       media: details.media,
+      videoLink: details.videoLink ?? "",
       propertyAddress: details.propertyAddress,
       city: details.city,
       state: details.state,
@@ -287,11 +292,11 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
     e.preventDefault();
     if (!validateStep4() || !validateStep3() || !validateStep2() || !validateStep1()) return;
 
-    const orderedMedia = [...details.media];
-    if (thumbnailIdx > 0 && orderedMedia[thumbnailIdx]) {
-      const [thumbnail] = orderedMedia.splice(thumbnailIdx, 1);
-      orderedMedia.unshift(thumbnail);
-    }
+    const orderedMedia = buildPropertyMediaPayload(
+      details.media,
+      details.videoLink ?? "",
+      thumbnailIdx
+    );
 
     if (isEditMode) {
       updatePropertyMutation.mutate(
@@ -546,6 +551,17 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
               </div>
             </div>
 
+            <Field label="Video link">
+              <input
+                type="url"
+                name="videoLink"
+                value={details.videoLink ?? ""}
+                onChange={handleDetailsChange}
+                placeholder="Add youtube video link here"
+                className={inputClassName}
+              />
+            </Field>
+
             <h3 className={sectionTitleClassName}>Location</h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
@@ -692,6 +708,12 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
                   <span className="text-opacityClr-60">Images:</span>{" "}
                   <span className="font-semibold">{details.media.length} uploaded</span>
                 </p>
+                {(details.videoLink ?? "").trim() && (
+                  <p className="md:col-span-2">
+                    <span className="text-opacityClr-60">Video:</span>{" "}
+                    <span className="font-semibold break-all">{(details.videoLink ?? "").trim()}</span>
+                  </p>
+                )}
                 <p>
                   <span className="text-opacityClr-60">Shares:</span>{" "}
                   <span className="font-semibold">{details.numberOfShares || "—"}</span>

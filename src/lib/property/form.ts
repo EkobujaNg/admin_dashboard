@@ -1,4 +1,5 @@
 import type { PropertyDetailsState, PropertyListingType, PropertyRecord } from "./types";
+import { isPropertyVideoUrl } from "./media";
 import {
   ADMIN_ADJUST_WITH_OPTIONS,
   calculatePropertyValuation,
@@ -44,13 +45,17 @@ export function mapPropertyToDetailsState(property: PropertyRecord): PropertyDet
   const aboutProperty = (property.aboutProperty ?? []).map(String).filter(Boolean);
 
   const presaleValue = property.presale ?? property.amountRaisedDuringPresale;
+  const allMedia = property.media?.length ? property.media : property.imageUrls || [];
+  const videoLink = allMedia.find(isPropertyVideoUrl) ?? "";
+  const media = allMedia.filter((url) => !isPropertyVideoUrl(url));
 
   return {
     name: property.name || property.propertyName || "",
     description: property.description || "",
     aboutProperty: aboutProperty.length > 0 ? aboutProperty : [""],
     propertyType: (property.propertyType as PropertyListingType) || "",
-    media: property.media?.length ? property.media : property.imageUrls || [],
+    media,
+    videoLink,
     propertyAddress: property.propertyAddress || "",
     city: property.city || "",
     state: property.state || "",

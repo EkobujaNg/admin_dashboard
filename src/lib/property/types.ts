@@ -8,6 +8,7 @@ export type PropertyDetailsState = {
   aboutProperty: string[];
   propertyType: PropertyListingType | "";
   media: string[];
+  videoLink: string;
   propertyAddress: string;
   city: string;
   state: string;
@@ -151,6 +152,7 @@ export function createInitialPropertyDetailsState(): PropertyDetailsState {
     aboutProperty: [""],
     propertyType: "",
     media: [],
+    videoLink: "",
     propertyAddress: "",
     city: "",
     state: "",

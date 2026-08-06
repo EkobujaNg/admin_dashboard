@@ -40,6 +40,13 @@ export const propertyListingStep1Schema = z.object({
 
 export const propertyListingStep2Schema = z.object({
   media: z.array(z.string()).min(1, "Please upload at least one property image."),
+  videoLink: z
+    .string()
+    .trim()
+    .refine(
+      (value) => value === "" || /youtube\.com|youtu\.be/i.test(value),
+      "Please enter a valid YouTube link."
+    ),
   propertyAddress: z.string().trim().min(1, "Please complete all location fields."),
   city: z.string().trim().min(1, "Please complete all location fields."),
   state: z.string().trim().min(1, "Please complete all location fields."),
