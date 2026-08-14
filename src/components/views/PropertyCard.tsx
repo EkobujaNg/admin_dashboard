@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { ArrowUpRight, Eye, EyeOff, MapPin, Info } from "lucide-react";
 import { usePropertyAPI } from "@/services/usePropertyAPI";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
+import MediaImage from "@/components/ui/MediaImage";
+import { getFirstPropertyImageUrl } from "@/lib/property/media";
 
 const PropertyCard = memo(({ property }: { property?: any }) => {
   const router = useRouter();
@@ -29,7 +31,7 @@ const PropertyCard = memo(({ property }: { property?: any }) => {
 
   if (!property) return null;
 
-  const imageUrl = property.imageUrls?.[0] || property.media?.[0] || "/assets/images/fallback-property.png";
+  const imageUrl = getFirstPropertyImageUrl(property, "/assets/images/fallback-property.png");
   const sharePrice = property.shareValue ?? property.pricePerStock ?? 0;
   const totalShares = property.numberOfShares ?? 0;
   const sharesSold = property.numberOfSharesSold ?? property.sharesSold ?? 0;
@@ -53,11 +55,16 @@ const PropertyCard = memo(({ property }: { property?: any }) => {
       <div
         className={`relative h-full w-full shadow border rounded-2xl ${isHidden ? "border-amber-200 opacity-90" : "border-opacityClr-20"}`}
       >
-        <div
-          className="w-full h-[250px] rounded-t-2xl flex flex-col items-start justify-between bg-cover bg-center bg-no-repeat relative object-cover"
-          style={{ backgroundImage: `url(${imageUrl})` }}
-        >
-          <div className="flex items-center justify-between py-6 px-4 w-full">
+        <div className="w-full h-[250px] rounded-t-2xl flex flex-col items-start justify-between relative overflow-hidden">
+          <MediaImage
+            src={imageUrl}
+            alt={property.propertyName || "Property"}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+
+          <div className="relative z-10 flex items-center justify-between py-6 px-4 w-full">
             <div className="flex py-[10px] px-4 items-center gap-3 rounded-2xl bg-white w-auto">
               <p className="text-primary-10 font-Raleway text-base font-bold leading-normal uppercase">{property.propertyName}</p>
             </div>
@@ -70,7 +77,7 @@ const PropertyCard = memo(({ property }: { property?: any }) => {
             type="button"
             onClick={() => setIsConfirmOpen(true)}
             disabled={isUpdatingPropertyVisibility}
-            className={`absolute top-4 right-4 flex items-center justify-center gap-2 w-[50px] h-[50px] rounded-full border transition-all duration-500 group cursor-pointer disabled:opacity-50 ${
+            className={`absolute z-10 top-4 right-4 flex items-center justify-center gap-2 w-[50px] h-[50px] rounded-full border transition-all duration-500 group cursor-pointer disabled:opacity-50 ${
               isHidden
                 ? "bg-green-100 border-neutral-lightGreen hover:bg-transparent hover:border-[#E8EBEB]"
                 : "bg-amber-100 border-amber-200 hover:bg-transparent hover:border-[#E8EBEB]"

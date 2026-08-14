@@ -100,6 +100,7 @@ export type PropertyRecord = {
   aboutProperty: string[];
   imageUrls: string[];
   media: string[];
+  videoLink?: string | null;
   pricePerStock: number;
   shareValue: number;
   ekobujaValue?: number | null;

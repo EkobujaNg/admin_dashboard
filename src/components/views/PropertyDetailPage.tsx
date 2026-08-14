@@ -13,6 +13,7 @@ import PropertyReportsTab from "@/components/views/PropertyReportsTab";
 import UpdatePropertyCommissionDrawer from "@/components/views/UpdatePropertyCommissionDrawer";
 import { useDrawerModal } from "@/context/DrawerModalContext";
 import { formatNaira, formatPercent } from "@/lib/property/valuation";
+import { getPropertyImageUrls, getPropertyVideoLink, getYouTubeEmbedUrl } from "@/lib/property/media";
 import { PROPERTY_LISTING_TYPE_OPTIONS, type PropertyRecord } from "@/lib/property/types";
 import { usePropertyAPI } from "@/services/usePropertyAPI";
 
@@ -75,6 +76,16 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
   useEffect(() => {
     setIsHidden(Boolean(property?.isHidden));
   }, [property?.isHidden]);
+
+  useEffect(() => {
+    setSelectedImageIndex(0);
+  }, [property?.propertyId]);
+
+  const images = useMemo(() => getPropertyImageUrls(property), [property]);
+  const videoEmbedUrl = useMemo(
+    () => getYouTubeEmbedUrl(getPropertyVideoLink(property)),
+    [property]
+  );
 
   const headerActions = useMemo(
     () => [
@@ -140,8 +151,7 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
     });
   };
 
-  const images = property.media?.length ? property.media : property.imageUrls || [];
-  const primaryImage = images[selectedImageIndex] || "/assets/images/propertyA.png";
+  const primaryImage = images[selectedImageIndex] || images[0] || "/assets/images/propertyA.png";
   const valuation = property.propertyValuation;
   const capRateDisplay = valuation?.capRate != null ? formatPercent(valuation.capRate) : "—";
   const progress =
@@ -233,7 +243,7 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
         <div className="flex gap-3 overflow-x-auto pb-1">
           {images.map((image, index) => (
             <button
-              key={image}
+              key={`${image}-${index}`}
               type="button"
               onClick={() => setSelectedImageIndex(index)}
               className={`relative flex-shrink-0 w-28 h-20 rounded-xl overflow-hidden border-2 transition-colors ${
@@ -243,6 +253,22 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
               <MediaImage src={image} alt={`${property.name} ${index + 1}`} fill className="object-cover" sizes="112px" />
             </button>
           ))}
+        </div>
+      )}
+
+      {videoEmbedUrl && (
+        <div className="w-full overflow-hidden rounded-2xl border border-opacityClr-30 bg-black">
+          <div className="relative w-full pt-[56.25%]">
+            <iframe
+              src={videoEmbedUrl}
+              title={`${property.name} video`}
+              className="absolute inset-0 h-full w-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="strict-origin-when-cross-origin"
+            />
+          </div>
         </div>
       )}
 

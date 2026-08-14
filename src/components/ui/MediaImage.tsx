@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 import Image, { type ImageProps } from "next/image";
+import { isPropertyVideoUrl } from "@/lib/property/media";
 
 const DIRECT_LOAD_HOSTS = ["ekobujamedia.com.ng"];
 
@@ -27,7 +28,7 @@ export function shouldLoadMediaDirectly(src: ImageProps["src"]): boolean {
 /**
  * ekobujamedia.com.ng blocks Next's optimizer. Load those URLs with a plain <img>.
  */
-export default function MediaImage({
+function MediaImage({
   unoptimized,
   fill,
   style,
@@ -41,7 +42,22 @@ export default function MediaImage({
 }: ImageProps) {
   const [failed, setFailed] = useState(false);
   const srcString = useMemo(() => resolveSrcString(src), [src]);
-  const isDirect = shouldLoadMediaDirectly(src);
+  const isDirect = useMemo(() => shouldLoadMediaDirectly(src), [src]);
+
+  if (srcString && isPropertyVideoUrl(srcString)) {
+    return (
+      <div
+        className={className}
+        style={{
+          width: fill ? "100%" : width,
+          height: fill ? "100%" : height,
+          backgroundColor: "#E8EBEB",
+          ...((style as object) || {}),
+        }}
+        aria-label={alt || "Video"}
+      />
+    );
+  }
 
   if (failed || !srcString) {
     return (
@@ -109,3 +125,8 @@ export default function MediaImage({
     />
   );
 }
+
+const MemoizedMediaImage = memo(MediaImage);
+MemoizedMediaImage.displayName = "MediaImage";
+
+export default MemoizedMediaImage;

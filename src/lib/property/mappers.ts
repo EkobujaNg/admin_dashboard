@@ -5,6 +5,7 @@ import type {
   PropertyValuationRecord,
   PropertyValuationRentalUnit,
 } from "./types";
+import { isPropertyVideoUrl, splitPropertyMedia } from "./media";
 
 type ApiProperty = Record<string, any>;
 
@@ -75,7 +76,9 @@ function normalizePropertyValuation(raw: Record<string, unknown> | null | undefi
 }
 
 export function normalizeProperty(property: ApiProperty): PropertyRecord {
-  const media = property.media || property.imageUrls || [];
+  const rawMedia = Array.isArray(property.media) && property.media.length > 0 ? property.media : property.imageUrls;
+  const media = Array.isArray(rawMedia) ? rawMedia : [];
+  const { images, videoLink } = splitPropertyMedia(media.map(String));
   const propertyId = property.propertyId || property.id || "";
   const propertyValuation = normalizePropertyValuation(property.propertyValuation);
   const sharesSold = property.numberOfSharesSold ?? property.sharesSold ?? 0;
@@ -102,8 +105,9 @@ export function normalizeProperty(property: ApiProperty): PropertyRecord {
     name: property.name || property.propertyName || "Untitled Property",
     description: property.description || "",
     aboutProperty,
-    imageUrls: media,
+    imageUrls: images.length > 0 ? images : media.filter((url) => !isPropertyVideoUrl(String(url))),
     media,
+    videoLink: videoLink || null,
     pricePerStock: property.pricePerStock ?? property.shareValue ?? 0,
     shareValue: property.shareValue ?? property.pricePerStock ?? 0,
     propertyLocation: buildLocation(property),
