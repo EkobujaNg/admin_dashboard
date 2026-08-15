@@ -11,6 +11,7 @@ import {
   DEVELOPMENT_OPTIONS,
   formatNaira,
   formatPercent,
+  getActiveRentalUnits,
   getAnnualRentForUnit,
   INFRASTRUCTURE_OPTIONS,
   PROPERTY_CLASSIFICATION_OPTIONS,
@@ -157,19 +158,60 @@ export default function PropertyValuationCalculator({
     onChange?.(state, nextResult, buildValuationPayload(state));
   };
 
-  const liveGrossRent = useMemo(() => state.rentalUnits.reduce((sum, unit) => sum + getAnnualRentForUnit(unit), 0), [state.rentalUnits]);
+  const handleIncludesRentalUnitsChange = (includesRentalUnits: boolean) => {
+    updateState({ includesRentalUnits });
+    setHasCalculated(false);
+    setResult(null);
+  };
+
+  const liveGrossRent = useMemo(
+    () => getActiveRentalUnits(state).reduce((sum, unit) => sum + getAnnualRentForUnit(unit), 0),
+    [state]
+  );
 
   return (
     <div className="flex flex-col gap-8 w-full">
       {!hideHeader && (
         <div className="flex flex-col gap-2">
-          <h2 className="text-xl font-Raleway font-bold text-primary-10">Property Valuation Calculator (Multi-Unit)</h2>
+          <h2 className="text-xl font-Raleway font-bold text-primary-10">Property Valuation Calculator</h2>
           <p className="text-sm font-Raleway font-medium text-opacityClr-80">
-            Enter rental units, operating expenses, and cap rate factors to estimate property value.
+            Enter operating expenses and cap rate factors to estimate property value. Rental units are optional.
           </p>
         </div>
       )}
 
+      <section className="flex flex-col gap-4 w-full">
+        <h3 className={sectionTitleClassName}>Rental Income</h3>
+        <p className="text-sm font-Raleway text-opacityClr-80">
+          Choose whether this property includes rental units in the valuation.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={() => handleIncludesRentalUnitsChange(true)}
+            className={`px-5 py-3 rounded-lg border font-Raleway text-sm font-semibold transition-colors ${
+              state.includesRentalUnits
+                ? "border-primary-10 bg-primary-10 text-white"
+                : "border-opacityClr-50 bg-white text-primary-10 hover:bg-opacityClr-10"
+            }`}
+          >
+            Include rental units
+          </button>
+          <button
+            type="button"
+            onClick={() => handleIncludesRentalUnitsChange(false)}
+            className={`px-5 py-3 rounded-lg border font-Raleway text-sm font-semibold transition-colors ${
+              !state.includesRentalUnits
+                ? "border-primary-10 bg-primary-10 text-white"
+                : "border-opacityClr-50 bg-white text-primary-10 hover:bg-opacityClr-10"
+            }`}
+          >
+            No rental units
+          </button>
+        </div>
+      </section>
+
+      {state.includesRentalUnits && (
       <section className="flex flex-col gap-4 w-full">
         <h3 className={sectionTitleClassName}>Rental Units</h3>
 
@@ -263,6 +305,7 @@ export default function PropertyValuationCalculator({
           </select>
         </Field>
       </section>
+      )}
 
       <section className="flex flex-col gap-4 w-full">
         <h3 className={sectionTitleClassName}>Operating Expenses (Annual)</h3>

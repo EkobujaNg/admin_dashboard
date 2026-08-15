@@ -1,6 +1,21 @@
 import type { ValuationPayload } from "./valuation";
 
-export type PropertyListingType = "residential" | "commercial" | "land";
+export type PropertyListingType =
+  | "residential"
+  | "hotel"
+  | "commercial"
+  | "industrial"
+  | "land"
+  | "other";
+
+export const PROPERTY_TYPE_VALUES = [
+  "residential",
+  "hotel",
+  "commercial",
+  "industrial",
+  "land",
+  "other",
+] as const satisfies readonly PropertyListingType[];
 
 export type PropertyDetailsState = {
   name: string;
@@ -37,8 +52,11 @@ export type UpdatePropertyPayload = Omit<CreatePropertyPayload, "numberOfShares"
 
 export const PROPERTY_LISTING_TYPE_OPTIONS: Array<{ value: PropertyListingType; label: string }> = [
   { value: "residential", label: "Residential" },
+  { value: "hotel", label: "Hotel" },
   { value: "commercial", label: "Commercial" },
+  { value: "industrial", label: "Industrial" },
   { value: "land", label: "Land" },
+  { value: "other", label: "Other" },
 ];
 
 export type PropertyValuationRentalUnit = {

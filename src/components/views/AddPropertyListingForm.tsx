@@ -95,8 +95,6 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
   const [previousPropertyType, setPreviousPropertyType] = useState<PropertyDetailsState["propertyType"]>("");
   const [isInitialized, setIsInitialized] = useState(!isEditMode);
 
-  const isResidential = details.propertyType === "residential";
-
   useEffect(() => {
     if (!isEditMode || !property) return;
 
@@ -245,19 +243,8 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
   };
 
   const validateStep3 = () => {
-    if (!isResidential) {
-      toast.error("Valuation for this property type is not available yet.");
-      return false;
-    }
     if (!hasCalculated || !valuationResult) {
       toast.error("Please calculate the property valuation before continuing.");
-      return false;
-    }
-    const hasValidRentalUnit = valuationState.rentalUnits.some(
-      (unit) => unit.unitType.trim() && unit.numberOfUnits > 0 && unit.monthlyRentPerUnit > 0
-    );
-    if (!hasValidRentalUnit) {
-      toast.error("Add at least one rental unit with a name, unit count, and monthly rent.");
       return false;
     }
     return true;
@@ -317,13 +304,11 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
   }[step];
 
   const stepDescription = {
-    1: "Choose the property type first. This determines which valuation flow you'll use.",
+    1: "Choose the property type and enter the basic listing details.",
     2: "Upload images and add the property location details.",
-    3: isResidential
-      ? isEditMode
-        ? "Update the valuation inputs and recalculate before saving."
-        : "Use the residential valuation calculator to estimate property value."
-      : "Valuation tools for this property type are coming soon.",
+    3: isEditMode
+      ? "Update the valuation inputs and recalculate before saving."
+      : "Use the valuation calculator to estimate property value. Rental units are optional.",
     4: isEditMode ? "Review your changes before saving the listing." : "Review everything before creating the listing.",
   }[step];
 
@@ -367,13 +352,6 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
                 ))}
               </select>
             </Field>
-
-            {details.propertyType && details.propertyType !== "residential" && (
-              <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-Raleway text-amber-900">
-                {getPropertyTypeLabel(details.propertyType)} listings can be created after the valuation engine for this
-                type is ready. For now, only residential properties can be fully submitted.
-              </div>
-            )}
 
             {previousPropertyType && previousPropertyType !== details.propertyType && (
               <div className="rounded-xl border border-opacityClr-20 bg-opacityClr-10 px-4 py-3 text-sm font-Raleway text-opacityClr-80">
@@ -615,35 +593,16 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
 
         {step === 3 && (
           <section className="flex flex-col gap-6 w-full">
-            {isResidential ? (
-              <PropertyValuationCalculator
-                state={valuationState}
-                onStateChange={setValuationState}
-                result={valuationResult}
-                onResultChange={setValuationResult}
-                hasCalculated={hasCalculated}
-                onHasCalculatedChange={setHasCalculated}
-                hideHeader
-                collapseAdvanced
-              />
-            ) : (
-              <div className="rounded-xl border border-opacityClr-30 bg-opacityClr-10 p-8 flex flex-col items-center gap-4 text-center">
-                <p className="text-lg font-Raleway font-bold text-primary-10">
-                  {getPropertyTypeLabel(details.propertyType)} valuation coming soon
-                </p>
-                <p className="text-sm font-Raleway text-opacityClr-80 max-w-lg">
-                  The multi-unit residential calculator is available today. Commercial and land valuation engines will
-                  use different inputs and will be added in a later phase.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => setStep(1)}
-                  className="px-5 py-3 bg-neutral-lightGreen rounded-md text-primary-10 font-Raleway text-sm font-semibold"
-                >
-                  Change property type
-                </button>
-              </div>
-            )}
+            <PropertyValuationCalculator
+              state={valuationState}
+              onStateChange={setValuationState}
+              result={valuationResult}
+              onResultChange={setValuationResult}
+              hasCalculated={hasCalculated}
+              onHasCalculatedChange={setHasCalculated}
+              hideHeader
+              collapseAdvanced
+            />
           </section>
         )}
 
@@ -727,6 +686,12 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
                 {valuationResult && (
                   <>
                     <p>
+                      <span className="text-opacityClr-60">Rental units:</span>{" "}
+                      <span className="font-semibold">
+                        {valuationState.includesRentalUnits ? "Included" : "Not included"}
+                      </span>
+                    </p>
+                    <p>
                       <span className="text-opacityClr-60">Cap rate:</span>{" "}
                       <span className="font-semibold">{formatPercent(valuationResult.capRate)}</span>
                     </p>
@@ -785,7 +750,7 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
             <button
               type="button"
               onClick={goNext}
-              disabled={isUploading || (step === 3 && !isResidential)}
+              disabled={isUploading}
               className="px-8 py-3 bg-primary-10 text-white font-Raleway font-bold rounded-lg hover:bg-primary-20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {step === 3 ? "Continue to review" : "Continue"}
@@ -793,7 +758,7 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
           ) : (
             <button
               type="submit"
-              disabled={isSubmitting || isUploading || !isResidential}
+              disabled={isSubmitting || isUploading}
               className="px-8 py-3 bg-opacityClr-100 text-white font-Raleway font-bold rounded-lg hover:bg-opacityClr-80 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {isSubmitting

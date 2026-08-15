@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { formatZodErrors } from "@/lib/validation/common";
-import type { PropertyListingType } from "./types";
+import { PROPERTY_TYPE_VALUES, type PropertyListingType } from "./types";
 
 export { formatZodErrors };
 
@@ -21,7 +21,7 @@ export const updatePropertyCommissionSchema = z.object({
 });
 
 export const propertyListingStep1Schema = z.object({
-  propertyType: z.string().trim().min(1, "Please select a property type."),
+  propertyType: z.enum(PROPERTY_TYPE_VALUES, { message: "Please select a property type." }),
   name: z.string().trim().min(1, "Please enter a property name."),
   description: z
     .string()

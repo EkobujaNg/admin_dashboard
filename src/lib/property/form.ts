@@ -76,17 +76,22 @@ export function mapPropertyToValuationState(property: PropertyRecord): {
 
   const classification = (valuation.propertyClassification || "standard") as PropertyClassification;
   const adminAdjustWith = (valuation.adminAjustWith === "minus" ? "minus" : "plus") as AdminAdjustWith;
+  const mappedRentalUnits =
+    valuation.rentalUnits.length > 0
+      ? valuation.rentalUnits.map((unit) => ({
+          id: unit.id || crypto.randomUUID(),
+          unitType: unit.unitType,
+          numberOfUnits: unit.numberOfUnits,
+          monthlyRentPerUnit: unit.monthlyRentPerUnit,
+        }))
+      : [createEmptyRentalUnit()];
+  const includesRentalUnits = valuation.rentalUnits.some(
+    (unit) => unit.unitType?.trim() && unit.numberOfUnits > 0 && unit.monthlyRentPerUnit > 0
+  );
 
   const state: ValuationFormState = {
-    rentalUnits:
-      valuation.rentalUnits.length > 0
-        ? valuation.rentalUnits.map((unit) => ({
-            id: unit.id || crypto.randomUUID(),
-            unitType: unit.unitType,
-            numberOfUnits: unit.numberOfUnits,
-            monthlyRentPerUnit: unit.monthlyRentPerUnit,
-          }))
-        : [createEmptyRentalUnit()],
+    includesRentalUnits,
+    rentalUnits: mappedRentalUnits,
     vacancy: matchSelectOption(VACANCY_OPTIONS, valuation.vacancyRate, valuation.vacancyRateName),
     securityCost: valuation.securityCost,
     maintenanceCost: valuation.maintenanceCost,

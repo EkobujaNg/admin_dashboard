@@ -19,6 +19,7 @@ export type AdminAdjustWith = "plus" | "minus";
 export type ExpenseInput = number | "";
 
 export type ValuationFormState = {
+  includesRentalUnits: boolean;
   rentalUnits: RentalUnit[];
   vacancy: SelectOption<number>;
   securityCost: ExpenseInput;
@@ -153,8 +154,20 @@ function getBaseCapRate(propertyTier: number, propertyClassification: PropertyCl
   return CAP_RATE_TABLE[propertyClassification][propertyTier] ?? CAP_RATE_TABLE.standard[propertyTier];
 }
 
+export function getActiveRentalUnits(state: ValuationFormState): RentalUnit[] {
+  if (!state.includesRentalUnits) return [];
+
+  return state.rentalUnits.filter(
+    (unit) => unit.unitType.trim() && unit.numberOfUnits > 0 && unit.monthlyRentPerUnit > 0
+  );
+}
+
+export function hasCompleteRentalUnit(state: ValuationFormState): boolean {
+  return getActiveRentalUnits(state).length > 0;
+}
+
 export function calculatePropertyValuation(state: ValuationFormState): ValuationResult {
-  const grossRent = getGrossRent(state.rentalUnits);
+  const grossRent = getGrossRent(getActiveRentalUnits(state));
 
   const totalOperatingExpenses =
     toExpenseNumber(state.securityCost) +
@@ -208,7 +221,7 @@ export function buildValuationPayload(state: ValuationFormState): ValuationPaylo
     securityRiskAdjustment: state.securityRiskAdjustment,
     infrastructureAdjustment: state.infrastructureAdjustment,
     developmentAdjustment: state.developmentAdjustment,
-    rentalUnits: state.rentalUnits.map(({ unitType, numberOfUnits, monthlyRentPerUnit }) => ({
+    rentalUnits: getActiveRentalUnits(state).map(({ unitType, numberOfUnits, monthlyRentPerUnit }) => ({
       unitType,
       numberOfUnits,
       monthlyRentPerUnit,
@@ -220,6 +233,7 @@ export function buildValuationPayload(state: ValuationFormState): ValuationPaylo
 
 export function createInitialValuationState(): ValuationFormState {
   return {
+    includesRentalUnits: true,
     rentalUnits: [createEmptyRentalUnit()],
     vacancy: VACANCY_OPTIONS[0],
     securityCost: "",
