@@ -7,6 +7,15 @@ import { store, persistor } from "@/lib/store";
 import { DrawerModalProvider } from "@/context/DrawerModalContext";
 import Drawer from "@/components/ui/Drawer";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import useIdleLogout from "@/hooks/useIdleLogout";
+import IdleTimeoutWarningModal from "@/components/ui/IdleTimeoutWarningModal";
+
+function IdleLogoutWatcher() {
+  const { showWarning, secondsRemaining, stayLoggedIn } = useIdleLogout();
+  return (
+    <IdleTimeoutWarningModal isOpen={showWarning} secondsRemaining={secondsRemaining} onStayLoggedIn={stayLoggedIn} />
+  );
+}
 
 export default function AppLayout({ children }) {
   const [queryClient] = useState(
@@ -31,6 +40,7 @@ export default function AppLayout({ children }) {
             <Toaster />
             <main>{children}</main>
             <Drawer />
+            <IdleLogoutWatcher />
           </DrawerModalProvider>
         </PersistGate>
       </Provider>
