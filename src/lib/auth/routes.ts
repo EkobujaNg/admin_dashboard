@@ -5,7 +5,9 @@ const AUTH_PUBLIC_ROUTES = [
   "/verify-code",
 ] as const;
 
-export const AUTH_COOKIE_NAME = "authToken";
+// Distinct from the other dashboards' auth cookies: cookies are shared across
+// localhost ports, so a shared name lets one app overwrite another's session.
+export const AUTH_COOKIE_NAME = "adminAuthToken";
 
 export function isAuthPublicRoute(pathname: string): boolean {
   return AUTH_PUBLIC_ROUTES.some(

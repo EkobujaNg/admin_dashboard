@@ -69,9 +69,12 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
     isUpdatingPropertyVisibility,
     addFeaturedProperty,
     isAddingFeaturedProperty,
+    featuredPropertyIds,
   } = usePropertyAPI({
     propertyId: property?.propertyId,
+    enableFeatured: true,
   });
+  const isFeatured = featuredPropertyIds.includes(property?.propertyId);
 
   useEffect(() => {
     setIsHidden(Boolean(property?.isHidden));
@@ -107,9 +110,9 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
           ),
       },
       {
-        label: "Feature Property",
+        label: isFeatured ? "Featured" : "Feature Property",
         icon: Star,
-        disabled: isAddingFeaturedProperty,
+        disabled: isFeatured || isAddingFeaturedProperty,
         onClick: () => setIsFeatureConfirmOpen(true),
       },
       {
@@ -122,6 +125,7 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
     ],
     [
       isAddingFeaturedProperty,
+      isFeatured,
       isHidden,
       isUpdatingPropertyVisibility,
       openModal,
@@ -170,7 +174,15 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
             <ArrowLeft className="text-primary-10 w-5 h-5" />
           </button>
           <div className="flex flex-col gap-1">
-            <h1 className="text-[28px] font-Raleway font-bold text-primary-10 uppercase">{property.name}</h1>
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="text-[28px] font-Raleway font-bold text-primary-10 uppercase">{property.name}</h1>
+              {isFeatured && (
+                <span className="flex items-center gap-1 rounded-full bg-[#C2DF93] px-3 py-1 text-xs font-Raleway font-bold uppercase text-primary-10">
+                  <Star className="w-3 h-3" />
+                  Featured
+                </span>
+              )}
+            </div>
             <div className="flex items-center gap-2">
               <MapPin className="text-opacityClr-60 w-4 h-4" />
               <p className="text-base font-Raleway font-normal text-opacityClr-60">{property.propertyLocation}</p>

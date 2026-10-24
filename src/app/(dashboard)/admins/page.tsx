@@ -244,7 +244,7 @@ export default function AdminsManagementPage() {
 
       <div className="flex flex-col items-start justify-center rounded-2xl border border-opacityClr-30 bg-white">
         <TableHeader
-          title={`Admins (${adminsMeta.totalRecords})`}
+          title={`Admins (${isLoadingAdmins ? "..." : adminsMeta.totalRecords})`}
           searchQuery={searchQuery}
           handleInputChange={(e) => setSearchQuery(e.target.value)}
           handleClear={() => setSearchQuery("")}

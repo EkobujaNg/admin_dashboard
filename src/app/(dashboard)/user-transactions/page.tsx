@@ -165,7 +165,7 @@ const UserTransactionsPage = () => {
 
       <div className="flex flex-col items-start justify-center rounded-2xl border border-opacityClr-30 bg-white">
         <TableHeader
-          title={`User Transactions (${walletMeta.totalRecords})`}
+          title={`User Transactions (${isLoadingWalletTransactions ? "..." : walletMeta.totalRecords})`}
           isLoading={isLoadingWalletTransactions}
           table={table}
           showSearch={false}

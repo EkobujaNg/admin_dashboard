@@ -15,6 +15,7 @@ import Dropdown from "@/components/ui/Dropdown";
 import { useDrawerModal } from "@/context/DrawerModalContext";
 import { emptyUser } from "../../../../public/assets/images";
 import useAdminLogsAPI from "@/services/useAdminLogsAPI";
+import { usePropertyAPI } from "@/services/usePropertyAPI";
 import ViewAdminLogDrawer from "@/components/views/ViewAdminLogDrawer";
 import { exportFromTable } from "@/lib/export/table-export";
 import {
@@ -59,6 +60,13 @@ export default function AdminLogsPage() {
     resourceType,
   });
 
+  // Logs only carry the resource ID; resolve property IDs to names for readability.
+  const { properties } = usePropertyAPI({ enableProperties: true, page: 1, limit: 100 });
+  const propertyNames = useMemo(
+    () => new Map((properties?.pageItems || []).map((p) => [p.propertyId || p.id, p.name])),
+    [properties]
+  );
+
   const handleViewLog = useCallback(
     (log: AdminLog) => {
       openModal("Log details", <ViewAdminLogDrawer logId={log.id} initialLog={log} />);
@@ -85,8 +93,14 @@ export default function AdminLogsPage() {
             <span className="font-Raleway text-primary-10">
               {formatAdminLogResourceType(info.row.original.resourceType)}
             </span>
-            <span className="text-xs text-gray-500 font-Raleway truncate max-w-[180px]">
-              {info.row.original.resourceId || "—"}
+            <span
+              className="text-xs text-gray-500 font-Raleway truncate max-w-[180px]"
+              title={info.row.original.resourceId || undefined}
+            >
+              {(info.row.original.resourceType === "property" &&
+                propertyNames.get(info.row.original.resourceId || "")) ||
+                info.row.original.resourceId ||
+                "—"}
             </span>
           </div>
         ),
@@ -137,7 +151,7 @@ export default function AdminLogsPage() {
         ),
       }),
     ],
-    [handleViewLog]
+    [handleViewLog, propertyNames]
   );
 
   const table = useReactTable({
@@ -198,7 +212,7 @@ export default function AdminLogsPage() {
           <div className="flex items-center gap-2">
             <ScrollText className="w-5 h-5 text-primary-10" />
             <h3 className="text-xl text-primary-10 font-Raleway font-bold leading-8 tracking-[-0.36px]">
-              Activity logs ({logsMeta.totalRecords})
+              Activity logs ({isLoadingLogs ? "..." : logsMeta.totalRecords})
             </h3>
           </div>
           <div className="flex items-center gap-2 flex-wrap justify-end">

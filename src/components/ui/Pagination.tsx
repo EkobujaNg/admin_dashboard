@@ -44,12 +44,17 @@ const Pagination = ({
   const pages = getPageNumbers();
   const showPageSize = typeof pageSize === "number" && typeof onPageSizeChange === "function";
 
+  const total = totalRecords || 0;
+  const rowsPerPage = pageSize || Math.ceil(total / Math.max(totalPages, 1)) || 0;
+  const rangeStart = total === 0 ? 0 : Math.min((currentPage - 1) * rowsPerPage + 1, total);
+  const rangeEnd = Math.min(currentPage * rowsPerPage, total);
+
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 py-4 px-6 border-t border-gray-200 w-full">
       <div className="flex flex-wrap items-center gap-4">
         <p className="text-sm text-gray-700 font-semibold">
-          Showing <span className="text-primary-10 font-bold">{currentPage}</span> -{" "}
-          <span className="text-primary-10 font-bold">{totalPages}</span> of {totalRecords || 0} {label}
+          Showing <span className="text-primary-10 font-bold">{rangeStart}</span> -{" "}
+          <span className="text-primary-10 font-bold">{rangeEnd}</span> of {total} {label}
         </p>
 
         {showPageSize && (

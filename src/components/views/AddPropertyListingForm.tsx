@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import StepProgress from "@/components/ui/StepProgress";
 import PropertyValuationCalculator from "@/components/views/PropertyValuationCalculator";
 import { createProperty, getPropertyErrorMessage, updateProperty } from "@/lib/property/api";
@@ -80,6 +80,7 @@ type PropertyListingFormProps = {
 
 export default function AddPropertyListingForm({ mode = "create", property }: PropertyListingFormProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isEditMode = mode === "edit";
   const propertyId = property?.propertyId || property?.id || "";
@@ -185,6 +186,8 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
           data?.message ||
           "Property created successfully!"
       );
+      queryClient.invalidateQueries({ queryKey: ["properties"] });
+      queryClient.invalidateQueries({ queryKey: ["property-statistics"] });
       router.push("/properties");
     },
     onError: (error: any) => {
@@ -201,6 +204,9 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
           data?.message ||
           "Property updated successfully!"
       );
+      queryClient.invalidateQueries({ queryKey: ["properties"] });
+      queryClient.invalidateQueries({ queryKey: ["property-statistics"] });
+      queryClient.invalidateQueries({ queryKey: ["property", propertyId] });
       router.push(`/properties/${propertyId}`);
     },
     onError: (error: any) => {

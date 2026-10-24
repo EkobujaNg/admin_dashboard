@@ -83,6 +83,7 @@ const PropertyCard = memo(({ property }: { property?: any }) => {
                 : "bg-amber-100 border-amber-200 hover:bg-transparent hover:border-[#E8EBEB]"
             }`}
             title={isHidden ? "Show property" : "Hide property"}
+            aria-label={isHidden ? "Show property" : "Hide property"}
           >
             {isHidden ? (
               <Eye className="group-hover:text-opacityClr-10 text-primary-10" />
@@ -113,6 +114,7 @@ const PropertyCard = memo(({ property }: { property?: any }) => {
             <button
               type="button"
               onClick={() => router.push(`/properties/${property.propertyId}`)}
+              aria-label={`View ${property.propertyName || "property"}`}
               className="bg-[#C2DF93] hidden md:flex items-center justify-center gap-2 p-2 h-[50px] w-[50px] rounded-full border border-neutral-lightGreen transition-all duration-500 hover:bg-transparent hover:border-[#E8EBEB] group cursor-pointer shrink-0"
             >
               <ArrowUpRight className="group-hover:text-opacityClr-10" />

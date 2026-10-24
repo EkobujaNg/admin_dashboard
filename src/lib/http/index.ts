@@ -53,7 +53,7 @@ function forceLogout() {
     store.dispatch(logout());
   }
 
-  // Clear the authToken cookie
+  // Clear the auth cookie
   destroyCookie(null, AUTH_COOKIE_NAME, { path: "/" });
 
   toast.error("Session expired. Please log in again.");
