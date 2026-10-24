@@ -179,7 +179,7 @@ export default function PropertyTransactionsTab({ propertyId }: PropertyTransact
 
       <div className="flex flex-col items-start justify-center rounded-2xl border border-opacityClr-30 bg-white">
         <TableHeader
-          title={`${marketLabel} transactions (${propertyMarketMeta.totalRecords})`}
+          title={`${marketLabel} transactions (${isLoadingPropertyMarketTransactions ? "..." : propertyMarketMeta.totalRecords})`}
           isLoading={isLoadingPropertyMarketTransactions}
           table={table}
           showSearch={false}

@@ -10,6 +10,7 @@ import {
   setPropertyVisibility as setPropertyVisibilityRequest,
   updatePropertyCommission as updatePropertyCommissionRequest,
   addFeaturedProperty as addFeaturedPropertyRequest,
+  getFeaturedPropertyIds,
 } from "@/lib/property/api";
 import type { CreatePropertyPayload } from "@/lib/property/types";
 
@@ -21,6 +22,7 @@ type UsePropertyAPIOptions = {
   enableProperties?: boolean;
   enableStatistics?: boolean;
   enablePropertyDetail?: boolean;
+  enableFeatured?: boolean;
 };
 
 export const usePropertyAPI = ({
@@ -31,6 +33,7 @@ export const usePropertyAPI = ({
   enableProperties = false,
   enableStatistics = false,
   enablePropertyDetail = false,
+  enableFeatured = false,
 }: UsePropertyAPIOptions = {}) => {
   const queryClient = useQueryClient();
   const trimmedSearch = searchTerm.trim();
@@ -40,6 +43,12 @@ export const usePropertyAPI = ({
     queryKey: ["properties", page, limit, nameFilter],
     queryFn: () => getProperties({ page, limit, name: nameFilter }),
     enabled: enableProperties,
+  });
+
+  const featuredQuery = useQuery({
+    queryKey: ["properties", "featured"],
+    queryFn: getFeaturedPropertyIds,
+    enabled: enableFeatured,
   });
 
   const statisticsQuery = useQuery({
@@ -236,6 +245,8 @@ export const usePropertyAPI = ({
     isLoadingPropertyDetail: propertyDetailQuery.isLoading,
     propertyDetailError: propertyDetailQuery.error,
     refetchPropertyDetail: propertyDetailQuery.refetch,
+
+    featuredPropertyIds: featuredQuery.data ?? [],
 
     propertyStatistics: statisticsQuery.data ?? null,
     isLoadingStatistics: statisticsQuery.isLoading,

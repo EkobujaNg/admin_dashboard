@@ -98,6 +98,17 @@ export async function updatePropertyCommission(
   return unwrapData(data);
 }
 
+export async function getFeaturedPropertyIds(): Promise<string[]> {
+  const { data } = await http.get<Record<string, unknown> | { data: Record<string, unknown> }>(
+    "/properties/featured"
+  );
+  const payload = unwrapData(data) as { items?: Array<{ id?: string; propertyId?: string }> } | unknown[];
+  const items = Array.isArray(payload) ? payload : payload?.items ?? [];
+  return (items as Array<{ id?: string; propertyId?: string }>)
+    .map((item) => item.propertyId || item.id || "")
+    .filter(Boolean);
+}
+
 export async function addFeaturedProperty(propertyId: string): Promise<CreatePropertyResponse> {
   const { data } = await http.post<CreatePropertyResponse | { data: CreatePropertyResponse }>(
     "/properties/featured",

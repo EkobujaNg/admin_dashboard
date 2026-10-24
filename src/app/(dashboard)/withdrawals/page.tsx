@@ -216,7 +216,7 @@ const WithdrawalsPage = () => {
 
       <div className="flex flex-col items-start justify-center rounded-2xl border border-opacityClr-30 bg-white">
         <TableHeader
-          title={`Requests (${requestsMeta.totalRecords})`}
+          title={`Requests (${isLoadingRequests ? "..." : requestsMeta.totalRecords})`}
           isLoading={isLoadingRequests}
           table={table}
           showSearch={false}
