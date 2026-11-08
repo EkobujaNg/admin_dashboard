@@ -11,15 +11,15 @@ import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import EditTaskDrawerContent from "@/components/views/EditTaskDrawerContent";
 import CreateTaskDrawer from "@/components/views/CreateTaskDrawer";
 import { taskTableData } from "@/data";
+import { flexRender } from "@tanstack/react-table";
 import {
-  createColumnHelper,
-  flexRender,
+  legacyCreateColumnHelper as createColumnHelper,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+  useLegacyTable as useReactTable,
+} from "@tanstack/react-table/legacy";
 
 const TaskLists = () => {
   const { openModal, closeModal } = useDrawerModal();
@@ -126,7 +126,7 @@ const TaskLists = () => {
     getFilteredRowModel: getFilteredRowModel(),
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    initialState: { pagination: { pageSize: 10 } },
+    initialState: { pagination: { pageIndex: 0, pageSize: 10 } },
   });
 
   return (

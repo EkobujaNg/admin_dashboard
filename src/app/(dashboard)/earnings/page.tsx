@@ -16,12 +16,12 @@ import type { CommissionRecord } from "@/lib/transactions/types";
 import type { UnownedProfitHistoryEntry } from "@/lib/profit-sharing/types";
 import { Eye } from "lucide-react";
 import {
-  createColumnHelper,
+  legacyCreateColumnHelper as createColumnHelper,
   getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+  useLegacyTable as useReactTable,
+} from "@tanstack/react-table/legacy";
 
 type EarningsTab = "commissions" | "unowned-history";
 

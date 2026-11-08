@@ -7,12 +7,12 @@ import Pagination from "@/components/ui/Pagination";
 import ActionDropdown from "@/components/ui/ActionDropdown";
 import { Eye, UserX, Check } from "lucide-react";
 import {
-  createColumnHelper,
+  legacyCreateColumnHelper as createColumnHelper,
   getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+  useLegacyTable as useReactTable,
+} from "@tanstack/react-table/legacy";
 import TableHeadAndBody from "@/components/ui/TableHeadAndBody";
 import TableHeader from "@/components/ui/TableHeader";
 import { emptyUser } from "../../../../public/assets/images";

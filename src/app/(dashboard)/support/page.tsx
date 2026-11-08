@@ -12,7 +12,13 @@ import useSupportAPI from "@/services/useSupportAPI";
 import useAccountDeletionAPI from "@/services/useAccountDeletionAPI";
 import type { ContactSubmission, SupportTicket, SupportTicketStatus } from "@/lib/support/types";
 import type { AccountDeletionRequest } from "@/lib/account-deletion/api";
-import { createColumnHelper, getCoreRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
+import {
+  legacyCreateColumnHelper as createColumnHelper,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useLegacyTable as useReactTable,
+} from "@tanstack/react-table/legacy";
 
 const contactColumnHelper = createColumnHelper<ContactSubmission>();
 const ticketColumnHelper = createColumnHelper<SupportTicket>();

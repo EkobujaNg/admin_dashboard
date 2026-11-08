@@ -16,12 +16,12 @@ import useFacilityManagerAPI from "@/services/useFacilityManagerAPI";
 import type { FacilityManagerRecord } from "@/lib/facility-manager/types";
 import { useDebounce } from "use-debounce";
 import {
-  createColumnHelper,
+  legacyCreateColumnHelper as createColumnHelper,
   getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+  useLegacyTable as useReactTable,
+} from "@tanstack/react-table/legacy";
 
 const columnHelper = createColumnHelper<FacilityManagerRecord>();
 

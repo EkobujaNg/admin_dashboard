@@ -3,10 +3,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Eye } from "lucide-react";
 import {
-  createColumnHelper,
+  legacyCreateColumnHelper as createColumnHelper,
   getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+  useLegacyTable as useReactTable,
+} from "@tanstack/react-table/legacy";
 import TableHeadAndBody from "@/components/ui/TableHeadAndBody";
 import TableHeader from "@/components/ui/TableHeader";
 import Pagination from "@/components/ui/Pagination";

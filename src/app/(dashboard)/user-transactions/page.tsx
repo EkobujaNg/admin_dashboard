@@ -11,12 +11,12 @@ import useTransactionsAPI from "@/services/useTransactionsAPI";
 import type { WalletTransaction } from "@/lib/transactions/types";
 import { Eye } from "lucide-react";
 import {
-  createColumnHelper,
+  legacyCreateColumnHelper as createColumnHelper,
   getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+  useLegacyTable as useReactTable,
+} from "@tanstack/react-table/legacy";
 
 const columnHelper = createColumnHelper<WalletTransaction>();
 

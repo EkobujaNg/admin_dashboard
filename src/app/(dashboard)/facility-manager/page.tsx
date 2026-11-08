@@ -11,15 +11,15 @@ import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import EditFacilityManagerDrawer from "@/components/views/EditFacilityManagerDrawer";
 import CreateFacilityManagerDrawer from "@/components/views/CreateFacilityManagerDrawer";
 import { facilityManagerTableData } from "@/data";
+import { flexRender } from "@tanstack/react-table";
 import {
-  createColumnHelper,
-  flexRender,
+  legacyCreateColumnHelper as createColumnHelper,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+  useLegacyTable as useReactTable,
+} from "@tanstack/react-table/legacy";
 
 const FacilityManager = () => {
   const { openModal, closeModal } = useDrawerModal();
@@ -129,7 +129,7 @@ const FacilityManager = () => {
     getFilteredRowModel: getFilteredRowModel(),
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    initialState: { pagination: { pageSize: 10 } },
+    initialState: { pagination: { pageIndex: 0, pageSize: 10 } },
   });
 
   return (

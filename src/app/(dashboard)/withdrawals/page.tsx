@@ -5,12 +5,12 @@ import StatsCard from "@/components/ui/StatsCard";
 import Pagination from "@/components/ui/Pagination";
 import { Eye } from "lucide-react";
 import {
-  createColumnHelper,
+  legacyCreateColumnHelper as createColumnHelper,
   getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+  useLegacyTable as useReactTable,
+} from "@tanstack/react-table/legacy";
 import TableHeadAndBody from "@/components/ui/TableHeadAndBody";
 import TableHeader from "@/components/ui/TableHeader";
 import { emptyWallet } from "../../../../public/assets/images";

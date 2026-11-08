@@ -3,12 +3,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  createColumnHelper,
+  legacyCreateColumnHelper as createColumnHelper,
   getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+  useLegacyTable as useReactTable,
+} from "@tanstack/react-table/legacy";
 import TableHeadAndBody from "@/components/ui/TableHeadAndBody";
 import TableHeader from "@/components/ui/TableHeader";
 import Pagination from "@/components/ui/Pagination";

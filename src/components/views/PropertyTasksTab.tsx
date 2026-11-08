@@ -3,12 +3,12 @@
 import React, { useMemo, useState } from "react";
 import { Eye } from "lucide-react";
 import {
-  createColumnHelper,
+  legacyCreateColumnHelper as createColumnHelper,
   getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+  useLegacyTable as useReactTable,
+} from "@tanstack/react-table/legacy";
 import TableHeadAndBody from "@/components/ui/TableHeadAndBody";
 import TableHeader from "@/components/ui/TableHeader";
 import Pagination from "@/components/ui/Pagination";
@@ -149,7 +149,7 @@ export default function PropertyTasksTab({ propertyId }: PropertyTasksTabProps) 
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    initialState: { pagination: { pageSize: 10 } },
+    initialState: { pagination: { pageIndex: 0, pageSize: 10 } },
   });
 
   const hasData = filteredTasks.length > 0;

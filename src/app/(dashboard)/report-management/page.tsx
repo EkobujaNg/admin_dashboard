@@ -11,15 +11,15 @@ import { useDrawerModal } from "@/context/DrawerModalContext";
 import TableHeadAndBody from "@/components/ui/TableHeadAndBody";
 import { emptyUser } from "../../../../public/assets/images";
 import { reportTableData } from "@/data";
+import { flexRender } from "@tanstack/react-table";
 import {
-  createColumnHelper,
-  flexRender,
+  legacyCreateColumnHelper as createColumnHelper,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+  useLegacyTable as useReactTable,
+} from "@tanstack/react-table/legacy";
 
 const ReportManagementPage = () => {
   const { openModal } = useDrawerModal();
@@ -110,7 +110,7 @@ const ReportManagementPage = () => {
     getFilteredRowModel: getFilteredRowModel(),
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    initialState: { pagination: { pageSize: 10 } },
+    initialState: { pagination: { pageIndex: 0, pageSize: 10 } },
   });
 
   const renderPagination = (tableInstance: any) => {

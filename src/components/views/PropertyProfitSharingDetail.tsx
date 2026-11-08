@@ -3,12 +3,12 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Building2, Loader2 } from "lucide-react";
 import {
-  createColumnHelper,
+  legacyCreateColumnHelper as createColumnHelper,
   getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+  useLegacyTable as useReactTable,
+} from "@tanstack/react-table/legacy";
 import TabButton from "@/components/ui/TabButton";
 import TableHeader from "@/components/ui/TableHeader";
 import TableHeadAndBody from "@/components/ui/TableHeadAndBody";
