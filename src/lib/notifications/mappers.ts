@@ -144,7 +144,7 @@ export function formatNotificationRelativeTime(value?: string | null): string {
 
 const CATEGORY_LABELS: Record<string, string> = {
   wallet_payments: "Wallet & payments",
-  primary_market: "Primary market",
+  primary_market: "New listings",
   secondary_market: "Secondary market",
   buyback: "Buyback",
   profit_sharing: "Profit sharing",
@@ -157,7 +157,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 const CATEGORY_DESCRIPTIONS: Record<string, string> = {
   wallet_payments: "Deposits, withdrawals, and wallet activity.",
-  primary_market: "Primary market investments and order updates.",
+  primary_market: "New listing purchases and updates.",
   secondary_market: "Secondary market trades and listing updates.",
   buyback: "Buyback offers and related activity.",
   profit_sharing: "Profit share loads and distributions.",
