@@ -4,8 +4,7 @@ import { toast } from "sonner";
 import { parseCookies, setCookie, destroyCookie } from "nookies";
 import { AUTH_COOKIE_NAME } from "@/lib/auth/routes";
 
-// const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-const API_BASE_URL = "/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "");
 
 const http = axios.create({
   baseURL: API_BASE_URL,

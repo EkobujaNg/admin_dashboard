@@ -1,23 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  async rewrites() {
-    const backendUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "");
-
-    if (!backendUrl) {
-      console.warn("NEXT_PUBLIC_API_BASE_URL is not set — API rewrites disabled.");
-      return [];
-    }
-
-    return [
-      {
-        // Browser calls /api/auth/register/initiate
-        // Proxied to https://ekobuja-be.onrender.com/auth/register/initiate
-        source: "/api/:path*",
-        destination: `${backendUrl}/:path*`,
-      },
-    ];
-  },
-
   images: {
     remotePatterns: [
       {

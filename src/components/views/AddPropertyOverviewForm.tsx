@@ -1,7 +1,9 @@
 // src/components/AddPropertyOverviewForm.jsx
 "use client";
 import React, { useState, useRef, useImperativeHandle, forwardRef } from "react";
+import { parseCookies } from "nookies";
 import { usePropertyAPI } from "@/services/usePropertyAPI";
+import { AUTH_COOKIE_NAME } from "@/lib/auth/routes";
 import { PROPERTY_LISTING_TYPE_OPTIONS } from "@/lib/property/types";
 
 const AddPropertyOverviewForm = forwardRef(({ onSuccess }: { onSuccess?: () => void }, ref) => {
@@ -51,11 +53,16 @@ const AddPropertyOverviewForm = forwardRef(({ onSuccess }: { onSuccess?: () => v
     thumbnailImageUrl: images[thumbnailIdx] || (images.length > 0 ? images[0] : ""),
   });
 
-  // ✅ Upload image to Cloudinary (via API route)
   const uploadImageToCloudinary = async (file) => {
     const body = new FormData();
     body.append("file", file);
-    const response = await fetch("/api/Media/upload", { method: "POST", body });
+    const token = parseCookies()[AUTH_COOKIE_NAME];
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "");
+    const response = await fetch(`${apiBaseUrl}/Media/upload`, {
+      method: "POST",
+      body,
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    });
     const data = await response.json();
     if (!response.ok) throw new Error(data.responseMessage || "Upload failed");
     return data.data.secureUrl;
