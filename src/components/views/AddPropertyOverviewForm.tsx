@@ -211,9 +211,9 @@ const AddPropertyOverviewForm = forwardRef(({ onSuccess }: { onSuccess?: () => v
         />
       </div>
 
-      {/* Price Per Stock */}
+      {/* Price per share */}
       <div className="flex flex-col gap-2">
-        <label className="font-semibold">Price Per Stock *</label>
+        <label className="font-semibold">Price per share *</label>
         <div className="flex items-center gap-2">
           <span className="px-3 py-3 border rounded-l bg-opacityClr-20">₦</span>
           <input
@@ -221,7 +221,7 @@ const AddPropertyOverviewForm = forwardRef(({ onSuccess }: { onSuccess?: () => v
             name="pricePerStock"
             value={formData.pricePerStock}
             onChange={handleChange}
-            placeholder="Enter price per stock"
+            placeholder="Enter price per share"
             required
             className="w-full border rounded-r-lg p-3 outline-none"
           />

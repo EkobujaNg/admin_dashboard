@@ -97,7 +97,7 @@ const PropertyCard = memo(({ property }: { property?: any }) => {
           <div className="flex items-start justify-between gap-4 w-full">
             <div className="flex flex-col items-start gap-3 min-w-0 flex-1">
               <h3 className="font-Raleway font-bold text-base text-opacity-100 leading-[140%]">
-                {priceDisplay} <span className="text-opacityClr-60">/stock</span>
+                {priceDisplay} <span className="text-opacityClr-60">per share</span>
               </h3>
 
               <div className="flex items-start gap-2 w-full">

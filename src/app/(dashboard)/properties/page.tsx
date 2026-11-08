@@ -75,7 +75,7 @@ const PropertiesPage = () => {
           footerText={`Starts from ${formatDate(propertyStatistics?.startDate)}`}
         />
         <StatsCard
-          title="Total Units Of Stocks"
+          title="Total shares issued"
           count={isLoadingStatistics ? "..." : propertyStatistics?.totalStocks?.toString() || "0"}
           textColor="#1d3638"
           bodyBg="#EFF1F1"
@@ -83,7 +83,7 @@ const PropertiesPage = () => {
           footerText={`Starts from ${formatDate(propertyStatistics?.startDate)}`}
         />
         <StatsCard
-          title="Inactive Stocks"
+          title="Inactive shares"
           count={isLoadingStatistics ? "..." : propertyStatistics?.inactiveStocks?.toString() || "0"}
           textColor="#1d3638"
           bodyBg="#EFF1F1"
