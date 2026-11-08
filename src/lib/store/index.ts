@@ -6,7 +6,8 @@ import authReducer from "./slices/authSlice";
 import { injectStore } from "@/lib/http";
 
 const persistConfig = {
-  key: "auth",
+  // Separate from user-auth and fm-auth. localStorage is shared by every app on the same origin.
+  key: "admin-auth",
   storage,
   whitelist: ["authToken", "refreshToken", "user", "isAuthenticated", "initiateEmail"],
 };

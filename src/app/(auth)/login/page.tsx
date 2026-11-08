@@ -55,6 +55,7 @@ const Login = () => {
           maxAge: rememberMe ? 10 * 24 * 60 * 60 : 7 * 24 * 60 * 60,
           path: "/",
           sameSite: "lax",
+          secure: process.env.NODE_ENV === "production",
         });
         router.push(getSafeRedirect(searchParams.get("from"), AUTHENTICATED_HOME));
       },

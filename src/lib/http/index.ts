@@ -91,6 +91,7 @@ async function refreshAccessToken() {
       maxAge: 7 * 24 * 60 * 60,
       path: "/",
       sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
     });
 
     if (store) {
@@ -104,16 +105,40 @@ async function refreshAccessToken() {
   }
 }
 
+// Endpoints where a 401 means "wrong credentials / code", not "session expired".
+// Their callers show the error themselves, so never refresh or force a logout here.
+const PUBLIC_AUTH_PATHS = [
+  "/auth/login",
+  "/auth/forgot-password",
+  "/auth/refresh",
+  "/auth/sign-out",
+];
+
+// Authenticated endpoints that also return 401 for a wrong password. An expired
+// access token is still refreshed, but a 401 after that is left to the caller
+// instead of logging the user out.
+const CREDENTIAL_CHECK_PATHS = ["/auth/change-password"];
+
+function matchesPath(url, paths) {
+  const path = (url || "").split("?")[0];
+  return paths.some((p) => path === p || path.startsWith(`${p}/`));
+}
+
 // Helper: Handle response errors
 async function handleResponseError(error) {
   const originalRequest = error.config;
-  const isRefreshCall = Boolean(originalRequest?.url?.includes("/auth/refresh"));
+  const isPublicAuthCall = matchesPath(originalRequest?.url, PUBLIC_AUTH_PATHS);
+  const isCredentialCheck = matchesPath(originalRequest?.url, CREDENTIAL_CHECK_PATHS);
   const refreshToken = store?.getState()?.auth?.refreshToken;
 
   if (error.response) {
     const status = error.response.status;
 
-    if (status === 401 && originalRequest && !originalRequest._retry && !isRefreshCall && refreshToken) {
+    if (status === 401 && isPublicAuthCall) {
+      return Promise.reject(error);
+    }
+
+    if (status === 401 && originalRequest && !originalRequest._retry && refreshToken) {
       originalRequest._retry = true;
 
       if (isRefreshing) {
@@ -134,6 +159,7 @@ async function handleResponseError(error) {
     }
 
     if (status === 401) {
+      if (isCredentialCheck) return Promise.reject(error);
       forceLogout();
     } else if (status === 500) {
       toast.error("Server error, please try again later.");

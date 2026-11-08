@@ -5,7 +5,15 @@ import { AUTH_COOKIE_NAME, isAuthPublicRoute } from "./routes";
 export const AUTHENTICATED_HOME = "/overview";
 
 export function getSafeRedirect(path: string | null | undefined, fallback: string) {
-  if (!path || !path.startsWith("/") || path.startsWith("//") || isAuthPublicRoute(path)) {
+  // Browsers treat "/\evil.com" like "//evil.com" and strip tabs/newlines, so reject
+  // backslashes and control characters as well as protocol-relative paths.
+  if (
+    !path ||
+    !path.startsWith("/") ||
+    path.startsWith("//") ||
+    /[\\\u0000-\u001f\u007f]/.test(path) ||
+    isAuthPublicRoute(path)
+  ) {
     return fallback;
   }
   return path;
