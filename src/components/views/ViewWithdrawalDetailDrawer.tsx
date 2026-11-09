@@ -14,6 +14,17 @@ import useWithdrawalsAPI from "@/services/useWithdrawalsAPI";
 import { formatZodErrors, withdrawalRejectReasonSchema } from "@/lib/withdrawals/validation";
 import { toast } from "sonner";
 
+/**
+ * Ready-made rejection reasons. The selected text is sent as-is and shown to the investor,
+ * so each one says what happened and what to do next. Admins can still edit or write their own.
+ */
+const PRESET_REJECTION_REASONS = [
+  "Not enough available balance when the request was reviewed.",
+  "Your bank account details could not be verified. Please check them and request again.",
+  "The bank account name doesn't match your EkoBuja profile. Add an account in your own name and request again.",
+  "Your identity verification isn't complete. Finish it in Settings, then request again.",
+];
+
 type ViewWithdrawalDetailDrawerProps = {
   requestId: string;
   closeModal?: () => void;
@@ -244,13 +255,34 @@ const ViewWithdrawalDetailDrawer = ({ requestId, closeModal }: ViewWithdrawalDet
         confirmDisabled={isConfirmPending || (isRejectFlow && !canConfirmReject)}
       >
         {isRejectFlow ? (
-          <textarea
-            value={rejectReason}
-            onChange={(e) => setRejectReason(e.target.value)}
-            placeholder="Reason for rejection"
-            rows={3}
-            className="w-full rounded-xl border border-opacityClr-50 px-3 py-2.5 text-sm font-Raleway text-primary-10 outline-none focus:border-primary-10 resize-none"
-          />
+          <div className="flex flex-col gap-3 text-left">
+            <p className="text-xs font-Raleway font-semibold text-opacityClr-80">
+              Pick a reason (the investor sees this) or write your own:
+            </p>
+            <div className="flex flex-col gap-2">
+              {PRESET_REJECTION_REASONS.map((reason) => (
+                <button
+                  key={reason}
+                  type="button"
+                  onClick={() => setRejectReason(reason)}
+                  className={`text-left rounded-lg border px-3 py-2 text-xs font-Raleway transition-colors ${
+                    rejectReason === reason
+                      ? "border-primary-10 bg-opacityClr-10 text-primary-10"
+                      : "border-opacityClr-30 text-opacityClr-80 hover:border-primary-10"
+                  }`}
+                >
+                  {reason}
+                </button>
+              ))}
+            </div>
+            <textarea
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              placeholder="Or write your own reason"
+              rows={3}
+              className="w-full rounded-xl border border-opacityClr-50 px-3 py-2.5 text-sm font-Raleway text-primary-10 outline-none focus:border-primary-10 resize-none"
+            />
+          </div>
         ) : null}
       </ConfirmationModal>
     </div>
