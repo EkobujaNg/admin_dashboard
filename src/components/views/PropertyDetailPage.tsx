@@ -228,7 +228,7 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
             </div>
 
             <div className="flex flex-col gap-2">
-              <p className="text-sm font-Raleway font-medium text-white/70">Ekobuja Value</p>
+              <p className="text-sm font-Raleway font-medium text-white/70">EkoBuja Value</p>
               <p className="text-2xl font-Raleway font-bold text-white">
                 {valuation ? formatNaira(valuation.ekobujaValue) : "—"}
               </p>

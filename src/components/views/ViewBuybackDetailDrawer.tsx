@@ -173,7 +173,7 @@ const ViewBuybackDetailDrawer = ({ requestId, closeModal }: ViewBuybackDetailDra
 
         <Section title="Buyback Rate" icon={Percent}>
           <DetailRow
-            label="Ekobuja Buyback %"
+            label="EkoBuja Buyback %"
             value={`${Number(requestDetail.ekobujaBuyBackPercent || 0)}%`}
           />
           <DetailRow label="Buyback Rate Per Unit" value={formatMoney(requestDetail.buybackRatePerUnit)} />
