@@ -154,10 +154,10 @@ const BuybackPage = () => {
     <section className="flex flex-col gap-6">
       <div className="flex flex-col gap-1 items-start">
         <h2 className="text-primary-10 font-Raleway font-bold text-[28px]">
-          Ekobuja <span className="text-primary-20">Buyback</span>
+          EkoBuja <span className="text-primary-20">Buyback</span>
         </h2>
         <p className="text-primary-10 font-Raleway text-sm">
-          Review users who sold shares back to Ekobuja
+          Review users who sold shares back to EkoBuja
         </p>
       </div>
 
