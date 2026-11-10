@@ -39,14 +39,17 @@ const PropertiesPage = () => {
 
   const displayProperties = properties?.pageItems || [];
 
+  // "Since <date>" when known; nothing instead of "Starts from N/A".
+  const sinceLabel = propertyStatistics?.startDate ? `Since ${formatDate(propertyStatistics.startDate)}` : "\u00a0";
+
   return (
     <section className="flex flex-col gap-6 pb-5">
       <div className="flex flex-wrap items-center justify-between w-full gap-4">
         <div>
           <h2 className="text-[28px] font-Raleway font-bold text-primary-10">
-            Property <span className="text-primary-20">Listings</span>
+            <span className="text-primary-20">Properties</span>
           </h2>
-          <p className="text-sm font-Raleway font-medium text-primary-10">Create and manage your properties across all users</p>
+          <p className="text-sm font-Raleway font-medium text-primary-10">Create listings, set valuations, and control what investors can see.</p>
         </div>
         <Link
           href="/properties/add"
@@ -59,36 +62,36 @@ const PropertiesPage = () => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 w-full">
         <StatsCard
-          title="Total Property Listed"
+          title="Properties listed"
           count={isLoadingStatistics ? "..." : propertyStatistics?.totalProperties?.toString() || "0"}
           textColor="#1d3638"
           bodyBg="#C2DF93"
           footerBg="#DAECBE"
-          footerText={`Starts from ${formatDate(propertyStatistics?.startDate)}`}
+          footerText={sinceLabel}
         />
         <StatsCard
-          title="Active Property"
+          title="Open for investment"
           count={isLoadingStatistics ? "..." : propertyStatistics?.activeProperties?.toString() || "0"}
           textColor="#1d3638"
           bodyBg="#EFF1F1"
           footerBg="#E1E7E7"
-          footerText={`Starts from ${formatDate(propertyStatistics?.startDate)}`}
+          footerText={sinceLabel}
         />
         <StatsCard
           title="Total shares issued"
-          count={isLoadingStatistics ? "..." : propertyStatistics?.totalStocks?.toString() || "0"}
+          count={isLoadingStatistics ? "..." : (propertyStatistics?.totalStocks ?? 0).toLocaleString()}
           textColor="#1d3638"
           bodyBg="#EFF1F1"
           footerBg="#E1E7E7"
-          footerText={`Starts from ${formatDate(propertyStatistics?.startDate)}`}
+          footerText={sinceLabel}
         />
         <StatsCard
-          title="Inactive shares"
-          count={isLoadingStatistics ? "..." : propertyStatistics?.inactiveStocks?.toString() || "0"}
+          title="Shares unsold"
+          count={isLoadingStatistics ? "..." : (propertyStatistics?.inactiveStocks ?? 0).toLocaleString()}
           textColor="#1d3638"
           bodyBg="#EFF1F1"
           footerBg="#E1E7E7"
-          footerText={`Starts from ${formatDate(propertyStatistics?.startDate)}`}
+          footerText={sinceLabel}
         />
       </div>
 

@@ -28,21 +28,21 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen: any; setIsOpen:
   const pathname = usePathname();
 
   const links: Array<{ href: string; label: string; icon: LucideIcon }> = [
-    { href: "/overview", label: "Overview", icon: LayoutDashboard },
-    { href: "/accounts", label: "Accounts", icon: Users },
+    { href: "/overview", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/accounts", label: "Investors", icon: Users },
     { href: "/properties", label: "Properties", icon: Building2 },
-    { href: "/earnings", label: "Earnings", icon: Banknote },
-    { href: "/user-transactions", label: "User Transactions", icon: ArrowLeftRight },
-    { href: "/profit-sharing", label: "Profit Sharing", icon: PieChart },
+    { href: "/earnings", label: "Platform earnings", icon: Banknote },
+    { href: "/user-transactions", label: "Investor transactions", icon: ArrowLeftRight },
+    { href: "/profit-sharing", label: "Profit sharing", icon: PieChart },
     { href: "/withdrawals", label: "Withdrawals", icon: ArrowDownToLine },
     { href: "/buyback", label: "Buyback", icon: RefreshCcw },
-    { href: "/admins", label: "Admins", icon: Shield },
-    { href: "/admin-logs", label: "Admin Logs", icon: ScrollText },
-    { href: "/facility-admin", label: "FM Manager", icon: ClipboardList },
+    { href: "/admins", label: "Team", icon: Shield },
+    { href: "/admin-logs", label: "Audit log", icon: ScrollText },
+    { href: "/facility-admin", label: "Facility managers", icon: ClipboardList },
   ];
 
   const bottomLinks: Array<{ href: string; label: string; icon: LucideIcon }> = [
-    { href: "/support", label: "Help & Support", icon: MessageCircle },
+    { href: "/support", label: "Support", icon: MessageCircle },
     { href: "/settings", label: "Settings", icon: Settings },
   ];
 

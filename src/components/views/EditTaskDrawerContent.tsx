@@ -16,8 +16,6 @@ const options = [
 ];
 
 const EditTaskDrawerContent = ({ task, handleDelete }: { task?: any; handleDelete?: any }) => {
-  if (!task) return null;
-
   const animatedComponents = makeAnimated();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -28,6 +26,8 @@ const EditTaskDrawerContent = ({ task, handleDelete }: { task?: any; handleDelet
   });
 
   useEffect(() => {
+    if (!task) return;
+
     setFormData({
       taskName: task.taskName || "",
       taskDate: task.date ? task.date.split("T")[0] : "",
@@ -35,6 +35,8 @@ const EditTaskDrawerContent = ({ task, handleDelete }: { task?: any; handleDelet
       assignedProperties: task.assignedProperties || [],
     });
   }, [task]);
+
+  if (!task) return null;
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

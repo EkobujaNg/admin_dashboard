@@ -30,7 +30,6 @@ const Header = memo(({ toggleSidebar }: { toggleSidebar: any }) => {
   const user = useSelector((state: { auth: { user: AuthUser | null } }) => state.auth.user);
   useAdminProfileAPI({ enableProfile: true });
   const { unreadCount } = useNotificationsAPI({ enableUnreadCount: true });
-  const [greeting, setGreeting] = useState("Hello");
   const [mounted, setMounted] = useState(false);
 
   const displayName = useMemo(() => displayNameFromUser(user), [user]);
@@ -39,14 +38,6 @@ const Header = memo(({ toggleSidebar }: { toggleSidebar: any }) => {
   // Prevent Hydration errors
   useEffect(() => {
     setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    const currentHour = new Date().getHours();
-    if (currentHour >= 5 && currentHour < 12) setGreeting("Good morning");
-    else if (currentHour >= 12 && currentHour < 17) setGreeting("Good afternoon");
-    else if (currentHour >= 17 && currentHour < 21) setGreeting("Good evening");
-    else setGreeting("Good night");
   }, []);
 
   return (
@@ -59,14 +50,11 @@ const Header = memo(({ toggleSidebar }: { toggleSidebar: any }) => {
 
           <div className="min-w-0">
             <h1 className="text-base md:text-lg font-semibold text-gray-800 truncate">
-              {mounted ? greeting : "Hello"}, {mounted ? displayName : "Admin"}
+              {mounted ? displayName : "Admin"}
+              {mounted && roleLabel ? ` · ${roleLabel}` : ""}
             </h1>
-            {(user?.email || roleLabel) && (
-              <p className="hidden sm:block text-primary-10 text-xs font-semibold font-geist truncate">
-                {user?.email}
-                {user?.email && roleLabel ? " · " : ""}
-                {roleLabel}
-              </p>
+            {mounted && user?.email && (
+              <p className="hidden sm:block text-primary-10 text-xs font-semibold font-geist truncate">{user.email}</p>
             )}
           </div>
         </div>

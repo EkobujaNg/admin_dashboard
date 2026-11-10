@@ -46,7 +46,7 @@ const EditPropertyPage = () => {
         items={[
           { label: "Properties", href: "/properties" },
           { label: propertyDetail.name, href: `/properties/${propertyId}` },
-          { label: "Edit Property" },
+          { label: "Edit listing" },
         ]}
       />
 

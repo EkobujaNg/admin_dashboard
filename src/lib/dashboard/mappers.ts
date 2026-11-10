@@ -68,13 +68,13 @@ export function getActionNeededItems(actions: DashboardActionsNeeded): ActionNee
   const items: ActionNeededItem[] = [
     {
       key: "payoutRequests",
-      label: "payout request",
+      label: "withdrawal",
       count: actions.payoutRequests,
       href: "/withdrawals",
     },
     {
       key: "buybackRequests",
-      label: "buyback request",
+      label: "buyback",
       count: actions.buybackRequests,
       href: "/buyback",
     },
@@ -86,13 +86,13 @@ export function getActionNeededItems(actions: DashboardActionsNeeded): ActionNee
     },
     {
       key: "propertyTasksPending",
-      label: "pending property task",
+      label: "maintenance task",
       count: actions.propertyTasksPending,
       href: "/properties",
     },
     {
       key: "newPropertyTasks",
-      label: "new property task",
+      label: "new maintenance task",
       count: actions.newPropertyTasks,
       href: "/properties",
     },

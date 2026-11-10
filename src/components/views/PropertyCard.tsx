@@ -155,7 +155,7 @@ const PropertyCard = memo(({ property }: { property?: any }) => {
             : `Hide "${property.propertyName}" from user-facing listings? The property will not be deleted.`
         }
         cancelMsg="Cancel"
-        confirmMsg={isUpdatingPropertyVisibility ? "Updating..." : isHidden ? "Show Property" : "Hide Property"}
+        confirmMsg={isUpdatingPropertyVisibility ? "Updating..." : isHidden ? "Show to investors" : "Hide from investors"}
         confirmButtonColor="green"
       />
     </>

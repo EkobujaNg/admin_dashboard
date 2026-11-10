@@ -173,10 +173,10 @@ const FacilityAdminPage = () => {
       <div className="flex flex-wrap items-center justify-between w-full gap-4">
         <div>
           <h2 className="text-[28px] font-Raleway font-bold text-primary-10">
-            Facility <span className="text-primary-20">Administration</span>
+            Facility <span className="text-primary-20">managers</span>
           </h2>
           <p className="text-sm font-Raleway font-medium text-primary-10">
-            Manage all facility managers across the system
+            Add managers, assign properties, and approve the work they log.
           </p>
         </div>
         <button
@@ -216,12 +216,12 @@ const FacilityAdminPage = () => {
           footerText="On this page"
         />
         <StatsCard
-          title="Pending Approval Reports"
+          title="Tasks awaiting your approval"
           count={0}
           textColor="#1d3638"
           bodyBg="#EFF1F1"
           footerBg="#E1E7E7"
-          footerText="Starts from 06 Jan 2025"
+          footerText="Approved tasks change property valuations."
         />
       </div>
 
@@ -252,6 +252,7 @@ const FacilityAdminPage = () => {
         />
         {hasData && (
           <Pagination
+            label="facility managers"
             currentPage={facilityManagersMeta.pageNumber}
             totalPages={facilityManagersMeta.totalPages}
             onPageChange={setPage}

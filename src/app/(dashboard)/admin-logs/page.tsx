@@ -16,6 +16,8 @@ import { useDrawerModal } from "@/context/DrawerModalContext";
 import { emptyUser } from "../../../../public/assets/images";
 import useAdminLogsAPI from "@/services/useAdminLogsAPI";
 import { usePropertyAPI } from "@/services/usePropertyAPI";
+import useUserAPI from "@/services/useUsersAPI";
+import { describeAdminLog } from "@/lib/admin-logs/describe";
 import ViewAdminLogDrawer from "@/components/views/ViewAdminLogDrawer";
 import { exportFromTable } from "@/lib/export/table-export";
 import {
@@ -66,6 +68,22 @@ export default function AdminLogsPage() {
     () => new Map((properties?.pageItems || []).map((p) => [p.propertyId || p.id, p.name])),
     [properties]
   );
+  // Same idea for investors, so entries can say whose bill or buyback it was.
+  const { users } = useUserAPI({ enableUsers: true, enableStats: false, page: 1, limit: 100 });
+  const userNames = useMemo(
+    () =>
+      new Map(
+        users.map((u) => [u.userId || u.id, [u.firstName, u.lastName].filter(Boolean).join(" ") || u.email])
+      ),
+    [users]
+  );
+  const lookup = useMemo(
+    () => ({
+      propertyName: (id: string | null) => (id ? propertyNames.get(id) ?? null : null),
+      userName: (id: string | null) => (id ? userNames.get(id) ?? null : null),
+    }),
+    [propertyNames, userNames]
+  );
 
   const handleViewLog = useCallback(
     (log: AdminLog) => {
@@ -99,6 +117,7 @@ export default function AdminLogsPage() {
             >
               {(info.row.original.resourceType === "property" &&
                 propertyNames.get(info.row.original.resourceId || "")) ||
+                (info.row.original.resourceType === "user" && userNames.get(info.row.original.resourceId || "")) ||
                 info.row.original.resourceId ||
                 "—"}
             </span>
@@ -125,7 +144,7 @@ export default function AdminLogsPage() {
         header: "Description",
         cell: (info) => (
           <span className="font-Raleway text-primary-10 line-clamp-2 max-w-[260px]">
-            {info.row.original.description || info.row.original.remark || "—"}
+            {describeAdminLog(info.row.original, lookup)}
           </span>
         ),
       }),
@@ -151,7 +170,7 @@ export default function AdminLogsPage() {
         ),
       }),
     ],
-    [handleViewLog, propertyNames]
+    [handleViewLog, propertyNames, userNames, lookup]
   );
 
   const table = useReactTable({
@@ -169,10 +188,10 @@ export default function AdminLogsPage() {
       <div className="flex flex-wrap items-center justify-between w-full gap-4">
         <div>
           <h2 className="text-[28px] font-Raleway font-bold text-primary-10">
-            Admin <span className="text-primary-20">Logs</span>
+            Audit <span className="text-primary-20">log</span>
           </h2>
           <p className="text-sm font-Raleway font-medium text-primary-10">
-            Track admin activity across the platform
+            Every action taken by a staff account. Cannot be edited or deleted.
           </p>
         </div>
       </div>
@@ -255,6 +274,7 @@ export default function AdminLogsPage() {
 
         {hasData && (
           <Pagination
+            label="entries"
             currentPage={logsMeta.pageNumber}
             totalPages={logsMeta.totalPages}
             onPageChange={setPage}

@@ -81,19 +81,19 @@ const ProfitSharing = () => {
         cell: (info) => <span className="text-gray-600">{info.getValue()}</span>,
       }),
       columnHelper.accessor("profitSharingRate", {
-        header: "Rate",
+        header: "Distributions per year",
         cell: (info) => <span className="text-primary-10">{info.getValue()}× / year</span>,
       }),
       columnHelper.accessor("currentSection", {
-        header: "Current section",
+        header: "Last released",
         cell: (info) => <span className="text-gray-600">{info.getValue()}</span>,
       }),
       columnHelper.accessor("nextSectionToLoad", {
-        header: "Next to load",
+        header: "Next due",
         cell: (info) => <span className="text-gray-600">{info.getValue() ?? "—"}</span>,
       }),
       columnHelper.accessor("canLoadNextSection", {
-        header: "Can load",
+        header: "Ready to release",
         cell: (info) => yesNoBadge(Boolean(info.getValue())),
       }),
       columnHelper.display({

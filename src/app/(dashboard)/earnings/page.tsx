@@ -203,10 +203,10 @@ const EarningsPage = () => {
       <div className="flex flex-wrap items-center justify-between w-full gap-4">
         <div>
           <h2 className="text-[28px] font-Raleway font-bold text-primary-10">
-            Wallet <span className="text-primary-20">& Total Earnings</span>
+            Platform <span className="text-primary-20">earnings</span>
           </h2>
           <p className="text-sm font-Raleway font-medium text-primary-10">
-            Manage all earnings, revenue and cost of maintenance here.
+            Commission collected, and profit accrued on shares EkoBuja still holds.
           </p>
         </div>
       </div>
@@ -222,12 +222,12 @@ const EarningsPage = () => {
           footerText="App wallet balance"
         />
         <StatsCard
-          title="Profit Balance"
+          title="Profit on unsold shares"
           count={isLoadingBalance ? "..." : formatMoney(balance?.profitBalance, balance?.currency)}
           textColor="#1d3638"
           bodyBg="#EFF1F1"
           footerBg="#E1E7E7"
-          footerText="Unowned profit balance"
+          footerText="Rent earned on shares EkoBuja still holds."
         />
       </div>
 
@@ -238,7 +238,7 @@ const EarningsPage = () => {
           onClick={() => setActiveTab("commissions")}
         />
         <TabButton
-          label="Profit Balance Unowned History"
+          label="Profit on unsold shares: history"
           isActive={!isCommissionsTab}
           onClick={() => setActiveTab("unowned-history")}
         />
@@ -249,7 +249,7 @@ const EarningsPage = () => {
           title={
             isCommissionsTab
               ? `Commissions (${activeMeta.totalRecords})`
-              : `Profit Balance Unowned History (${activeMeta.totalRecords})`
+              : `Profit on unsold shares (${activeMeta.totalRecords})`
           }
           isLoading={isLoading}
           table={activeTable}

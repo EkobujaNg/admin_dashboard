@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { Pencil } from "lucide-react";
+import { useSelector } from "react-redux";
+import type { AuthUser } from "@/lib/auth/types";
 import { toast } from "sonner";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import CurrencyAmountInput from "@/components/ui/CurrencyAmountInput";
@@ -28,6 +30,7 @@ function SettingsRow({ label, value, hint }: { label: string; value: React.React
 }
 
 const PlatformSettingsPage = () => {
+  const currentUser = useSelector((state: { auth: { user: AuthUser | null } }) => state.auth.user);
   const { settings, isLoadingSettings, settingsError, saveSettings, isUpdatingSettings } =
     useAdminSettingsAPI({ enableSettings: true });
   const [isEditing, setIsEditing] = useState(false);
@@ -82,7 +85,7 @@ const PlatformSettingsPage = () => {
   if (isLoadingSettings) {
     return (
       <div className="flex flex-col gap-6 px-6 w-full">
-        <Breadcrumb items={[{ label: "Settings", href: "/settings" }, { label: "Platform Settings" }]} />
+        <Breadcrumb items={[{ label: "Settings", href: "/settings" }, { label: "Platform settings" }]} />
         <div className="flex flex-col gap-4">
           {Array.from({ length: 2 }).map((_, i) => (
             <div key={i} className="h-14 rounded-lg bg-opacityClr-10 animate-pulse" />
@@ -95,22 +98,27 @@ const PlatformSettingsPage = () => {
   if (settingsError && !settings) {
     return (
       <div className="flex flex-col gap-6 px-6 w-full">
-        <Breadcrumb items={[{ label: "Settings", href: "/settings" }, { label: "Platform Settings" }]} />
+        <Breadcrumb items={[{ label: "Settings", href: "/settings" }, { label: "Platform settings" }]} />
         <p className="text-sm text-red-600 font-Raleway">Failed to load settings. Please try again.</p>
       </div>
     );
   }
 
+  const isSuperAdmin = Boolean(currentUser?.roles?.includes("super_admin") || currentUser?.role === "super_admin");
+
   return (
     <div className="flex flex-col gap-6 px-6 w-full pb-10">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <Breadcrumb items={[{ label: "Settings", href: "/settings" }, { label: "Platform Settings" }]} />
+          <Breadcrumb items={[{ label: "Settings", href: "/settings" }, { label: "Platform settings" }]} />
           <p className="text-sm font-Raleway text-opacityClr-60 mt-2">
-            Manage referral rewards and commission limits for the platform.
+            Referral reward and commission cap. Changes apply to every new transaction immediately.
           </p>
         </div>
-        {!isEditing && (
+        {!isEditing && !isSuperAdmin && (
+          <p className="text-sm font-Raleway text-opacityClr-60">Only a Super Admin can change these settings.</p>
+        )}
+        {!isEditing && isSuperAdmin && (
           <button
             type="button"
             onClick={() => setIsEditing(true)}

@@ -171,10 +171,10 @@ const WithdrawalsPage = () => {
     <section className="flex flex-col gap-6">
       <div className="flex flex-col gap-1 items-start">
         <h2 className="text-primary-10 font-Raleway font-bold text-[28px]">
-          Withdrawal <span className="text-primary-20">Requests</span>
+          <span className="text-primary-20">Withdrawals</span>
         </h2>
         <p className="text-primary-10 font-Raleway text-sm">
-          Review and process wallet withdrawal requests
+          Approve or decline payouts to investors&apos; bank accounts. Investors see your decline reason.
         </p>
       </div>
 
@@ -238,6 +238,7 @@ const WithdrawalsPage = () => {
         />
         {hasData && (
           <Pagination
+            label="requests"
             currentPage={requestsMeta.pageNumber}
             totalPages={requestsMeta.totalPages}
             onPageChange={setPage}

@@ -93,7 +93,7 @@ const FacilityManagerDetailPage = () => {
       <div className="flex flex-col items-center justify-center gap-4 min-h-[50vh]">
         <p className="text-primary-10 font-Raleway text-lg">Facility manager not found</p>
         <Link href="/facility-admin" className="text-sm font-Raleway font-semibold text-primary-20 hover:underline">
-          Back to FM Manager
+          Back to facility managers
         </Link>
       </div>
     );
@@ -109,7 +109,7 @@ const FacilityManagerDetailPage = () => {
       <Breadcrumb
         items={[
           { label: "Dashboard", href: "/" },
-          { label: "FM Manager", href: "/facility-admin" },
+          { label: "Facility managers", href: "/facility-admin" },
           { label: fullName },
         ]}
       />
