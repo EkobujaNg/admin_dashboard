@@ -42,7 +42,7 @@ const CustomTooltip = ({
       </div>
       <div className="flex items-center gap-4 justify-between p-3 w-full">
         <div className="w-1 h-4 rounded bg-[#8CB326]" />
-        <p className="text-sm font-normal font-Raleway text-primary-10 leading-5">Income</p>
+        <p className="text-sm font-normal font-Raleway text-primary-10 leading-5">Commission</p>
         <p className="text-sm font-semibold font-Raleway text-primary-10 leading-5">
           {formatDashboardMoney(amount)}
         </p>
@@ -72,12 +72,12 @@ const InvestmentRevenueChart = memo(({ income, isLoading = false }: InvestmentRe
     <div className="w-full bg-[#EFF1F1] rounded-2xl p-6 flex flex-col gap-10">
       <div className="flex justify-between items-start gap-4 flex-wrap">
         <div className="flex items-center gap-3 flex-wrap">
-          <h2 className="text-base text-primary-10 font-Raleway font-bold leading-5">Income</h2>
+          <h2 className="text-base text-primary-10 font-Raleway font-bold leading-5">Revenue</h2>
           <span className="text-opacityClr-20 font-normal text-base">|</span>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#8CB326]" />
             <p className="text-xs text-primary-10 font-normal leading-4">
-              {selectedRange} total: <span className="font-bold">{formatDashboardMoney(total)}</span>
+              Commission earned. {selectedRange} total: <span className="font-bold">{formatDashboardMoney(total)}</span>
             </p>
           </div>
         </div>

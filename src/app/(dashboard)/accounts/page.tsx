@@ -41,11 +41,13 @@ function formatDate(value?: string | null) {
   });
 }
 
-function getKycLabel(user: AdminUserRecord) {
+/** Names the missing step so reviewers don't have to open the record to find out. */
+function getKycStatus(user: AdminUserRecord): { tone: "done" | "partial" | "none"; label: string } {
   const { nin, utilityBill } = user.kyc;
-  if (nin && utilityBill) return "Complete";
-  if (nin || utilityBill) return "Partial";
-  return "Pending";
+  if (nin && utilityBill) return { tone: "done", label: "Verified" };
+  if (nin) return { tone: "partial", label: "NIN done, bill outstanding" };
+  if (utilityBill) return { tone: "partial", label: "Bill done, NIN outstanding" };
+  return { tone: "none", label: "Not started" };
 }
 
 const AccountPage = () => {
@@ -119,11 +121,11 @@ const AccountPage = () => {
         id: "kyc",
         header: "KYC",
         cell: (info) => {
-          const label = getKycLabel(info.row.original);
+          const { tone, label } = getKycStatus(info.row.original);
           const styles =
-            label === "Complete"
+            tone === "done"
               ? "bg-[#CEDDB7] text-[#6D9F1B]"
-              : label === "Partial"
+              : tone === "partial"
                 ? "bg-[#E3DAC1] text-[#C39830]"
                 : "bg-[#DBC8C0] text-[#9F471B]";
 
@@ -229,28 +231,29 @@ const AccountPage = () => {
     <section className="flex flex-col gap-6">
       <div className="flex flex-col gap-1 items-start">
         <h2 className="text-primary-10 font-Raleway font-bold text-[28px]">
-          User <span className="text-primary-20">Management</span>
+          <span className="text-primary-20">Investors</span>
         </h2>
-        <p className="text-primary-10 font-Raleway text-sm">Create and manage user accounts on EkoBuja</p>
+        <p className="text-primary-10 font-Raleway text-sm">Review verification, status and activity.</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 w-full">
+        {/* The tile that needs action comes first. */}
         <StatsCard
-          title="All Users"
-          count={isLoadingSummary ? "..." : summaryStats?.allUsers ?? 0}
+          title="Pending Utility Bill"
+          count={isLoadingSummary ? "..." : summaryStats?.pendingUtilityBillReview ?? 0}
           textColor="#E8EBEB"
           FTextColor="#1d3638"
           bodyBg="#4E6E6E"
           footerBg="#E1E7E7"
-          footerText="Total registered users"
+          footerText="Awaiting utility bill review"
         />
         <StatsCard
-          title="Pending Utility Bill"
-          count={isLoadingSummary ? "..." : summaryStats?.pendingUtilityBillReview ?? 0}
+          title="All Users"
+          count={isLoadingSummary ? "..." : summaryStats?.allUsers ?? 0}
           textColor="#1d3638"
           bodyBg="#EFF1F1"
           footerBg="#E1E7E7"
-          footerText="Awaiting utility bill review"
+          footerText="Total registered users"
         />
         <StatsCard
           title="Blocked Users"
@@ -295,6 +298,7 @@ const AccountPage = () => {
         />
         {hasData && (
           <Pagination
+            label="investors"
             currentPage={usersMeta.pageNumber}
             totalPages={usersMeta.totalPages}
             onPageChange={setPage}

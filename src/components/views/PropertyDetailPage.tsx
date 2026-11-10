@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import MediaImage from "@/components/ui/MediaImage";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Eye, EyeOff, MapPin, ArrowUpRight, Pencil, Percent, Star } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Info, MapPin, ArrowUpRight, Pencil, Percent, Star } from "lucide-react";
 import TabButton from "@/components/ui/TabButton";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import ActionDropdown from "@/components/ui/ActionDropdown";
@@ -20,12 +20,21 @@ import { usePropertyAPI } from "@/services/usePropertyAPI";
 type DetailRowProps = {
   label: string;
   value: React.ReactNode;
+  /** Plain-language explanation shown on hover (and to screen readers). */
+  hint?: string;
 };
 
-function DetailRow({ label, value }: DetailRowProps) {
+function DetailRow({ label, value, hint }: DetailRowProps) {
   return (
     <div className="flex items-center justify-between gap-4">
-      <p className="text-base font-Raleway font-medium text-opacityClr-60">{label}</p>
+      <p className="text-base font-Raleway font-medium text-opacityClr-60 inline-flex items-center gap-1">
+        {label}
+        {hint && (
+          <span title={hint} aria-label={hint} className="cursor-help text-opacityClr-50">
+            <Info size={14} />
+          </span>
+        )}
+      </p>
       <p className="text-base font-Raleway font-semibold text-primary-10 text-right">{value}</p>
     </div>
   );
@@ -93,16 +102,16 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
   const headerActions = useMemo(
     () => [
       {
-        label: "Edit Property",
+        label: "Edit listing",
         icon: Pencil,
         onClick: () => router.push(`/properties/${property.propertyId}/edit`),
       },
       {
-        label: "Update Commission",
+        label: "Change commission",
         icon: Percent,
         onClick: () =>
           openModal(
-            "Update Commission",
+            "Change commission",
             <UpdatePropertyCommissionDrawer
               propertyId={property.propertyId}
               currentCommission={property.commission}
@@ -110,13 +119,13 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
           ),
       },
       {
-        label: isFeatured ? "Featured" : "Feature Property",
+        label: isFeatured ? "Featured on homepage" : "Feature on homepage",
         icon: Star,
         disabled: isFeatured || isAddingFeaturedProperty,
         onClick: () => setIsFeatureConfirmOpen(true),
       },
       {
-        label: isHidden ? "Show Property" : "Hide Property",
+        label: isHidden ? "Show to investors" : "Hide from investors",
         icon: isHidden ? Eye : EyeOff,
         variant: isHidden ? ("success" as const) : ("warning" as const),
         disabled: isUpdatingPropertyVisibility,
@@ -215,12 +224,12 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
         <div className="flex flex-col justify-center gap-6 w-full md:w-1/2">
           <div className="grid grid-cols-2 gap-6">
             <div className="flex flex-col gap-2">
-              <p className="text-sm font-Raleway font-medium text-white/70">Share Price</p>
+              <p className="text-sm font-Raleway font-medium text-white/70">Share price</p>
               <p className="text-2xl font-Raleway font-bold text-white">{formatNaira(property.shareValue)}</p>
             </div>
 
             <div className="flex flex-col gap-2">
-              <p className="text-sm font-Raleway font-medium text-white/70">Cap Rate</p>
+              <p className="text-sm font-Raleway font-medium text-white/70">Cap rate</p>
               <div className="flex items-center gap-2">
                 <p className="text-2xl font-Raleway font-bold text-white">{capRateDisplay}</p>
                 <ArrowUpRight className="text-white w-5 h-5" />
@@ -228,14 +237,14 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
             </div>
 
             <div className="flex flex-col gap-2">
-              <p className="text-sm font-Raleway font-medium text-white/70">EkoBuja Value</p>
+              <p className="text-sm font-Raleway font-medium text-white/70">Listed value</p>
               <p className="text-2xl font-Raleway font-bold text-white">
                 {valuation ? formatNaira(valuation.ekobujaValue) : "—"}
               </p>
             </div>
 
             <div className="flex flex-col gap-2">
-              <p className="text-sm font-Raleway font-medium text-white/70">Shares Sold</p>
+              <p className="text-sm font-Raleway font-medium text-white/70">Shares sold</p>
               <p className="text-2xl font-Raleway font-bold text-white">
                 {property.sharesSold.toLocaleString()} / {property.numberOfShares.toLocaleString()}
               </p>
@@ -243,7 +252,7 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
           </div>
 
           <div className="flex flex-col gap-2">
-            <p className="text-sm font-Raleway font-medium text-white/70">Presale Progress</p>
+            <p className="text-sm font-Raleway font-medium text-white/70">Raise progress ({progress})</p>
             <div className="w-full bg-white/20 rounded-full h-3 overflow-hidden">
               <div className="h-full bg-neutral-lightGreen transition-all duration-700" style={{ width: progress }} />
             </div>
@@ -357,26 +366,63 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
                   <DetailRow label="Total Expenses" value={formatNaira(valuation.totalExpenses)} />
                   <DetailRow label="Net Operating Income" value={formatNaira(valuation.noi)} />
                   <DetailRow label="Cap Rate" value={capRateDisplay} />
-                  <DetailRow label="Estimated Value" value={formatNaira(valuation.estimatedValue)} />
-                  <DetailRow label="Computed Value" value={formatNaira(valuation.computedValue)} />
-                  <DetailRow label="Ekobuja Value" value={formatNaira(valuation.ekobujaValue)} />
+                  <DetailRow label="Model value (from the valuation inputs)" value={formatNaira(valuation.estimatedValue)} />
                   <DetailRow
-                    label="Admin Adjustment"
-                    value={`${valuation.adminAjustWith === "minus" ? "-" : "+"}${formatNaira(valuation.adminAdjustment)}`}
+                    label="Admin adjustment"
+                    value={(() => {
+                      // Stored as a percentage of the model value; show the naira change too.
+                      const sign = valuation.adminAjustWith === "minus" ? "-" : "+";
+                      const percent = Number(valuation.adminAdjustment || 0);
+                      const delta = (Number(valuation.estimatedValue || 0) * percent) / 100;
+                      return `${sign}${percent}% (${sign}${formatNaira(delta)})`;
+                    })()}
                   />
+                  {/* Only shown when it differs from the listed value, so the usual case shows three numbers. */}
+                  {Math.round(Number(valuation.computedValue || 0)) !== Math.round(Number(valuation.ekobujaValue || 0)) && (
+                    <DetailRow label="Computed value" value={formatNaira(valuation.computedValue)} />
+                  )}
+                  <DetailRow label="Listed value (what investors pay against)" value={formatNaira(valuation.ekobujaValue)} />
                 </SectionCard>
 
                 <SectionCard title="Assumptions">
-                  <DetailRow label="Vacancy Rate" value={valuation.vacancyRateName || "—"} />
-                  <DetailRow label="Property Tier" value={`Tier ${valuation.propertyTier}`} />
+                  <p className="text-sm font-Raleway text-opacityClr-60 -mt-2">
+                    Value = net operating income ÷ cap rate. A higher cap rate means a lower value and share price.
+                  </p>
                   <DetailRow
+                    label="Vacancy Rate"
+                    value={valuation.vacancyRateName || "—"}
+                    hint="Share of rent assumed lost to empty units. Effective income = gross rent × (1 − vacancy). Prime 5%, middle market 10%, low income 15%."
+                  />
+                  <DetailRow
+                    label="Property Tier"
+                    value={`Tier ${valuation.propertyTier}`}
+                    hint="Sets the base cap rate together with the classification. Tier 1 (prime) has the lowest cap rate, Tier 5 (high risk) the highest."
+                  />
+                  <DetailRow
+                    hint="Chooses which base cap-rate table the tier uses: premium residential is lowest, standard in the middle, low-income / edge highest."
                     label="Classification"
                     value={valuation.propertyClassification.charAt(0).toUpperCase() + valuation.propertyClassification.slice(1)}
                   />
-                  <DetailRow label="Title" value={valuation.titleAdjustmentName || "—"} />
-                  <DetailRow label="Security Risk" value={valuation.securityRiskAdjustmentName || "—"} />
-                  <DetailRow label="Infrastructure" value={valuation.infrastructureAdjustmentName || "—"} />
-                  <DetailRow label="Development" value={valuation.developmentAdjustmentName || "—"} />
+                  <DetailRow
+                    label="Title"
+                    value={valuation.titleAdjustmentName || "—"}
+                    hint="Title risk, added to the cap rate: C of O / Supreme Court 0%, Governor's Consent +1%, Registered Deed +2%, Omo-Onile +4%."
+                  />
+                  <DetailRow
+                    label="Security Risk"
+                    value={valuation.securityRiskAdjustmentName || "—"}
+                    hint="Area security, added to the cap rate: gated & secure 0%, fair +1%, high risk +3%."
+                  />
+                  <DetailRow
+                    label="Infrastructure"
+                    value={valuation.infrastructureAdjustmentName || "—"}
+                    hint="Roads, power and water around the property, added to the cap rate: good 0%, moderate +1%, poor +2%."
+                  />
+                  <DetailRow
+                    label="Development"
+                    value={valuation.developmentAdjustmentName || "—"}
+                    hint="Direction the area is heading: growing −1% (raises value), stable 0%, declining +1% (lowers value)."
+                  />
                 </SectionCard>
 
                 <SectionCard title="Operating Expenses">
@@ -435,16 +481,18 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
         onConfirm={handleVisibilityConfirm}
         message={
           isHidden
-            ? `Show "${property.name}" on user-facing listings again?`
-            : `Hide "${property.name}" from user-facing listings? The property will not be deleted.`
+            ? `Show "${property.name}" to investors again?`
+            : property.sharesSold > 0
+              ? `Investors hold ${property.sharesSold.toLocaleString()} shares in "${property.name}". Hiding it removes it from their browse view. Continue?`
+              : `No investors hold shares in "${property.name}" yet. Hiding it removes it from the browse view. Continue?`
         }
         cancelMsg="Cancel"
         confirmMsg={
           isUpdatingPropertyVisibility
             ? "Updating..."
             : isHidden
-              ? "Show Property"
-              : "Hide Property"
+              ? "Show to investors"
+              : "Hide from investors"
         }
         confirmButtonColor="green"
       />
@@ -455,7 +503,7 @@ const PropertyDetailPage = ({ property }: { property: PropertyRecord }) => {
         onConfirm={handleFeatureConfirm}
         message={`Add "${property.name}" to the featured list? If the list is full, the oldest featured property will be removed.`}
         cancelMsg="Cancel"
-        confirmMsg={isAddingFeaturedProperty ? "Featuring..." : "Feature Property"}
+        confirmMsg={isAddingFeaturedProperty ? "Featuring..." : "Feature on homepage"}
         confirmButtonColor="green"
       />
     </div>

@@ -53,7 +53,7 @@ const Pagination = ({
     <div className="flex flex-wrap items-center justify-between gap-4 py-4 px-6 border-t border-gray-200 w-full">
       <div className="flex flex-wrap items-center gap-4">
         <p className="text-sm text-gray-700 font-semibold">
-          Showing <span className="text-primary-10 font-bold">{rangeStart}</span> -{" "}
+          Showing <span className="text-primary-10 font-bold">{rangeStart}</span>–
           <span className="text-primary-10 font-bold">{rangeEnd}</span> of {total} {label}
         </p>
 

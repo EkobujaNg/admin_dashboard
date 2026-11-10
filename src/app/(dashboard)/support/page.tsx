@@ -287,7 +287,7 @@ const SupportSettingsPage = () => {
     <section className="flex w-full flex-col gap-5 pt-4 md:pt-0">
       <div>
         <h1 className="font-Raleway text-2xl font-bold text-primary-10">Help & Support</h1>
-        <p className="mt-1 font-Raleway text-sm text-opacityClr-80">Manage website contact requests and customer support tickets.</p>
+        <p className="mt-1 font-Raleway text-sm text-opacityClr-80">Contact form messages, investor tickets, and account deletion requests.</p>
       </div>
 
       <div className="flex w-full items-center justify-center gap-2 rounded-[100px] bg-[#ECECEC]">

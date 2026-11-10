@@ -77,7 +77,14 @@ const BuybackPage = () => {
     [openModal, closeModal]
   );
 
-  const pendingCount = requests.filter((request) => String(request.status).toLowerCase() === "pending").length;
+  // Count pending requests across all pages, not just the rows currently shown.
+  const { requestsMeta: pendingMeta, isLoadingRequests: isLoadingPending } = useBuybackAPI({
+    enableList: true,
+    page: 1,
+    limit: 1,
+    status: "pending",
+  });
+  const pendingCount = pendingMeta.totalRecords;
 
   const columns = useMemo(
     () => [
@@ -86,19 +93,28 @@ const BuybackPage = () => {
         cell: (info) => <span className="font-medium text-primary-10">{info.getValue() || "—"}</span>,
       }),
       columnHelper.accessor("units", {
-        header: "Units",
+        header: "Shares",
         cell: (info) => <span className="text-primary-10">{info.getValue() ?? 0}</span>,
       }),
       columnHelper.accessor("shareValue", {
-        header: "Share Value",
+        header: "Current share value",
         cell: (info) => <span className="text-primary-10">{formatMoney(info.getValue())}</span>,
       }),
       columnHelper.accessor("buybackRatePerUnit", {
-        header: "Buyback Rate",
-        cell: (info) => <span className="text-primary-10">{formatMoney(info.getValue())}</span>,
+        header: "Buyback price",
+        cell: (info) => {
+          const { shareValue } = info.row.original;
+          const percent = shareValue > 0 ? Math.round((info.getValue() / shareValue) * 100) : null;
+          return (
+            <span className="text-primary-10">
+              {formatMoney(info.getValue())}
+              {percent !== null && <span className="text-opacityClr-60"> ({percent}%)</span>}
+            </span>
+          );
+        },
       }),
       columnHelper.accessor("totalAmount", {
-        header: "Total Amount",
+        header: "Payout",
         cell: (info) => (
           <span className="font-semibold text-primary-10">{formatMoney(info.getValue())}</span>
         ),
@@ -154,10 +170,10 @@ const BuybackPage = () => {
     <section className="flex flex-col gap-6">
       <div className="flex flex-col gap-1 items-start">
         <h2 className="text-primary-10 font-Raleway font-bold text-[28px]">
-          EkoBuja <span className="text-primary-20">Buyback</span>
+          Buyback <span className="text-primary-20">requests</span>
         </h2>
         <p className="text-primary-10 font-Raleway text-sm">
-          Review users who sold shares back to EkoBuja
+          Investors asking EkoBuja to buy their shares back at the published rate.
         </p>
       </div>
 
@@ -171,8 +187,8 @@ const BuybackPage = () => {
           footerText="Filtered buyback requests"
         />
         <StatsCard
-          title="Pending on Page"
-          count={isLoadingRequests ? "..." : pendingCount}
+          title="Pending (all pages)"
+          count={isLoadingPending ? "..." : pendingCount}
           textColor="#1d3638"
           bodyBg="#EFF1F1"
           footerBg="#E1E7E7"
@@ -204,6 +220,7 @@ const BuybackPage = () => {
         />
         {hasData && (
           <Pagination
+            label="requests"
             currentPage={requestsMeta.pageNumber}
             totalPages={requestsMeta.totalPages}
             onPageChange={setPage}

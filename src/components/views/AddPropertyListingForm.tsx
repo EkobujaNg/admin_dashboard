@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import StepProgress from "@/components/ui/StepProgress";
+import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import PropertyValuationCalculator from "@/components/views/PropertyValuationCalculator";
 import { createProperty, getPropertyErrorMessage, updateProperty } from "@/lib/property/api";
 import { mapPropertyToDetailsState, mapPropertyToValuationState } from "@/lib/property/form";
@@ -115,14 +116,27 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
     setIsInitialized(true);
   }, [isEditMode, property]);
 
+  const [pendingPropertyType, setPendingPropertyType] = useState<string | null>(null);
+
+  const applyPropertyTypeChange = (value: string) => {
+    setValuationState(createInitialValuationState());
+    setValuationResult(null);
+    setHasCalculated(false);
+    setPreviousPropertyType(details.propertyType);
+    setDetails((prev) => ({ ...prev, propertyType: value as PropertyDetailsState["propertyType"] }));
+  };
+
   const handleDetailsChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
 
     if (name === "propertyType" && value !== details.propertyType) {
-      setValuationState(createInitialValuationState());
-      setValuationResult(null);
-      setHasCalculated(false);
-      setPreviousPropertyType(details.propertyType);
+      // Changing type wipes the Valuation step, so ask first when there's something to lose.
+      if (details.propertyType && hasCalculated) {
+        setPendingPropertyType(value);
+        return;
+      }
+      applyPropertyTypeChange(value);
+      return;
     }
 
     setDetails((prev) => ({ ...prev, [name]: value }));
@@ -359,11 +373,6 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
               </select>
             </Field>
 
-            {previousPropertyType && previousPropertyType !== details.propertyType && (
-              <div className="rounded-xl border border-opacityClr-20 bg-opacityClr-10 px-4 py-3 text-sm font-Raleway text-opacityClr-80">
-                Property type changed — valuation data has been reset.
-              </div>
-            )}
 
             <Field label="Property Name" required>
               <input
@@ -414,7 +423,7 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
 
             <div className="flex flex-col gap-3 w-full">
               <div className="flex items-center justify-between gap-3">
-                <label className={labelClassName}>About property *</label>
+                <label className={labelClassName}>About this property *</label>
                 <button
                   type="button"
                   onClick={handleAddAboutProperty}
@@ -424,7 +433,8 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
                 </button>
               </div>
               <p className="text-sm font-Raleway text-opacityClr-70 -mt-1">
-                Short bullet points shown on the property details page.
+                Three to four short facts investors will see on the listing. Each should be something a surveyor could
+                confirm — floors, tenants, parking, power.
               </p>
               {details.aboutProperty.map((item, index) => (
                 <div key={`about-${index}`} className="flex items-start gap-2 w-full">
@@ -778,6 +788,19 @@ export default function AddPropertyListingForm({ mode = "create", property }: Pr
           )}
         </div>
       </form>
+
+      <ConfirmationModal
+        isOpen={pendingPropertyType !== null}
+        onClose={() => setPendingPropertyType(null)}
+        onConfirm={() => {
+          if (pendingPropertyType !== null) applyPropertyTypeChange(pendingPropertyType);
+          setPendingPropertyType(null);
+        }}
+        message="Changing the property type clears everything on the Valuation step. Continue?"
+        cancelMsg="Cancel"
+        confirmMsg="Change type"
+        confirmButtonColor="red"
+      />
     </div>
   );
 }

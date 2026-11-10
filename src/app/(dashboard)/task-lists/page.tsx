@@ -183,6 +183,7 @@ const TaskLists = () => {
           }}
         />
         <Pagination
+            label="tasks"
           currentPage={taskTable.getState().pagination.pageIndex + 1}
           totalPages={Math.max(taskTable.getPageCount(), 1)}
           onPageChange={(page: number) => taskTable.setPageIndex(page - 1)}

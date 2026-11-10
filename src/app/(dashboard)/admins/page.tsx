@@ -80,10 +80,18 @@ export default function AdminsManagementPage() {
     enableList: true,
   });
 
-  const blockedCount = useMemo(
-    () => admins.filter((admin) => admin.isBlocked).length,
-    [admins]
-  );
+  // The admins API has no status filter, so the tiles load every admin in one request
+  // (staff lists are small) and count across all of them, not just the visible page.
+  const ADMIN_COUNT_LIMIT = 100;
+  const { admins: allAdmins, adminsMeta: allAdminsMeta, isLoadingAdmins: isLoadingAllAdmins } = useAdminsAPI({
+    page: 1,
+    limit: ADMIN_COUNT_LIMIT,
+    enableList: true,
+  });
+  const blockedCount = useMemo(() => allAdmins.filter((admin) => admin.isBlocked).length, [allAdmins]);
+  const activeCount = Math.max(allAdmins.length - blockedCount, 0);
+  // If the API capped the request below the real total, say so rather than show a wrong count.
+  const countsArePartial = allAdminsMeta.totalRecords > allAdmins.length;
 
   const columns = useMemo(
     () => [
@@ -197,10 +205,10 @@ export default function AdminsManagementPage() {
       <div className="flex flex-wrap items-center justify-between w-full gap-4">
         <div>
           <h2 className="text-[28px] font-Raleway font-bold text-primary-10">
-            Admins <span className="text-primary-20">Management</span>
+            <span className="text-primary-20">Team</span>
           </h2>
           <p className="text-sm font-Raleway font-medium text-primary-10">
-            Create and manage admin accounts and roles
+            Create staff accounts and set what each person can do.
           </p>
         </div>
         <button
@@ -225,20 +233,20 @@ export default function AdminsManagementPage() {
           footerText="All registered admin accounts"
         />
         <StatsCard
-          title="Active (this page)"
-          count={isLoadingAdmins ? "..." : Math.max(admins.length - blockedCount, 0)}
+          title="Active"
+          count={isLoadingAllAdmins ? "..." : activeCount}
           textColor="#1d3638"
           bodyBg="#EFF1F1"
           footerBg="#E1E7E7"
-          footerText="Visible on current page"
+          footerText={countsArePartial ? `First ${allAdmins.length} admins only` : "All admin accounts"}
         />
         <StatsCard
-          title="Blocked (this page)"
-          count={isLoadingAdmins ? "..." : blockedCount}
+          title="Blocked"
+          count={isLoadingAllAdmins ? "..." : blockedCount}
           textColor="#1d3638"
           bodyBg="#EFF1F1"
           footerBg="#E1E7E7"
-          footerText="Visible on current page"
+          footerText={countsArePartial ? `First ${allAdmins.length} admins only` : "All admin accounts"}
         />
       </div>
 
@@ -267,6 +275,7 @@ export default function AdminsManagementPage() {
         />
         {hasData && (
           <Pagination
+            label="team members"
             currentPage={adminsMeta.pageNumber}
             totalPages={adminsMeta.totalPages}
             onPageChange={setPage}

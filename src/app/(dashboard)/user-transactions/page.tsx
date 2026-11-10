@@ -156,16 +156,16 @@ const UserTransactionsPage = () => {
     <section className="flex flex-col gap-6 pb-5">
       <div className="flex flex-col gap-1 items-start">
         <h2 className="text-[28px] font-Raleway font-bold text-primary-10">
-          User <span className="text-primary-20">Transactions</span>
+          Investor <span className="text-primary-20">transactions</span>
         </h2>
         <p className="text-sm font-Raleway font-medium text-primary-10">
-          View all user wallet funding and withdrawal activity.
+          Every deposit, withdrawal and share purchase across the platform.
         </p>
       </div>
 
       <div className="flex flex-col items-start justify-center rounded-2xl border border-opacityClr-30 bg-white">
         <TableHeader
-          title={`User Transactions (${isLoadingWalletTransactions ? "..." : walletMeta.totalRecords})`}
+          title={`Investor transactions (${isLoadingWalletTransactions ? "..." : walletMeta.totalRecords})`}
           isLoading={isLoadingWalletTransactions}
           table={table}
           showSearch={false}
@@ -184,6 +184,7 @@ const UserTransactionsPage = () => {
         />
         {walletTransactions.length > 0 && (
           <Pagination
+            label="transactions"
             currentPage={walletMeta.pageNumber}
             totalPages={walletMeta.totalPages}
             onPageChange={setPage}
